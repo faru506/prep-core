@@ -1,0 +1,14 @@
+development:
+  clients:
+    default:
+      uri: mongodb://localhost:27017/backend_development
+
+test:
+  clients:
+    default:
+      uri: mongodb://localhost:27017/backend_test
+
+production:
+  clients:
+    default:
+      uri: mongodb://localhost:27017/backend_production

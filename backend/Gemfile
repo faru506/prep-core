@@ -1,0 +1,46 @@
+source 'https://rubygems.org'
+
+ruby '3.4.1'
+
+# Core
+gem 'rails', '~> 8.1'
+gem 'bootsnap', require: false
+gem 'rack-cors'
+gem 'puma', '~> 6.4'
+
+# MongoDB ODM
+gem 'mongoid', '~> 9.0'
+
+# Authentication
+gem 'devise'
+gem 'devise-jwt'
+gem 'jwt'
+gem 'bcrypt', '~> 3.1'
+
+# Authorization
+gem 'pundit'
+
+# Serialization
+gem 'jsonapi-serializer'
+
+# HTTP client (Judge0 later)
+gem 'faraday'
+
+
+gem 'ostruct'
+
+group :development, :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'faker'
+  gem 'dotenv-rails'
+  gem 'pry-rails'
+end
+
+group :development do
+  gem 'listen'
+end
+
+group :test do
+  gem 'shoulda-matchers'
+end
