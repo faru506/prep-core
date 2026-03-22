@@ -1,7 +1,11 @@
 development:
   clients:
     default:
-      uri: mongodb://localhost:27017/backend_development
+      database: interview_prep_development
+      hosts:
+        - mongodb:27017   ✅
+      options:
+        server_selection_timeout: 5
 
 test:
   clients:

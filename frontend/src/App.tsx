@@ -1,39 +1,59 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
 
-import Layout from "./components/layout/Layout";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-import InterviewPage from "./pages/interview/InterviewPage";
-import InterviewTopicPage from "./pages/interview/InterviewTopicPage";
+function Home() {
+  return (
+    <div style={{ padding: "40px" }}>
+      <h1>Interview Prep Platform 🚀</h1>
+    </div>
+  );
+}
+
+function Dashboard() {
+  return <h2>Dashboard 🔐</h2>;
+}
 
 function App() {
   return (
     <BrowserRouter>
 
-      <Layout>
+      <Navbar />
 
-        <Routes>
+      <Routes>
 
-          {/* Home Route */}
-          <Route
-            path="/"
-            element={<InterviewPage />}
-          />
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-          {/* Interview Topics */}
-          <Route
-            path="/interview"
-            element={<InterviewPage />}
-          />
+        <Route
+          path="/signup"
+          element={<Signup />}
+        />
 
-          {/* Topic Questions */}
-          <Route
-            path="/interview/:topicSlug"
-            element={<InterviewTopicPage />}
-          />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        </Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      </Layout>
+      </Routes>
 
     </BrowserRouter>
   );
