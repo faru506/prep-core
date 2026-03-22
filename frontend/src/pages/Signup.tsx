@@ -1,4 +1,5 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 
 interface SignupForm {
   email: string;
@@ -46,7 +47,7 @@ function Signup() {
       alert("Signup successful 🎉");
       window.location.href = "/login";
     } else {
-      alert(data.errors?.join(", "));
+      alert(data.errors?.join(", ") || "Signup failed");
     }
   };
 

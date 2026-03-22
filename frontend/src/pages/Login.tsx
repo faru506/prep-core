@@ -1,4 +1,5 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 
 interface LoginForm {
   email: string;
@@ -52,7 +53,7 @@ function Login() {
       window.location.href = "/";
 
     } else {
-      alert("Invalid credentials");
+      alert(data.errors?.join(", ") || "Invalid credentials");
     }
   };
 
