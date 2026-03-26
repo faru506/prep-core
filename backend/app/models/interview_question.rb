@@ -8,9 +8,9 @@ class InterviewQuestion
   # Fields
   field :question,      type: String
   field :answer,        type: String    # Markdown — full explanation
-  field :level,         type: String,   default: 'intermediate'
+  field :level,         type: String,   default: "intermediate"
   field :tags,          type: Array,    default: []
-  field :target_roles,  type: Array,    default: ['sde1', 'sde2']
+  field :target_roles,  type: Array,    default: [ "sde1", "sde2" ]
   field :is_published,  type: Boolean,  default: false
   field :is_premium,    type: Boolean,  default: false
   field :order,         type: Integer,  default: 0
@@ -40,7 +40,7 @@ class InterviewQuestion
   scope :free,         -> { where(is_premium: false) }
   scope :premium_only, -> { where(is_premium: true) }
   scope :by_level,     ->(l) { where(level: l) }
-  scope :for_role,     ->(r) { where(:target_roles.in => [r]) }
+  scope :for_role,     ->(r) { where(:target_roles.in => [ r ]) }
   scope :ordered,      -> { order(order: :asc) }
 
   # Increment view count without triggering other callbacks

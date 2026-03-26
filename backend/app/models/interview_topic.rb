@@ -23,7 +23,7 @@ class InterviewTopic
   validates :name,  presence: true, uniqueness: true
   validates :slug,  presence: true, uniqueness: true
   validates :color, format: { with: /\A#[0-9a-fA-F]{6}\z/,
-                               message: 'must be a valid hex color e.g. #CC342D' },
+                               message: "must be a valid hex color e.g. #CC342D" },
                     allow_blank: true
 
   # Callbacks
@@ -42,8 +42,8 @@ class InterviewTopic
 
   def generate_slug
     self.slug = name.downcase
-                    .gsub(/[^a-z0-9\s-]/, '')
+                    .gsub(/[^a-z0-9\s-]/, "")
                     .strip
-                    .gsub(/\s+/, '-')
+                    .gsub(/\s+/, "-")
   end
 end

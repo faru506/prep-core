@@ -1,6 +1,5 @@
 class Api::V1::ChallengesController < ApplicationController
-
-  before_action :get_challenge only: [:show, :update, :destroy]
+  before_action :get_challenge, only: %i[show update destroy]
 
   def index
     @challenges = Challenge.all
@@ -12,7 +11,7 @@ class Api::V1::ChallengesController < ApplicationController
     if challenge.save
       render json: { message: "Challenge created successfully...", data: challenge }, status: :created
     else
-      render json: { message: "Failed...", data: challenge.errors.full_messages}, status: :unprocessable_entity
+      render json: { message: "Failed...", data: challenge.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -47,8 +46,7 @@ class Api::V1::ChallengesController < ApplicationController
 
     unless @challenge.present?
       render json: { message: "Challenge not found..." }, status: :not_found
-      return
+      nil
     end
   end
-
 end

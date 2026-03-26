@@ -16,7 +16,7 @@ class Bookmark
 
   def no_duplicate_bookmark
     if Bookmark.where(user: user, problem: problem).where(:id.ne => id).exists?
-      errors.add(:base, 'Already bookmarked')
+      errors.add(:base, "Already bookmarked")
     end
   end
 end

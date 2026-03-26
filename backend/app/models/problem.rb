@@ -9,7 +9,7 @@ class Problem
   field :difficulty,        type: String    # easy | medium | hard
   field :category,          type: String    # arrays, dp, graphs, trees, etc.
   field :tags,              type: Array,    default: []
-  field :target_roles,      type: Array,    default: ['sde1', 'sde2']
+  field :target_roles,      type: Array,    default: [ "sde1", "sde2" ]
   field :constraints,       type: String
   field :examples,          type: Array,    default: []  # [{input, output, explanation}]
   field :hints,             type: Array,    default: []  # premium only
@@ -27,11 +27,11 @@ class Problem
 
   # Starter code templates per language
   field :starter_code, type: Hash, default: {
-    'ruby'       => "def solution(input)\n  # your code here\nend",
-    'python'     => "def solution(input):\n    # your code here\n    pass",
-    'javascript' => "function solution(input) {\n  // your code here\n}",
-    'java'       => "class Solution {\n  public int[] solution(int[] input) {\n    // your code here\n    return new int[]{};\n  }\n}",
-    'cpp'        => "#include <vector>\nusing namespace std;\nclass Solution {\npublic:\n    vector<int> solution(vector<int>& input) {\n        // your code here\n        return {};\n    }\n};"
+    "ruby"       => "def solution(input)\n  # your code here\nend",
+    "python"     => "def solution(input):\n    # your code here\n    pass",
+    "javascript" => "function solution(input) {\n  // your code here\n}",
+    "java"       => "class Solution {\n  public int[] solution(int[] input) {\n    // your code here\n    return new int[]{};\n  }\n}",
+    "cpp"        => "#include <vector>\nusing namespace std;\nclass Solution {\npublic:\n    vector<int> solution(vector<int>& input) {\n        // your code here\n        return {};\n    }\n};"
   }
 
   # Associations
@@ -52,7 +52,7 @@ class Problem
   validates :title,      presence: true, uniqueness: true
   validates :slug,       presence: true, uniqueness: true,
                          format: { with: /\A[a-z0-9-]+\z/,
-                                   message: 'only lowercase letters, numbers, hyphens' }
+                                   message: "only lowercase letters, numbers, hyphens" }
   validates :difficulty, inclusion: { in: %w[easy medium hard] }
   validates :category,   presence: true
 
@@ -62,7 +62,7 @@ class Problem
 
   # Scopes
   scope :published,     -> { where(is_published: true) }
-  scope :for_role,      ->(role) { where(:target_roles.in => [role]) }
+  scope :for_role,      ->(role) { where(:target_roles.in => [ role ]) }
   scope :by_category,   ->(cat)  { where(category: cat) }
   scope :by_difficulty, ->(diff) { where(difficulty: diff) }
   scope :frequent,      -> { order(frequency: :desc) }
@@ -75,9 +75,9 @@ class Problem
 
   def generate_slug
     self.slug = title.downcase
-                     .gsub(/[^a-z0-9\s-]/, '')
+                     .gsub(/[^a-z0-9\s-]/, "")
                      .strip
-                     .gsub(/\s+/, '-')
+                     .gsub(/\s+/, "-")
   end
 
   def recalculate_acceptance_rate

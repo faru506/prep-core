@@ -2,7 +2,6 @@
 # rails runner scripts/import_questions.rb PATH_TO_RB_FILES
 
 Dir.glob(ARGV[0] || 'questions/**/*.rb').each do |file|
-
   topic_slug = File.basename(file, '.rb').split('_').first
 
   topic = InterviewTopic.find_by(slug: topic_slug)
@@ -22,7 +21,7 @@ Dir.glob(ARGV[0] || 'questions/**/*.rb').each do |file|
       iq.answer        = q[:answer]
       iq.level         = q[:level] || 'intermediate'
       iq.tags          = q[:tags] || []
-      iq.target_roles  = q[:target_roles] || ['sde1', 'sde2']
+      iq.target_roles  = q[:target_roles] || [ 'sde1', 'sde2' ]
       iq.is_premium    = q[:premium] || false
       iq.is_published  = true
       iq.order         = i
@@ -31,5 +30,4 @@ Dir.glob(ARGV[0] || 'questions/**/*.rb').each do |file|
   end
 
   puts "Imported #{questions.size} questions for #{topic.name}"
-
 end

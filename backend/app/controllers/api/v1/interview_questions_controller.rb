@@ -21,9 +21,9 @@ module Api
         unless current_user&.premium?
           if question.is_premium?
             return render json: {
-              error: 'Premium required',
+              error: "Premium required",
               question: question.question,
-              upgrade_url: '/upgrade'
+              upgrade_url: "/upgrade"
             }, status: :payment_required
           end
         end
@@ -31,7 +31,7 @@ module Api
         question.inc(view_count: 1)
         render json: InterviewQuestionSerializer.new(question).serializable_hash
       rescue Mongoid::Errors::DocumentNotFound
-        render json: { error: 'Question not found' }, status: :not_found
+        render json: { error: "Question not found" }, status: :not_found
       end
 
       private
@@ -39,7 +39,7 @@ module Api
       def set_topic
         @topic = InterviewTopic.find_by!(slug: params[:interview_topic_slug])
       rescue Mongoid::Errors::DocumentNotFound
-        render json: { error: 'Topic not found' }, status: :not_found
+        render json: { error: "Topic not found" }, status: :not_found
       end
     end
   end

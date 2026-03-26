@@ -17,7 +17,7 @@ class Submission
   # Fields
   field :language,      type: String
   field :code,          type: String
-  field :status,        type: String,  default: 'pending'
+  field :status,        type: String,  default: "pending"
   field :runtime,       type: Integer  # milliseconds
   field :memory,        type: Integer  # KB
   field :error_message, type: String
@@ -44,16 +44,16 @@ class Submission
   after_save   :update_stats, if: :status_previously_changed?
 
   # Scopes
-  scope :accepted, -> { where(status: 'accepted') }
+  scope :accepted, -> { where(status: "accepted") }
   scope :recent,   -> { order(created_at: :desc) }
   scope :for_user, ->(user) { where(user: user) }
 
   def accepted?
-    status == 'accepted'
+    status == "accepted"
   end
 
   def pending?
-    status == 'pending'
+    status == "pending"
   end
 
   private

@@ -6,7 +6,7 @@ topics = [
   { name: 'Docker', icon: '🐳', color: '#2496ED', description: 'Docker and containerization' },
   { name: 'JavaScript', icon: '🟨', color: '#F7DF1E', description: 'Core JavaScript concepts' },
   { name: 'System Design', icon: '🏗️', color: '#8B5CF6', description: 'Architecture and design' },
-  { name: 'DSA', icon: '🧮', color: '#F59E0B', description: 'Data structures and algorithms' },
+  { name: 'DSA', icon: '🧮', color: '#F59E0B', description: 'Data structures and algorithms' }
 ]
 
 topics.each_with_index do |t, i|

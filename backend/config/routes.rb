@@ -1,14 +1,12 @@
 Rails.application.routes.draw do
-
   # ── Devise JWT Auth ──────────────────────
   devise_for :users, controllers: {
-    sessions: 'users/sessions',
-    registrations: 'users/registrations'
+    sessions: "users/sessions",
+    registrations: "users/registrations"
   }
 
   namespace :api do
     namespace :v1 do
-
       # post 'auth/refresh', to: 'tokens#refresh'
       # resource :profile, only: [:show, :update]
 
@@ -23,8 +21,6 @@ Rails.application.routes.draw do
       # end
 
       resources :challenges
-
     end
   end
-
 end
