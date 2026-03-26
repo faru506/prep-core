@@ -32,6 +32,8 @@ Rails.application.routes.draw do
         resources :interview_questions, shallow: true
       end
 
+      resources :challenges
+
     end
   end
 
