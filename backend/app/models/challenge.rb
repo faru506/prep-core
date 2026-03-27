@@ -8,6 +8,9 @@ class Challenge
   field :start_date,   type: Date
   field :end_date,     type: Date
 
+  # Associations
+  belongs_to :user
+
   # Indexes (useful if you query by dates)
   index({ start_date: 1 })
   index({ end_date: 1 })

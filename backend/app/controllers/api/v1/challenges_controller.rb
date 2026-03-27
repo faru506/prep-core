@@ -1,4 +1,6 @@
 class Api::V1::ChallengesController < ApplicationController
+  before_action :authenticate_user!, only: %i[create update destroy]
+  before_action :authorize_admin!, only: %i[create update destroy]
   before_action :get_challenge, only: %i[show update destroy]
 
   def index
@@ -7,7 +9,7 @@ class Api::V1::ChallengesController < ApplicationController
   end
 
   def create
-    challenge = Challenge.new(challenge_params)
+    challenge = current_user.challenges.new(challenge_params)
     if challenge.save
       render json: { message: "Challenge created successfully...", data: challenge }, status: :created
     else
@@ -45,8 +47,12 @@ class Api::V1::ChallengesController < ApplicationController
     @challenge = Challenge.find_by(id: params[:id])
 
     unless @challenge.present?
-      render json: { message: "Challenge not found..." }, status: :not_found
+    render json: { message: "Challenge not found..." }, status: :not_found
       nil
-    end
+  end
+
+  def authorize_admin!
+    return if current_user.email == ENV['ADMIN_EMAIL']
+    render json: { message: "Unauthorized Access" }, status: :forbidden
   end
 end

@@ -38,6 +38,7 @@ class User
   # ── Associations ─────────────────────────
   # has_many :submissions, dependent: :destroy
   # has_many :bookmarks,   dependent: :destroy
+  has_many :challenges,  dependent: :destroy
 
   # ── Indexes ──────────────────────────────
   # index({ email: 1 },    unique: true)
@@ -72,4 +73,9 @@ class User
   #   role == 'premium' ||
   #     (premium_until.present? && premium_until > Time.current)
   # end
+
+  def self.primary_key
+    :_id
+  end
+
 end
