@@ -1,10 +1,12 @@
+import Navar from './components/Navbar.jsx'
+import Footer from './components/Footer.jsx'
+
 function App() {
 
   return (
    <>
-    <h1 class="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <Navar />
+    <Footer />
    </>
   )
 }
