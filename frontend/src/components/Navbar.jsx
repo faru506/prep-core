@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import MenuIcon from "../assets/menu.svg?react";
+import CloseIcon from "../assets/close.svg?react";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const navLinkClass = ({ isActive }) =>
     `relative px-1 py-2 transition ${
@@ -17,23 +18,33 @@ const Navbar = () => {
 
       <div className="flex items-center justify-between">
 
-        <div className="flex items-center gap-10">
+        <div className="w-9 hidden md:block"></div>
 
-          <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg"></span>
-          </div>
+        <div className="hidden md:flex items-center gap-10 font-medium">
 
-          <div className="hidden md:flex items-center gap-8 font-medium">
+          <NavLink to="/" className={navLinkClass}>
+            {({ isActive }) => (
+              <span className="relative">
+                Challenges
 
-            <NavLink to="/" className={navLinkClass}>
-              Challenges
-            </NavLink>
+                {isActive && (
+                  <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
+                )}
+              </span>
+            )}
+          </NavLink>
 
-            <NavLink to="/topics" className={navLinkClass}>
-              Topics
-            </NavLink>
+          <NavLink to="/topics" className={navLinkClass}>
+            {({ isActive }) => (
+              <span className="relative">
+                Topics
 
-          </div>
+                {isActive && (
+                  <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
+                )}
+              </span>
+            )}
+          </NavLink>
 
         </div>
 
@@ -42,21 +53,25 @@ const Navbar = () => {
           <div className="relative">
 
             <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="w-9 h-9 rounded-full overflow-hidden border border-slate-700"
+              className="text-slate-300 hover:text-white transition"
+              onClick={() => setMenuOpen(!menuOpen)}
             >
-              <img
-                src="https://i.pravatar.cc/100"
-                alt="profile"
-                className="w-full h-full object-cover"
-              />
+              {menuOpen ? (
+                <CloseIcon className="w-6 h-6" />
+              ) : (
+                <MenuIcon className="w-6 h-6" />
+              )}
             </button>
 
-            {profileOpen && (
+            {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-lg shadow-lg py-2">
 
                 <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700">
-                  Settings
+                  Option 1
+                </button>
+
+                <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700">
+                  Option 2
                 </button>
 
                 <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700">
@@ -68,42 +83,9 @@ const Navbar = () => {
 
           </div>
 
-          <button
-            className="md:hidden text-slate-300"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-
         </div>
 
       </div>
-
-      {menuOpen && (
-        <div className="md:hidden mt-4 flex flex-col gap-3 font-medium">
-
-          <NavLink to="/" className={navLinkClass}>
-            Dashboard
-          </NavLink>
-
-          <NavLink to="/team" className={navLinkClass}>
-            Teams
-          </NavLink>
-
-        </div>
-      )}
 
     </nav>
   );

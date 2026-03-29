@@ -1,13 +1,19 @@
-import Navar from './components/Navbar.jsx'
+import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 
 function App() {
 
   return (
-   <>
-    <Navar />
-    <Footer />
-   </>
+   <div className="min-h-screen flex flex-col bg-slate-950">
+
+      <Navbar />
+
+      <main className="flex-grow">
+      </main>
+
+      <Footer />
+
+    </div>
   )
 }
 
