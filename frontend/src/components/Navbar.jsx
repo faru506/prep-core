@@ -6,6 +6,12 @@ import CloseIcon from "../assets/close.svg?react";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const navItems = [
+    { name: "Home", path: "/" },
+    { name: "Challenges", path: "/challenges" },
+    { name: "Topics", path: "/topics" }
+  ];
+
   const navLinkClass = ({ isActive }) =>
     `relative px-1 py-2 transition ${
       isActive
@@ -15,36 +21,29 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-slate-900 border border-slate-800 px-6 py-3">
-
+      
       <div className="flex items-center justify-between">
-
-        <div className="w-9 hidden md:block"></div>
 
         <div className="hidden md:flex items-center gap-10 font-medium">
 
-          <NavLink to="/" className={navLinkClass}>
-            {({ isActive }) => (
-              <span className="relative">
-                Challenges
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={navLinkClass}
+            >
+              {({ isActive }) => (
+                <span className="relative">
+                  {item.name}
 
-                {isActive && (
-                  <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
-                )}
-              </span>
-            )}
-          </NavLink>
+                  {isActive && (
+                    <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
+                  )}
 
-          <NavLink to="/topics" className={navLinkClass}>
-            {({ isActive }) => (
-              <span className="relative">
-                Topics
-
-                {isActive && (
-                  <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
-                )}
-              </span>
-            )}
-          </NavLink>
+                </span>
+              )}
+            </NavLink>
+          ))}
 
         </div>
 
