@@ -8,8 +8,9 @@ const Navbar = () => {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Challenges", path: "/challenges" },
-    { name: "Topics", path: "/topics" }
+    { name: "Programs", path: "/programs" },
+    // { name: "Contests", path: "/contests" }, In further phases, we are going to introduce Contests too.
+    { name: "Interview Q&A", path: "/interview_qa" }
   ];
 
   const navLinkClass = ({ isActive }) =>

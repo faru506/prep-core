@@ -1,4 +1,5 @@
 import Navbar from './components/Navbar.jsx'
+import MainContent from "./components/MainContent";
 import Footer from './components/Footer.jsx'
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
       <Navbar />
 
       <main className="flex-grow">
+        <MainContent />
       </main>
 
       <Footer />
