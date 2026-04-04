@@ -5,7 +5,7 @@ import GithubIcon from "../assets/github.svg?react";
 
 const Footer = () => {
   return (
-    <footer className="w-full mt-10 bg-slate-900 border border-slate-800 px-6 py-6">
+    <footer className="w-full mt-0 bg-slate-900 border border-slate-800 px-6 py-6">
 
       <div className="flex flex-col items-center gap-4">
 

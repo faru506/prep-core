@@ -1,6 +1,6 @@
 import Navbar from './components/Navbar.jsx'
-import MainContent from "./components/MainContent";
 import Footer from './components/Footer.jsx'
+import Body from './components/Body.jsx'
 
 function App() {
 
@@ -8,11 +8,9 @@ function App() {
    <div className="min-h-screen flex flex-col bg-slate-950">
 
       <Navbar />
-
-      <main className="flex-grow">
-        <MainContent />
+      <main className="flex-1 overflow-hidden">
+        <Body />
       </main>
-
       <Footer />
 
     </div>
