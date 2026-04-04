@@ -6,7 +6,7 @@ import Programs from "../pages/Programs";
 
 const MainContent = () => {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="py-3">
 
       <Routes>
 
