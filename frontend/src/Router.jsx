@@ -1,16 +1,26 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Authentication from "./pages/Authentication";
 import App from "./App";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
+import { getToken } from "./utilities/storage";
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Authentication />
+    element: (
+      <PublicRoute>
+        <Authentication />
+      </PublicRoute>
+    )
   },
   {
     path: "/register",
-    element: <Authentication />
+    element: (
+      <PublicRoute>
+        <Authentication />
+      </PublicRoute>
+    )
   },
   {
     path: "/",
@@ -22,7 +32,9 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <Authentication />
+    element: getToken()
+      ? <Navigate to="/" replace />
+      : <Navigate to="/login" replace />
   }
 ]);
 

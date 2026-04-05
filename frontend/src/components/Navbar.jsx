@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Scrollbar from "./Scrollbar";
 import MenuIcon from "../assets/menu.svg?react";
 import CloseIcon from "../assets/close.svg?react";
+import { getToken, removeToken } from "../utilities/storage";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -21,10 +23,18 @@ const Navbar = () => {
         : "text-slate-300 hover:text-white"
     }`;
 
+  const removeUser = () => {
+    const token = getToken();
+    if (token) {
+      removeToken();
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <>
       <nav className="w-full bg-slate-900 border border-slate-800 px-6 py-3">
-        
+
         <div className="flex items-center justify-between">
 
           <div className="hidden md:flex items-center gap-10 font-medium">
@@ -68,15 +78,8 @@ const Navbar = () => {
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-lg shadow-lg py-2">
 
-                  <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700">
-                    Option 1
-                  </button>
-
-                  <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700">
-                    Option 2
-                  </button>
-
-                  <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700">
+                  <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700"
+                          onClick={removeUser}>
                     Logout
                   </button>
 
