@@ -1,20 +1,19 @@
-import Navbar from './components/Navbar.jsx'
-import Footer from './components/Footer.jsx'
-import Body from './components/Body.jsx'
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import { Outlet } from "react-router-dom";
 
 function App() {
-
   return (
-   <div className="min-h-screen flex flex-col bg-slate-950">
+    <div className="min-h-screen flex flex-col bg-slate-950">
 
       <Navbar />
       <main className="flex-1 overflow-hidden">
-        <Body />
+        <Outlet />
       </main>
       <Footer />
 
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
