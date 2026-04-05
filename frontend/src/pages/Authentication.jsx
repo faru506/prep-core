@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loginApi, registerApi } from "../apis/authentication";
 import { saveToken } from "../utilities/storage";
 
@@ -17,15 +17,68 @@ const Authentication = () => {
     password: ""
   });
 
+  const [errors, setErrors] = useState({
+    email: "",
+    password: ""
+  });
+
+  useEffect(() => {
+
+    setErrors({
+      email: "",
+      password: ""
+    });
+
+    setForm({
+      email: "",
+      password: ""
+    });
+
+  }, [mode]);
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    setErrors({
+      ...errors,
+      [name]: ""
+    });
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+
+    if (!emailRegex.test(form.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (mode === "register") {
+      if (!passwordRegex.test(form.password)) {
+        newErrors.password = "Password must be 8+ chars, include uppercase, lowercase, number & symbol";
+      }
+    } else {
+      if (form.password.length < 1) {
+        newErrors.password = "Password is required";
+      }
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
 
     try {
       let response;
@@ -38,12 +91,13 @@ const Authentication = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Auth Error:", errorData);
+        console.error(errorData);
         alert("Authentication failed");
         return;
       }
 
-      const token = response.headers?.get("Authorization");
+      const token =
+        response.headers?.get("Authorization");
 
       if (token) {
         saveToken(token);
@@ -52,85 +106,124 @@ const Authentication = () => {
       navigate("/");
 
     } catch (error) {
-      console.error("Auth error:", error);
+      console.error(error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white px-4">
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-slate-900 p-8 rounded-lg w-96 space-y-4"
-      >
+      <h1 className="text-3xl font-bold mb-10">
+        {mode === "login"
+          ? "Login to your account"
+          : "Create your account"}
+      </h1>
 
-        <h2 className="text-2xl font-bold text-center">
+      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-xl p-8">
 
-          {mode === "login"
-            ? "Login"
-            : "Register"}
-
-        </h2>
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-slate-800"
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-slate-800"
-          required
-        />
-
-        <button
-          type="submit"
-          className={`w-full p-2 rounded ${
-            mode === "login"
-              ? "bg-blue-600"
-              : "bg-green-600"
-          }`}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
         >
 
-          {mode === "login"
-            ? "Login"
-            : "Register"}
+          <div>
+            <label className="block text-sm mb-2 text-slate-300">
+              Email address
+            </label>
 
-        </button>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg 
+                bg-slate-800 border 
+                ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-slate-700"
+                }
+                focus:outline-none focus:border-indigo-500`}
+            />
 
-        <p className="text-center text-sm">
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.email}
+              </p>
+            )}
 
-          {mode === "login"
-            ? "Don't have an account?"
-            : "Already have an account?"}
+          </div>
 
-          <Link
-            to={
-              mode === "login"
-                ? "/register"
-                : "/login"
-            }
-            className="text-blue-400 ml-2"
+          <div>
+            <label className="block text-sm mb-2 text-slate-300">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg 
+                bg-slate-800 border 
+                ${
+                  errors.password
+                    ? "border-red-500"
+                    : "border-slate-700"
+                }
+                focus:outline-none focus:border-indigo-500`}
+            />
+
+            {errors.password && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.password}
+              </p>
+            )}
+
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg 
+                       bg-gradient-to-r 
+                       from-indigo-500 
+                       to-purple-500
+                       hover:opacity-90
+                       font-semibold transition"
           >
 
             {mode === "login"
-              ? "Register"
-              : "Login"}
+              ? "Login"
+              : "Register"}
 
-          </Link>
+          </button>
 
-        </p>
+          <p className="text-center text-sm text-slate-400">
 
-      </form>
+            {mode === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+
+            <Link
+              to={
+                mode === "login"
+                  ? "/register"
+                  : "/login"
+              }
+              className="ml-2 text-indigo-400 hover:text-indigo-300"
+            >
+
+              {mode === "login"
+                ? "Register"
+                : "Login"}
+
+            </Link>
+
+          </p>
+
+        </form>
+
+      </div>
 
     </div>
   );
