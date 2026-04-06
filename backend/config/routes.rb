@@ -1,13 +1,17 @@
 Rails.application.routes.draw do
-  # ── Devise JWT Auth ──────────────────────
-  devise_for :users, controllers: {
-    sessions: "users/sessions",
-    registrations: "users/registrations"
-  }
+
+  devise_for :users,
+    path: "api/v1/users",
+    controllers: {
+      sessions: "api/v1/users/sessions",
+      registrations: "api/v1/users/registrations"
+    }
 
   namespace :api do
     namespace :v1 do
-      resources :challenges
+      namespace :admin do
+        resources :users, only: [:index]
+      end
     end
   end
 end

@@ -4,6 +4,8 @@ class User
 
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
+  before_save :downcase_email
+
   devise :database_authenticatable,
          :registerable,
          :recoverable,
@@ -14,7 +16,10 @@ class User
 
   # ── Fields ─────────────────────────
 
+  field :first_name,         type: String, default: ""
+  field :last_name,          type: String, default: ""
   field :email,              type: String, default: ""
+  field :role,               type: String, default: "user"
   field :encrypted_password, type: String, default: ""
 
   field :jti, type: String, default: -> { SecureRandom.uuid }
@@ -23,8 +28,17 @@ class User
   field :reset_password_sent_at, type: Time
   field :remember_created_at,    type: Time
 
-  # ── Custom Validations ───────────────────
+  # ── Constants ───────────────────
 
+  ROLES = %w[user admin]
+
+  # ── Validations ───────────────────
+
+  validates :first_name, :last_name, presence: true
+
+  validates :role, inclusion: { in: ROLES }
+
+  # Strong password validation
   validates :password,
             format: {
               with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}\z/,
@@ -32,10 +46,25 @@ class User
             },
             if: :password_required?
 
-  # ── Associations ─────────────────────────
+  # ── Helpers ───────────────────
+
+  def admin?
+    role == "admin"
+  end
+
+  def user?
+    role == "user"
+  end
+
+  # ── Mongoid Primary Key ───────────────────
 
   def self.primary_key
     :_id
+  end
+
+  # ── Callback Methods ───────────────────
+  def downcase_email
+    self.email = email.downcase
   end
 
 end

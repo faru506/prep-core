@@ -6,12 +6,22 @@ class ApplicationController < ActionController::API
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(
       :sign_up,
-      keys: [ :username, :name ]
+      keys: [:first_name, :last_name]
     )
 
     devise_parameter_sanitizer.permit(
       :account_update,
-      keys: [ :username, :name ]
+      keys: [:first_name, :last_name]
     )
   end
+
+  def authorize_admin!
+    unless current_user&.admin?
+      render json: {
+        error: "Forbidden: Admin access only"
+      },
+      status: :forbidden
+    end
+  end
+
 end
