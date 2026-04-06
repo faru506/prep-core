@@ -19,27 +19,27 @@ logs:
 
 # View logs for Rails only
 logs-backend:
-	docker compose -f $(COMPOSE_FILE) logs -f rails_backend
+	docker compose -f $(COMPOSE_FILE) logs -f backend
 
 # View logs for React only
 logs-frontend:
-	docker compose -f $(COMPOSE_FILE) logs -f react_frontend
+	docker compose -f $(COMPOSE_FILE) logs -f frontend
 
 # Open Rails console
 rails:
-	docker compose -f $(COMPOSE_FILE) exec rails_backend rails console
+	docker compose -f $(COMPOSE_FILE) exec backend rails console
 
 # Run Rails migrations
 migrate:
-	docker compose -f $(COMPOSE_FILE) exec rails_backend rails db:migrate
+	docker compose -f $(COMPOSE_FILE) exec backend rails db:migrate
 
 # Seed database
 seed:
-	docker compose -f $(COMPOSE_FILE) exec rails_backend rails db:seed
+	docker compose -f $(COMPOSE_FILE) exec backend rails db:seed
 
 # Open bash inside Rails container
 bash:
-	docker compose -f $(COMPOSE_FILE) exec rails_backend bash
+	docker compose -f $(COMPOSE_FILE) exec backend bash
 
 # Rebuild containers
 build:
