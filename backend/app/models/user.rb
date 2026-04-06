@@ -2,10 +2,8 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  # Required for JTI strategy
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
-  # ── Devise + JWT ─────────────────────────
   devise :database_authenticatable,
          :registerable,
          :recoverable,
@@ -14,7 +12,8 @@ class User
          :jwt_authenticatable,
          jwt_revocation_strategy: self
 
-  # ── Devise Fields ────────────────────────
+  # ── Fields ─────────────────────────
+
   field :email,              type: String, default: ""
   field :encrypted_password, type: String, default: ""
 
@@ -24,8 +23,16 @@ class User
   field :reset_password_sent_at, type: Time
   field :remember_created_at,    type: Time
 
+  # ── Custom Validations ───────────────────
+
+  validates :password,
+            format: {
+              with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}\z/,
+              message: "must be at least 8 characters and include uppercase, lowercase, number and symbol"
+            },
+            if: :password_required?
+
   # ── Associations ─────────────────────────
-  has_many :challenges,  dependent: :destroy
 
   def self.primary_key
     :_id
