@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import MenuIcon from "../assets/menu.svg?react";
-import CloseIcon from "../assets/close.svg?react";
-import { getToken, removeToken } from "../utilities/storage";
+import { getToken, removeToken, getRole } from "../utilities/storage";
 
 const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [role, setRole] = useState(getRole());
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setRole(getRole());
+  }, []);
 
   const navItems = [
     { name: "Home", path: "/" },
     { name: "Interview Q&A", path: "/interview_qa" },
     { name: "Programs", path: "/programs" },
     { name: "Contests", path: "/contests" },
+
+    ...(role === "admin"
+      ? [{ name: "Users", path: "/users" }]
+      : [])
   ];
 
   const navLinkClass = ({ isActive }) =>
@@ -22,7 +30,7 @@ const Navbar = () => {
         : "text-slate-300 hover:text-white"
     }`;
 
-  const removeUser = () => {
+  const logoutUser = () => {
     if (getToken()) {
       removeToken();
       navigate("/login", { replace: true });
@@ -34,7 +42,7 @@ const Navbar = () => {
 
       <div className="flex items-center justify-between">
 
-        <div className="hidden md:flex items-center gap-10 font-medium">
+        <div className="flex items-center gap-10 font-medium">
 
           {navItems.map((item) => (
             <NavLink
@@ -60,23 +68,46 @@ const Navbar = () => {
         <div className="relative">
 
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-slate-300 hover:text-white"
+            onClick={() => setProfileOpen(!profileOpen)}
+            className="flex items-center gap-3"
           >
-            {menuOpen
-              ? <CloseIcon className="w-6 h-6" />
-              : <MenuIcon className="w-6 h-6" />}
+
+            <img
+              src="https://i.pravatar.cc/40"
+              alt="Profile"
+              className="w-9 h-9 rounded-full border border-slate-700"
+            />
+
           </button>
 
-          {menuOpen && (
+          {profileOpen && (
 
-            <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-lg shadow-lg py-2">
+            <div className="absolute right-0 mt-3 w-56
+                            bg-slate-800 border border-slate-700
+                            rounded-xl shadow-lg py-2">
 
               <button
-                onClick={removeUser}
-                className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700"
+                className="w-full text-left px-5 py-3
+                           text-slate-300 hover:bg-slate-700"
               >
-                Logout
+                Your profile
+              </button>
+
+              <button
+                className="w-full text-left px-5 py-3
+                           text-slate-300 hover:bg-slate-700"
+              >
+                Settings
+              </button>
+
+              <div className="border-t border-slate-700 my-1"></div>
+
+              <button
+                onClick={logoutUser}
+                className="w-full text-left px-5 py-3
+                           text-red-400 hover:bg-slate-700"
+              >
+                Sign out
               </button>
 
             </div>

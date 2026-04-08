@@ -110,11 +110,10 @@ const Authentication = () => {
         return;
       }
 
-      const token =
-        response.headers?.get("Authorization");
+      const token = response.headers?.get("Authorization");
 
       if (token) {
-        saveToken(token);
+        saveToken(token.replace("Bearer ", ""));
       }
 
       navigate("/");

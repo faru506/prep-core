@@ -56,6 +56,13 @@ class User
     role == "user"
   end
 
+  def jwt_payload
+    super.merge(
+      email: email,
+      role: role
+    )
+  end
+
   # ── Mongoid Primary Key ───────────────────
 
   def self.primary_key
