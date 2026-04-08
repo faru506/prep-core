@@ -13,11 +13,15 @@ const Authentication = () => {
       : "login";
 
   const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
     password: ""
   });
 
   const [errors, setErrors] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
     password: ""
   });
@@ -25,11 +29,15 @@ const Authentication = () => {
   useEffect(() => {
 
     setErrors({
+      first_name: "",
+      last_name: "",
       email: "",
       password: ""
     });
 
     setForm({
+      first_name: "",
+      last_name: "",
       email: "",
       password: ""
     });
@@ -63,6 +71,12 @@ const Authentication = () => {
     if (mode === "register") {
       if (!passwordRegex.test(form.password)) {
         newErrors.password = "Password must be 8+ chars, include uppercase, lowercase, number & symbol";
+      }
+      if (form.first_name.length < 1) {
+        newErrors.first_name = "First Name must be present";
+      }
+      if (form.last_name.length < 1) {
+        newErrors.last_name = "Last Name must be present";
       }
     } else {
       if (form.password.length < 1) {
@@ -125,6 +139,69 @@ const Authentication = () => {
           onSubmit={handleSubmit}
           className="space-y-6"
         >
+          {mode == "register" &&
+            <div className="flex flex-row gap-4">
+
+              <div>
+                <label className="block text-sm mb-2 text-slate-300">
+                  First Name
+                </label>
+
+                <input
+                  type="text"
+                  name="first_name"
+                  value={form.first_name}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-lg 
+                    bg-slate-800 border 
+                    ${
+                      errors.first_name
+                        ? "border-red-500"
+                        : "border-slate-700"
+                    }
+                    focus:outline-none focus:border-indigo-500`}
+                />
+
+                {errors.first_name && (
+                  <p className="text-red-400 text-sm mt-1">
+                    {errors.first_name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm mb-2 text-slate-300">
+                  Last Name
+                </label>
+
+                <input
+                  type="text"
+                  name="last_name"
+                  value={form.last_name}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-lg 
+                    bg-slate-800 border 
+                    ${
+                      errors.last_name
+                        ? "border-red-500"
+                        : "border-slate-700"
+                    }
+                    focus:outline-none focus:border-indigo-500`}
+                />
+
+                {errors.last_name && (
+                  <p className="text-red-400 text-sm mt-1">
+                    {errors.last_name}
+                  </p>
+                )}
+              </div>
+
+
+
+              
+
+            </div>
+          }
 
           <div>
             <label className="block text-sm mb-2 text-slate-300">
