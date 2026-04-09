@@ -12,6 +12,15 @@ Rails.application.routes.draw do
       namespace :admin do
         resources :users, only: [:index]
       end
+
+      resources :courses, only: [:index] do
+        resources :topics, only: [:index]
+      end
+
+      resources :topics, only: [] do
+        resources :questions, only: [:index]
+      end
+
     end
   end
 end
