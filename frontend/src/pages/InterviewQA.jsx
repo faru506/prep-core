@@ -19,7 +19,7 @@ const InterviewQA = () => {
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-  const questionsRef = useRef(null);
+  const questionRefs = useRef({});
 
   // Load courses initially
   useEffect(() => {
@@ -56,7 +56,9 @@ const InterviewQA = () => {
 
     if (questions.length > 0) {
 
-      questionsRef.current?.scrollIntoView({
+      const firstQuestion = questionRefs.current[questions[0].id];
+
+      firstQuestion?.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
@@ -64,6 +66,62 @@ const InterviewQA = () => {
     }
 
   }, [questions]);
+
+  useEffect(() => {
+
+    const observer = new IntersectionObserver(
+
+      (entries) => {
+
+        entries.forEach(entry => {
+
+          if (entry.isIntersecting) {
+
+            const visibleId =
+              entry.target.getAttribute("data-id");
+
+            const topic =
+              topics.find(
+                t => t.id === visibleId
+              );
+
+            if (topic) {
+              setSelectedTopic(topic);
+            }
+
+          }
+
+        });
+
+      },
+
+      {
+        root: null,
+        rootMargin: "-100px 0px -60% 0px",
+        threshold: 0.1
+      }
+
+    );
+
+    Object.values(questionRefs.current)
+      .forEach(el => {
+
+        if (el) observer.observe(el);
+
+      });
+
+    return () => {
+
+      Object.values(questionRefs.current)
+        .forEach(el => {
+
+          if (el) observer.unobserve(el);
+
+        });
+
+    };
+
+  }, [questions, topics]);
 
   const loadCourses = async () => {
 
@@ -273,7 +331,7 @@ const InterviewQA = () => {
 
         </div>
 
-        <div ref={questionsRef} className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6">
 
           {loadingQuestions ? (
 
@@ -293,6 +351,8 @@ const InterviewQA = () => {
 
               <div
                 key={q.id}
+                data-id={q.topic_id}
+                ref={(el) => (questionRefs.current[q.id] = el)}
                 className="mb-10 border-b border-slate-800 pb-6"
               >
 
