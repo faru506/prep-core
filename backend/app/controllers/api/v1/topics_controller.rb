@@ -9,7 +9,8 @@ class Api::V1::TopicsController < ApplicationController
     render json: topics.map { |topic|
       {
         id: topic.id.to_s,
-        title: topic.title
+        title: topic.title,
+        slug: topic.slug
       }
     }
 

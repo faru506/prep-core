@@ -54,6 +54,16 @@ const router = createBrowserRouter([
 
       {
         path: "interview_qa",
+        element: (
+          <Navigate
+            to="/interview_qa/ruby"
+            replace
+          />
+        )
+      },
+
+      {
+        path: "interview_qa/:courseSlug/:topicSlug?",
         element: <InterviewQA />
       },
 

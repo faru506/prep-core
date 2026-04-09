@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchCoursesApi } from "../apis/courses";
 import { fetchTopicsApi } from "../apis/topics";
 import { fetchQuestionsApi } from "../apis/questions";
 
 const InterviewQA = () => {
+
+  const { courseSlug, topicSlug } = useParams();
+  const navigate = useNavigate();
 
   const [courses, setCourses] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -15,9 +19,36 @@ const InterviewQA = () => {
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
+  // Load courses initially
   useEffect(() => {
     loadCourses();
   }, []);
+
+  // Reload topics when courseSlug changes
+  useEffect(() => {
+
+    if (courseSlug) {
+      loadTopics(courseSlug);
+    }
+
+  }, [courseSlug]);
+
+  // Reload questions when topicSlug changes
+  useEffect(() => {
+
+    if (topicSlug && topics.length > 0) {
+
+      const topic =
+        topics.find(t => t.slug === topicSlug);
+
+      if (topic) {
+        setSelectedTopic(topic);
+        loadQuestions(topic.id);
+      }
+
+    }
+
+  }, [topicSlug, topics]);
 
   const loadCourses = async () => {
 
@@ -30,11 +61,14 @@ const InterviewQA = () => {
 
       if (data.length > 0) {
 
-        const firstCourse = data[0];
+        const selected = data.find(c => c.slug === courseSlug) || data[0];
 
-        setSelectedCourse(firstCourse);
+        setSelectedCourse(selected);
 
-        loadTopics(firstCourse.slug);
+        navigate(
+          `/interview_qa/${selected.slug}`,
+          { replace: true }
+        );
 
       }
 
@@ -46,15 +80,15 @@ const InterviewQA = () => {
 
   };
 
-  const loadTopics = async (courseSlug) => {
+  const loadTopics = async (slug) => {
 
-    if (!courseSlug) return;
+    if (!slug) return;
 
     try {
 
       setLoadingTopics(true);
 
-      const response = await fetchTopicsApi(courseSlug);
+      const response = await fetchTopicsApi(slug);
 
       const data = await response.json();
 
@@ -70,15 +104,16 @@ const InterviewQA = () => {
 
       if (data.length > 0) {
 
-        const firstTopic = data[0];
+        const selected = data.find(t => t.slug === topicSlug) || data[0];
 
-        setSelectedTopic(firstTopic);
+        setSelectedTopic(selected);
 
-        loadQuestions(firstTopic.id);
+        navigate(
+          `/interview_qa/${slug}/${selected.slug}`,
+          { replace: true }
+        );
 
-      } else {
-
-        setQuestions([]);
+        loadQuestions(selected.id);
 
       }
 
@@ -135,9 +170,7 @@ const InterviewQA = () => {
 
         <div
           className="flex gap-4 overflow-x-auto
-          [&::-webkit-scrollbar]:hidden
-          [-ms-overflow-style:none]
-          [scrollbar-width:none]"
+          [&::-webkit-scrollbar]:hidden"
         >
 
           {courses.map(course => (
@@ -147,7 +180,10 @@ const InterviewQA = () => {
               onClick={() => {
 
                 setSelectedCourse(course);
-                loadTopics(course.slug);
+
+                navigate(
+                  `/interview_qa/${course.slug}`
+                );
 
               }}
               className={`px-4 py-2 rounded-lg transition
@@ -190,18 +226,20 @@ const InterviewQA = () => {
               topics.map(topic => (
 
                 <button
-                  key={`topic-${topic.id}`}
+                  key={topic.slug}
                   onClick={() => {
 
                     setSelectedTopic(topic);
-                    loadQuestions(topic.id);
+
+                    navigate(
+                      `/interview_qa/${selectedCourse.slug}/${topic.slug}`
+                    );
 
                   }}
                   className={`text-left px-4 py-2 rounded-lg
-                    transition
-                    hover:bg-slate-800
+                    transition hover:bg-slate-800
                     ${
-                      selectedTopic?.id === topic.id
+                      selectedTopic?.slug === topic.slug
                         ? "bg-slate-800"
                         : ""
                     }
@@ -239,7 +277,7 @@ const InterviewQA = () => {
             questions.map(q => (
 
               <div
-                key={`question-${q.id}`}
+                key={q.id}
                 className="mb-10 border-b border-slate-800 pb-6"
               >
 
