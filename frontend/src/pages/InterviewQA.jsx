@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchCoursesApi } from "../apis/courses";
 import { fetchTopicsApi } from "../apis/topics";
@@ -18,6 +18,8 @@ const InterviewQA = () => {
 
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+
+  const questionsRef = useRef(null);
 
   // Load courses initially
   useEffect(() => {
@@ -49,6 +51,19 @@ const InterviewQA = () => {
     }
 
   }, [topicSlug, topics]);
+
+  useEffect(() => {
+
+    if (questions.length > 0) {
+
+      questionsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
+
+  }, [questions]);
 
   const loadCourses = async () => {
 
@@ -258,7 +273,7 @@ const InterviewQA = () => {
 
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div ref={questionsRef} className="flex-1 overflow-y-auto p-6">
 
           {loadingQuestions ? (
 
