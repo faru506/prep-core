@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+pre {
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+code {
+  font-size: 0.9rem;
+}

@@ -4,6 +4,14 @@ import { fetchCoursesApi } from "../apis/courses";
 import { fetchTopicsApi } from "../apis/topics";
 import { fetchQuestionsApi } from "../apis/questions";
 
+import Prism from "prismjs";
+
+// Load languages
+import "prismjs/components/prism-ruby";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-markup";
+
 const InterviewQA = () => {
 
   const { courseSlug, topicSlug } = useParams();
@@ -122,6 +130,12 @@ const InterviewQA = () => {
     };
 
   }, [questions, topics]);
+
+  useEffect(() => {
+
+    Prism.highlightAll();
+
+  }, [questions]);
 
   const loadCourses = async () => {
 

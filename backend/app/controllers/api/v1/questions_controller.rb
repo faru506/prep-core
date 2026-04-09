@@ -10,7 +10,7 @@ class Api::V1::QuestionsController < ApplicationController
       {
         id: q.id.to_s,
         title: q.title,
-        answer: q.answer,
+        answer: q.answer&.content,
         topic_id: q.topic_id.to_s
       }
     }
