@@ -33,7 +33,7 @@ class Api::V1::Admin::TopicsController < ApplicationController
   end
 
   def reorder
-    params[:topics].each_with_index do |id, index|
+    params[:topic_ids].each_with_index do |id, index|
       Topic.find(id).update(position: index + 1)
     end
 

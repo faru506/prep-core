@@ -36,6 +36,22 @@ export const reorderCoursesApi =
       }
     );
 
+export const reorderTopicsApi =
+  (topicIds) =>
+    fetch(
+      `${DOMAIN}/api/v1/admin/topics/reorder`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          topic_ids: topicIds
+        })
+      }
+    );
+
 export const fetchAdminCourses = () =>
   fetch(`${DOMAIN}/api/v1/admin/courses`);
 

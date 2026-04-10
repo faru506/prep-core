@@ -4,7 +4,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { reorderCoursesApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
+import { reorderCoursesApi, reorderTopicsApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
 import CreateCourseModal from "../components/CreateCourseModal";
 import CreateTopicModal from "../components/CreateTopicModal";
 
@@ -14,7 +14,8 @@ const SortableCourse =
   expanded,
   toggleCourse,
   setSelectedCourse,
-  setShowTopicModal
+  setShowTopicModal,
+  setCourses
 }) => {
 
   const {
@@ -27,6 +28,59 @@ const SortableCourse =
 
   const style = {
     transform: CSS.Transform.toString(transform), transition
+  };
+
+  const handleTopicDragEnd = async (event) => {
+
+    const { active, over } = event;
+
+    if (!over) return;
+
+    if (active.id !== over.id) {
+
+      const oldIndex =
+        course.topics.findIndex(
+          t => t.id === active.id
+        );
+
+      const newIndex =
+        course.topics.findIndex(
+          t => t.id === over.id
+        );
+
+      const newTopics =
+        [...course.topics];
+
+      const [moved] =
+        newTopics.splice(
+          oldIndex,
+          1
+        );
+
+      newTopics.splice(
+        newIndex,
+        0,
+        moved
+      );
+
+      /* 🔥 Update UI */
+
+      setCourses(prev =>
+        prev.map(c =>
+          c.id === course.id
+            ? { ...c, topics: newTopics }
+            : c
+        )
+      );
+
+      /* 🔥 Save order */
+
+      await reorderTopicsApi(
+        newTopics.map(t => t.id)
+      );
+
+    }
+
   };
 
   return (
@@ -69,16 +123,32 @@ const SortableCourse =
 
         <div className="ml-6 mt-2 space-y-1">
 
-          {course.topics.map(topic => (
-
-            <div
-              key={topic.id}
-              className="bg-slate-900 p-2 rounded"
+          <DndContext
+            collisionDetection={ closestCenter }
+            onDragEnd={ handleTopicDragEnd }
+          >
+            <SortableContext
+              items={
+                course.topics.map(
+                  t => t.id
+                )
+              }
+              strategy={
+                verticalListSortingStrategy
+              }
             >
-              {topic.title}
-            </div>
 
-          ))}
+              {course.topics.map(topic => (
+                <SortableTopic
+                  key={topic.id}
+                  topic={topic}
+                />
+
+              ))}
+
+            </SortableContext>
+
+          </DndContext>
 
           <button
             onClick={() => {
@@ -96,6 +166,46 @@ const SortableCourse =
         </div>
 
       )}
+
+    </div>
+
+  );
+
+};
+
+const SortableTopic = ({
+  topic
+}) => {
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({
+    id: topic.id
+  });
+
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-slate-900 p-2 rounded flex gap-2"
+    >
+
+      <span
+        {...attributes}
+        {...listeners}
+        className="cursor-grab"
+      >
+        ⠿
+      </span>
+
+      {topic.title}
 
     </div>
 
@@ -246,12 +356,9 @@ const CourseManager = () => {
                 course={course}
                 expanded={expanded}
                 toggleCourse={toggleCourse}
-                setSelectedCourse={
-                  setSelectedCourse
-                }
-                setShowTopicModal={
-                  setShowTopicModal
-                }
+                setSelectedCourse={setSelectedCourse}
+                setShowTopicModal={setShowTopicModal}
+                setCourses={setCourses}
               />
 
             ))}
