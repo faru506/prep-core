@@ -11,6 +11,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :admin do
         resources :users, only: [:index]
+        resources :courses, only: [:index, :create]
+        resources :topics, only: [:index, :create] 
+        resources :questions, only: [:create]
+        post "courses/reorder", to: "courses#reorder"
+        post "topics/reorder", to: "topics#reorder"
       end
 
       resources :courses, only: [:index] do

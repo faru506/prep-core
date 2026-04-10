@@ -12,6 +12,7 @@ import Programs from "./pages/Programs";
 import Contests from "./pages/Contests";
 import InterviewQA from "./pages/InterviewQA";
 import Users from "./pages/Users";
+import CourseManager from "./pages/CourseManager"
 
 import { getToken } from "./utilities/storage";
 
@@ -82,6 +83,15 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <Users />
+          </AdminRoute>
+        )
+      },
+
+      {
+        path: "course_manager",
+        element: (
+          <AdminRoute>
+            <CourseManager />
           </AdminRoute>
         )
       }

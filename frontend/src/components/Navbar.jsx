@@ -19,7 +19,9 @@ const Navbar = () => {
     { name: "Contests", path: "/contests" },
 
     ...(role === "admin"
-      ? [{ name: "Users", path: "/users" }]
+      ? [{ name: "Users", path: "/users" },
+         { name: "Course Manager", path: "/course_manager" }
+      ]
       : [])
   ];
 
