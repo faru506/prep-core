@@ -5,12 +5,14 @@ class Api::V1::Admin::QuestionsController < ApplicationController
 
     question = topic.questions.create!(
       title: params[:title],
-      position: params[:position]
+      position: topic.questions.count
     )
 
-    question.create_answer!(
-      content: params[:content]
+    question.build_answer(
+      content: params[:answer]
     )
+
+    question.save!
 
     render json: {
       id: question.id.to_s,

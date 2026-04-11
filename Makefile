@@ -4,14 +4,13 @@ COMPOSE_FILE=docker-compose.dev.yml
 start:
 	docker compose -f $(COMPOSE_FILE) up -d
 
-# Stop containers
+# Stop containers (SAFE — keeps DB)
 stop:
 	docker compose -f $(COMPOSE_FILE) down
 
-# Restart containers
+# Restart containers (SAFE)
 restart:
-	docker compose -f $(COMPOSE_FILE) down
-	docker compose -f $(COMPOSE_FILE) up -d
+	docker compose -f $(COMPOSE_FILE) restart
 
 # View logs (all services)
 logs:
@@ -41,18 +40,36 @@ seed:
 bash:
 	docker compose -f $(COMPOSE_FILE) exec backend bash
 
-# Rebuild containers
+# Open bash inside frontend container
+frontend:
+	docker compose -f $(COMPOSE_FILE) exec frontend sh
+
+# Build containers (SAFE)
 build:
 	docker compose -f $(COMPOSE_FILE) build
 
-# Rebuild without cache
+# Rebuild containers (SAFE — keeps DB)
 rebuild:
 	docker compose -f $(COMPOSE_FILE) build --no-cache
+	docker compose -f $(COMPOSE_FILE) up -d
 
-# Remove containers + volumes (reset DB)
+# Remove containers ONLY (SAFE — keeps DB)
 clean:
+	docker compose -f $(COMPOSE_FILE) down
+
+# ⚠️ Dangerous — Deletes Database
+reset-db:
 	docker compose -f $(COMPOSE_FILE) down -v
+	docker compose -f $(COMPOSE_FILE) up -d
 
 # Show running containers
 ps:
 	docker compose -f $(COMPOSE_FILE) ps
+
+# Install frontend packages inside container
+npm-install:
+	docker compose -f $(COMPOSE_FILE) exec frontend npm install
+
+# Install specific npm package
+npm-add:
+	docker compose -f $(COMPOSE_FILE) exec frontend npm install $(pkg)
