@@ -2,9 +2,9 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { reorderQuestionsApi } from "../../apis/course_manager";
-import SortableQuestion from "./Question";
+import Question from "./Question";
 
-const SortableQuestionsList = ({
+const QuestionsList = ({
   topic,
   course,
   setCourses
@@ -92,7 +92,7 @@ const SortableQuestionsList = ({
 
           {topic.questions.map(q => (
 
-            <SortableQuestion
+            <Question
               key={q.id}
               question={q}
             />
@@ -121,4 +121,4 @@ const SortableQuestionsList = ({
 
 };
 
-export default SortableQuestionsList;
+export default QuestionsList;

@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const SortableQuestion = ({
+const Question = ({
   question
 }) => {
 
@@ -41,4 +41,4 @@ const SortableQuestion = ({
 
 };
 
-export default SortableQuestion;
+export default Question;

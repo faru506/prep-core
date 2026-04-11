@@ -1,9 +1,9 @@
-import SortableQuestionsList from "./QuestionsList";
+import QuestionsList from "./QuestionsList";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const SortableTopic = ({
+const Topic = ({
   topic,
   course,
   setCourses,
@@ -57,7 +57,7 @@ const SortableTopic = ({
       {expandedTopics[topic.id] &&
         topic.questions && (
 
-        <SortableQuestionsList
+        <QuestionsList
           topic={topic}
           course={course}
           setCourses={setCourses}
@@ -71,4 +71,4 @@ const SortableTopic = ({
 
 };
 
-export default SortableTopic;
+export default Topic;
