@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Modal from "./Modal";
+import Base from "./Base";
 
-import { createCourseApi } from "../apis/course_manager";
+import { createCourseApi } from "../../apis/course_manager";
 
-const CreateCourseModal = ({
+const CreateCourse = ({
   onClose,
   onCreated
 }) => {
@@ -20,7 +20,7 @@ const CreateCourseModal = ({
 
   return (
 
-    <Modal
+    <Base
       title="Create Course"
       onClose={onClose}
     >
@@ -49,10 +49,10 @@ const CreateCourseModal = ({
 
       </form>
 
-    </Modal>
+    </Base>
 
   );
 
 };
 
-export default CreateCourseModal;
+export default CreateCourse;

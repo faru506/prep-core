@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Modal from "./Modal";
+import Base from "./Base";
 
-import { createTopicApi } from "../apis/course_manager";
+import { createTopicApi } from "../../apis/course_manager";
 
-const CreateTopicModal = ({
+const CreateTopic = ({
   course,
   onClose,
   onCreated
@@ -26,7 +26,7 @@ const CreateTopicModal = ({
 
   return (
 
-    <Modal
+    <Base
       title={`Create Topic — ${course.title}`}
       onClose={onClose}
     >
@@ -55,10 +55,10 @@ const CreateTopicModal = ({
 
       </form>
 
-    </Modal>
+    </Base>
 
   );
 
 };
 
-export default CreateTopicModal;
+export default CreateTopic;
