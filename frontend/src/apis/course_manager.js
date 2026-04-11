@@ -68,3 +68,26 @@ export const createQuestionApi = (data) =>
     },
     body: JSON.stringify(data)
   });
+
+export const fetchAdminQuestions =
+  (topicId) =>
+    fetch(
+      `${DOMAIN}/api/v1/admin/topics/${topicId}/questions`
+    );
+
+export const reorderQuestionsApi =
+  (questionIds, topicId) =>
+    fetch(
+      `${DOMAIN}/api/v1/admin/questions/reorder`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          question_ids: questionIds,
+          topic_id: topicId
+        })
+      }
+    );

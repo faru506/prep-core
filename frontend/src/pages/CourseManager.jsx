@@ -4,7 +4,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { reorderCoursesApi, reorderTopicsApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
+import { reorderCoursesApi, reorderTopicsApi, reorderQuestionsApi, fetchAdminCourses, fetchAdminTopics, fetchAdminQuestions } from "../apis/course_manager";
 import CreateCourseModal from "../components/CreateCourseModal";
 import CreateTopicModal from "../components/CreateTopicModal";
 
@@ -15,7 +15,9 @@ const SortableCourse =
   toggleCourse,
   setSelectedCourse,
   setShowTopicModal,
-  setCourses
+  setCourses,
+  expandedTopics,
+  setExpandedTopics
 }) => {
 
   const {
@@ -63,8 +65,6 @@ const SortableCourse =
         moved
       );
 
-      /* 🔥 Update UI */
-
       setCourses(prev =>
         prev.map(c =>
           c.id === course.id
@@ -73,10 +73,55 @@ const SortableCourse =
         )
       );
 
-      /* 🔥 Save order */
-
       await reorderTopicsApi(
-        newTopics.map(t => t.id)
+        newTopics.map(t => t.id),
+        course.id
+      );
+
+    }
+
+  };
+
+  const toggleTopic = async (topicId) => {
+
+    setExpandedTopics(prev => ({
+      ...prev,
+      [topicId]:
+        !prev[topicId]
+    }));
+
+    const topic =
+      course.topics.find(
+        t => t.id === topicId
+      );
+
+    if (!topic.questions) {
+
+      const res =
+        await fetchAdminQuestions(
+          topicId
+        );
+
+      const questions =
+        await res.json();
+
+      setCourses(prev =>
+        prev.map(c =>
+          c.id === course.id
+            ? {
+                ...c,
+                topics:
+                  c.topics.map(t =>
+                    t.id === topicId
+                      ? {
+                          ...t,
+                          questions
+                        }
+                      : t
+                  )
+              }
+            : c
+        )
       );
 
     }
@@ -121,49 +166,51 @@ const SortableCourse =
       {expanded[course.id] &&
         course.topics && (
 
-        <div className="ml-6 mt-2 space-y-1">
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={(event) =>
+            handleTopicDragEnd(event)
+          }
+        >
 
-          <DndContext
-            collisionDetection={ closestCenter }
-            onDragEnd={ handleTopicDragEnd }
+          <SortableContext
+            items={course.topics.map(
+              t => t.id
+            )}
+            strategy={
+              verticalListSortingStrategy
+            }
           >
-            <SortableContext
-              items={
-                course.topics.map(
-                  t => t.id
-                )
-              }
-              strategy={
-                verticalListSortingStrategy
-              }
-            >
+
+            <div className="ml-6 mt-2 space-y-1">
 
               {course.topics.map(topic => (
                 <SortableTopic
                   key={topic.id}
                   topic={topic}
+                  course={course}
+                  setCourses={setCourses}
+                  expandedTopics={expandedTopics}
+                  toggleTopic={toggleTopic}
                 />
 
               ))}
 
-            </SortableContext>
+              <button
+                onClick={() => {
+                  setSelectedCourse(course);
+                  setShowTopicModal(true);
+                }}
+                className="text-indigo-400 text-sm mt-2"
+              >
+                + Create Topic
+              </button>
 
-          </DndContext>
+            </div>
 
-          <button
-            onClick={() => {
+          </SortableContext>
 
-              setSelectedCourse(course);
-
-              setShowTopicModal(true);
-
-            }}
-            className="text-indigo-400 text-sm mt-2"
-          >
-            + Create Topic
-          </button>
-
-        </div>
+        </DndContext>
 
       )}
 
@@ -174,7 +221,11 @@ const SortableCourse =
 };
 
 const SortableTopic = ({
-  topic
+  topic,
+  course,
+  setCourses,
+  expandedTopics,
+  toggleTopic
 }) => {
 
   const {
@@ -187,14 +238,86 @@ const SortableTopic = ({
     id: topic.id
   });
 
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const style = {
+    transform:
+      CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+
+    <div ref={setNodeRef} style={style}>
+
+      <div
+        className="bg-slate-900 p-2 rounded flex gap-2 items-center"
+      >
+
+        <span
+          {...attributes}
+          {...listeners}
+          className="cursor-grab"
+        >
+          ⠿
+        </span>
+
+        <span
+          className="cursor-pointer"
+          onClick={() =>
+            toggleTopic(topic.id)
+          }
+        >
+          {expandedTopics[topic.id]
+            ? "▼"
+            : "▶"}
+        </span>
+
+        {topic.title}
+
+      </div>
+
+      {expandedTopics[topic.id] &&
+        topic.questions && (
+
+        <SortableQuestionsList
+          topic={topic}
+          course={course}
+          setCourses={setCourses}
+        />
+
+      )}
+
+    </div>
+
+  );
+
+};
+
+const SortableQuestion = ({
+  question
+}) => {
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({
+    id: question.id
+  });
+
+  const style = {
+    transform:
+      CSS.Transform.toString(transform),
+    transition
+  };
 
   return (
 
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-slate-900 p-2 rounded flex gap-2"
+      className="bg-slate-950 p-2 rounded flex gap-2"
     >
 
       <span
@@ -205,9 +328,138 @@ const SortableTopic = ({
         ⠿
       </span>
 
-      {topic.title}
+      {question.title}
 
     </div>
+
+  );
+
+};
+
+const SortableQuestionsList = ({
+  topic,
+  course,
+  setCourses
+}) => {
+
+  const handleDragEnd =
+    async (event) => {
+
+      const { active, over } =
+        event;
+
+      if (!over) return;
+
+      if (active.id !== over.id) {
+
+        const oldIndex =
+          topic.questions.findIndex(
+            q => q.id === active.id
+          );
+
+        const newIndex =
+          topic.questions.findIndex(
+            q => q.id === over.id
+          );
+
+        const newQuestions =
+          [...topic.questions];
+
+        const [moved] =
+          newQuestions.splice(
+            oldIndex,
+            1
+          );
+
+        newQuestions.splice(
+          newIndex,
+          0,
+          moved
+        );
+
+        /* Update UI */
+
+        setCourses(prev =>
+          prev.map(c =>
+            c.id === course.id
+              ? {
+                  ...c,
+                  topics:
+                    c.topics.map(t =>
+                      t.id === topic.id
+                        ? {
+                            ...t,
+                            questions:
+                              newQuestions
+                          }
+                        : t
+                    )
+                }
+              : c
+          )
+        );
+
+        /* Save Order */
+
+        await reorderQuestionsApi(
+          newQuestions.map(
+            q => q.id
+          ),
+          topic.id
+        );
+
+      }
+
+    };
+
+  return (
+
+    <DndContext
+      collisionDetection={
+        closestCenter
+      }
+      onDragEnd={handleDragEnd}
+    >
+
+      <SortableContext
+        items={topic.questions.map(
+          q => q.id
+        )}
+        strategy={
+          verticalListSortingStrategy
+        }
+      >
+
+        <div className="ml-6 mt-2 space-y-1">
+
+          {topic.questions.map(q => (
+
+            <SortableQuestion
+              key={q.id}
+              question={q}
+            />
+
+          ))}
+
+          {/* Create Question Button */}
+
+          <button
+            onClick={() =>
+              window.open(
+                `/course_manager/${course.slug}/${topic.slug}/questions`,
+                "_blank"
+              )
+            }
+            className="text-indigo-400 text-sm mt-2"
+          >
+            + Create Question
+          </button>
+
+        </div>
+
+      </SortableContext>
+
+    </DndContext>
 
   );
 
@@ -220,6 +472,7 @@ const CourseManager = () => {
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [expandedTopics, setExpandedTopics] = useState({});
 
   useEffect(() => {
     loadCourses();
@@ -359,6 +612,8 @@ const CourseManager = () => {
                 setSelectedCourse={setSelectedCourse}
                 setShowTopicModal={setShowTopicModal}
                 setCourses={setCourses}
+                expandedTopics={expandedTopics}
+                setExpandedTopics={setExpandedTopics}
               />
 
             ))}

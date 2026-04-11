@@ -12,10 +12,13 @@ Rails.application.routes.draw do
       namespace :admin do
         resources :users, only: [:index]
         resources :courses, only: [:index, :create]
-        resources :topics, only: [:index, :create] 
+        resources :topics, only: [:index, :create] do
+          resources :questions, only: [:index]
+        end 
         resources :questions, only: [:create]
         post "courses/reorder", to: "courses#reorder"
         post "topics/reorder", to: "topics#reorder"
+        post "questions/reorder", to: "questions#reorder"
       end
 
       resources :courses, only: [:index] do
