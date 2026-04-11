@@ -3,6 +3,13 @@ import StarterKit from "@tiptap/starter-kit";
 import CodeBlock from "@tiptap/extension-code-block";
 import Placeholder from "@tiptap/extension-placeholder";
 
+import {
+  Bold,
+  Italic,
+  List,
+  Code
+} from "lucide-react";
+
 const RichTextEditor = ({ value, onChange }) => {
 
   const editor = useEditor({
@@ -13,12 +20,14 @@ const RichTextEditor = ({ value, onChange }) => {
 
       CodeBlock.configure({
         HTMLAttributes: {
-          class: "bg-slate-900 text-white p-3 rounded"
+          class:
+            "bg-slate-900 text-white p-4 rounded-lg"
         }
       }),
 
       Placeholder.configure({
-        placeholder: "Write answer here..."
+        placeholder:
+          "Write answer here... (supports code, lists, formatting)"
       })
 
     ],
@@ -26,66 +35,91 @@ const RichTextEditor = ({ value, onChange }) => {
     content: value,
 
     onUpdate({ editor }) {
-
       onChange(editor.getHTML());
-
     }
 
   });
 
   if (!editor) return null;
 
+  const Button = ({
+    onClick,
+    isActive,
+    children
+  }) => (
+
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        p-2 rounded-md transition
+        ${isActive
+          ? "bg-indigo-600 text-white"
+          : "bg-slate-100 hover:bg-slate-200"}
+      `}
+    >
+      {children}
+    </button>
+
+  );
+
   return (
 
-    <div className="border rounded bg-white text-black">
+    <div className="border border-slate-700 rounded-xl overflow-hidden bg-white text-black shadow-lg">
 
-      <div className="flex gap-2 border-b p-2 flex-wrap">
+      {/* Toolbar */}
 
-        <button
-          type="button"
+      <div className="flex flex-wrap items-center gap-2 border-b bg-slate-50 p-2">
+
+        <Button
           onClick={() =>
             editor.chain().focus().toggleBold().run()
           }
-          className="px-2 py-1 bg-slate-200 rounded"
+          isActive={editor.isActive("bold")}
         >
-          Bold
-        </button>
+          <Bold size={16} />
+        </Button>
 
-        <button
-          type="button"
+]        <Button
           onClick={() =>
             editor.chain().focus().toggleItalic().run()
           }
-          className="px-2 py-1 bg-slate-200 rounded"
+          isActive={editor.isActive("italic")}
         >
-          Italic
-        </button>
+          <Italic size={16} />
+        </Button>
 
-        <button
-          type="button"
+        <div className="w-px h-6 bg-slate-300 mx-1" />
+
+        <Button
           onClick={() =>
             editor.chain().focus().toggleBulletList().run()
           }
-          className="px-2 py-1 bg-slate-200 rounded"
+          isActive={editor.isActive("bulletList")}
         >
-          Bullet List
-        </button>
+          <List size={16} />
+        </Button>
 
-        <button
-          type="button"
+        <Button
           onClick={() =>
             editor.chain().focus().toggleCodeBlock().run()
           }
-          className="px-2 py-1 bg-slate-200 rounded"
+          isActive={editor.isActive("codeBlock")}
         >
-          Code Block
-        </button>
+          <Code size={16} />
+        </Button>
 
       </div>
 
       <EditorContent
         editor={editor}
-        className="p-4 min-h-[250px]"
+        className="
+          p-5
+          min-h-[300px]
+          prose
+          max-w-none
+          focus:outline-none
+        "
       />
 
     </div>
