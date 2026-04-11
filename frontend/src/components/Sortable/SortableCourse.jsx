@@ -1,12 +1,13 @@
-import Topic from "./Topic";
+import Topic from "./SortableTopic";
 
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import { reorderTopicsApi, fetchAdminQuestions } from "../../apis/course_manager";
+import SortableTopic from "./SortableTopic";
 
-const Course = 
+const SortableCourse = 
 ({
   course,
   expanded,
@@ -182,7 +183,7 @@ const Course =
             <div className="ml-6 mt-2 space-y-1">
 
               {course.topics.map(topic => (
-                <Topic
+                <SortableTopic
                   key={topic.id}
                   topic={topic}
                   course={course}
@@ -217,4 +218,4 @@ const Course =
 
 };
 
-export default Course;
+export default SortableCourse;

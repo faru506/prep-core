@@ -6,7 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { reorderCoursesApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
 import CreateCourseModal from "../components/Modal/CreateCourseModal";
 import CreateTopicModal from "../components/Modal/CreateTopicModal";
-import SortableCourse from "../components/Sortable/Course"
+import SortableCourse from "../components/Sortable/SortableCourse"
 
 const CourseManager = () => {
 

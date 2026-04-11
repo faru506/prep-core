@@ -3,7 +3,7 @@ import QuestionsList from "./QuestionsList";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const Topic = ({
+const SortableTopic = ({
   topic,
   course,
   setCourses,
@@ -71,4 +71,4 @@ const Topic = ({
 
 };
 
-export default Topic;
+export default SortableTopic;
