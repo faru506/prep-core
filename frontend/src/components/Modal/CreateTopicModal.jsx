@@ -1,9 +1,10 @@
 import { useState } from "react";
-import Base from "./Base";
+import BaseModal from "./BaseModal";
 
-import { createCourseApi } from "../../apis/course_manager";
+import { createTopicApi } from "../../apis/course_manager";
 
-const CreateCourse = ({
+const CreateTopicModal = ({
+  course,
   onClose,
   onCreated
 }) => {
@@ -11,17 +12,22 @@ const CreateCourse = ({
   const [title, setTitle] = useState("");
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
     const slug = title.toLowerCase().replace(/\s+/g, "-");
-    await createCourseApi({ title, slug });
-    onCreated();
+
+    await createTopicApi({ course_id: course.id, title, slug });
+
+    onCreated(course.id);
     onClose();
+
   };
 
   return (
 
-    <Base
-      title="Create Course"
+    <BaseModal
+      title={`Create Topic — ${course.title}`}
       onClose={onClose}
     >
 
@@ -31,7 +37,7 @@ const CreateCourse = ({
       >
 
         <input
-          placeholder="Course Title"
+          placeholder="Topic Title"
           value={title}
           onChange={(e) =>
             setTitle(e.target.value)
@@ -44,15 +50,15 @@ const CreateCourse = ({
           type="submit"
           className="bg-indigo-600 p-3 rounded"
         >
-          Create Course
+          Create Topic
         </button>
 
       </form>
 
-    </Base>
+    </BaseModal>
 
   );
 
 };
 
-export default CreateCourse;
+export default CreateTopicModal;

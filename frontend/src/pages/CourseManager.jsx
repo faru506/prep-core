@@ -4,8 +4,8 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { reorderCoursesApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
-import CreateCourse from "../components/Modal/CreateCourse";
-import CreateTopic from "../components/Modal/CreateTopic";
+import CreateCourseModal from "../components/Modal/CreateCourseModal";
+import CreateTopicModal from "../components/Modal/CreateTopicModal";
 import SortableCourse from "../components/Sortable/Course"
 
 const CourseManager = () => {
@@ -169,7 +169,7 @@ const CourseManager = () => {
 
       {showCourseModal && (
 
-        <CreateCourse
+        <CreateCourseModal
           onClose={() =>
             setShowCourseModal(false)
           }
@@ -181,7 +181,7 @@ const CourseManager = () => {
       {showTopicModal &&
         selectedCourse && (
 
-        <CreateTopic
+        <CreateTopicModal
           course={selectedCourse}
           onClose={() =>
             setShowTopicModal(false)

@@ -1,4 +1,4 @@
-const Base = ({ title, children, onClose }) => {
+const BaseModal = ({ title, children, onClose }) => {
 
   return (
 
@@ -40,4 +40,4 @@ const Base = ({ title, children, onClose }) => {
 
 };
 
-export default Base;
+export default BaseModal;
