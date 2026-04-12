@@ -10,6 +10,36 @@ class Api::V1::Admin::CoursesController < ApplicationController
     render json: course
   end
 
+  def update
+    course = Course.find(params[:id])
+
+    course.update!(
+      title: params[:title],
+      slug: params[:slug]
+    )
+
+    render json: {
+      id: course.id.to_s,
+      title: course.title,
+      slug: course.slug
+    }
+  end
+
+  def destroy
+    course = Course.find(params[:id])
+
+    destroyed_position = course.position
+
+    course.destroy!
+
+    Course.where(:position.gt => destroyed_position)
+      .each do |remaining_course|
+        remaining_course.inc(position: -1)
+      end
+
+    head :no_content
+  end
+
   def index
     courses = Course.order_by(position: :asc)
 

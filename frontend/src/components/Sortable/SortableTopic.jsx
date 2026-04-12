@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import QuestionsList from "./QuestionsList";
 import CreateQuestionModal from "../Modal/CreateQuestionModal";
-import { fetchAdminQuestions } from "../../apis/course_manager";
+import EditTopicModal from "../Modal/EditTopicModal";
+import ActionIconButton from "./ActionIconButton";
+import {
+  fetchAdminQuestions,
+  deleteTopicApi
+} from "../../apis/course_manager";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -15,6 +20,7 @@ const SortableTopic = ({
   toggleTopic
 }) => {
   const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const {
     attributes,
@@ -26,6 +32,29 @@ const SortableTopic = ({
 
   const style = {
     transform: CSS.Transform.toString(transform), transition
+  };
+
+  const handleDeleteTopic = async () => {
+
+    const confirmed = window.confirm(
+      `Delete the topic "${topic.title}" and all its questions?`
+    );
+
+    if (!confirmed) return;
+
+    await deleteTopicApi(topic.id);
+
+    setCourses(prev =>
+      prev.map(c =>
+        c.id === course.id
+          ? {
+              ...c,
+              topics: c.topics.filter(t => t.id !== topic.id)
+            }
+          : c
+      )
+    );
+
   };
 
   return (
@@ -63,14 +92,46 @@ const SortableTopic = ({
 
         </div>
 
-        <button
-          onClick={() =>
-            setShowQuestionModal(true)
-          }
-          className="text-indigo-400 text-sm shrink-0"
-        >
-          + Create Question
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+
+          <ActionIconButton
+            label="Create Question"
+            tone="primary"
+            onClick={() =>
+              setShowQuestionModal(true)
+            }
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+          <ActionIconButton
+            label="Edit Topic"
+            onClick={() =>
+              setShowEditModal(true)
+            }
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M4 20h4l10-10-4-4L4 16v4Z" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="m12 6 4 4" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+          <ActionIconButton
+            label="Delete Topic"
+            tone="danger"
+            onClick={handleDeleteTopic}
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M4 7h16" strokeLinecap="round" />
+              <path d="M9 7V5h6v2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 7l1 12h8l1-12" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 11v5M14 11v5" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+        </div>
 
       </div>
 
@@ -112,6 +173,40 @@ const SortableTopic = ({
                             ? {
                                 ...t,
                                 questions
+                              }
+                            : t
+                        )
+                    }
+                  : c
+              )
+            );
+
+          }}
+        />
+
+      )}
+
+      {showEditModal && (
+
+        <EditTopicModal
+          course={course}
+          topic={topic}
+          onClose={() =>
+            setShowEditModal(false)
+          }
+          onUpdated={(updatedTopic) => {
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      topics:
+                        c.topics.map(t =>
+                          t.id === topic.id
+                            ? {
+                                ...t,
+                                title: updatedTopic.title,
+                                slug: updatedTopic.slug
                               }
                             : t
                         )

@@ -10,6 +10,22 @@ export const createCourseApi =
       body: JSON.stringify(data)
     });
 
+export const updateCourseApi =
+  (courseId, data) =>
+    fetch(`${DOMAIN}/api/v1/admin/courses/${courseId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+export const deleteCourseApi =
+  (courseId) =>
+    fetch(`${DOMAIN}/api/v1/admin/courses/${courseId}`, {
+      method: "DELETE"
+    });
+
 export const createTopicApi =
   (data) =>
     fetch(`${DOMAIN}/api/v1/admin/topics`, {
@@ -18,6 +34,22 @@ export const createTopicApi =
         "Content-Type": "application/json"
       },
       body: JSON.stringify(data)
+    });
+
+export const updateTopicApi =
+  (topicId, data) =>
+    fetch(`${DOMAIN}/api/v1/admin/topics/${topicId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+export const deleteTopicApi =
+  (topicId) =>
+    fetch(`${DOMAIN}/api/v1/admin/topics/${topicId}`, {
+      method: "DELETE"
     });
 
 export const reorderCoursesApi =

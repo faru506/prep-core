@@ -1,9 +1,16 @@
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useState } from "react";
 
-import { reorderTopicsApi, fetchAdminQuestions } from "../../apis/course_manager";
+import {
+  reorderTopicsApi,
+  fetchAdminQuestions,
+  deleteCourseApi
+} from "../../apis/course_manager";
 import SortableTopic from "./SortableTopic";
+import ActionIconButton from "./ActionIconButton";
+import EditCourseModal from "../Modal/EditCourseModal";
 
 const SortableCourse = 
 ({
@@ -16,6 +23,7 @@ const SortableCourse =
   expandedTopics,
   setExpandedTopics
 }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const {
     attributes,
@@ -124,6 +132,20 @@ const SortableCourse =
 
   };
 
+  const handleDeleteCourse = async () => {
+
+    const confirmed = window.confirm(
+      `Delete the course "${course.title}" and all its topics/questions?`
+    );
+
+    if (!confirmed) return;
+
+    await deleteCourseApi(course.id);
+    setCourses(prev =>
+      prev.filter(c => c.id !== course.id)
+    );
+  };
+
   return (
 
     <div
@@ -163,15 +185,47 @@ const SortableCourse =
 
         </div>
 
-        <button
-          onClick={() => {
-            setSelectedCourse(course);
-            setShowTopicModal(true);
-          }}
-          className="text-indigo-400 text-sm shrink-0"
-        >
-          + Create Topic
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+
+          <ActionIconButton
+            label="Create Topic"
+            tone="primary"
+            onClick={() => {
+              setSelectedCourse(course);
+              setShowTopicModal(true);
+            }}
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+          <ActionIconButton
+            label="Edit Course"
+            onClick={() =>
+              setShowEditModal(true)
+            }
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M4 20h4l10-10-4-4L4 16v4Z" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="m12 6 4 4" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+          <ActionIconButton
+            label="Delete Course"
+            tone="danger"
+            onClick={handleDeleteCourse}
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+              <path d="M4 7h16" strokeLinecap="round" />
+              <path d="M9 7V5h6v2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 7l1 12h8l1-12" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 11v5M14 11v5" strokeLinecap="round" />
+            </svg>
+          </ActionIconButton>
+
+        </div>
 
       </div>
 
@@ -212,6 +266,30 @@ const SortableCourse =
           </SortableContext>
 
         </DndContext>
+
+      )}
+
+      {showEditModal && (
+
+        <EditCourseModal
+          course={course}
+          onClose={() =>
+            setShowEditModal(false)
+          }
+          onUpdated={(updatedCourse) =>
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      title: updatedCourse.title,
+                      slug: updatedCourse.slug
+                    }
+                  : c
+              )
+            )
+          }
+        />
 
       )}
 

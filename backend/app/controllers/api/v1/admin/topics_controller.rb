@@ -18,6 +18,37 @@ class Api::V1::Admin::TopicsController < ApplicationController
 
   end
 
+  def update
+    topic = Topic.find(params[:id])
+
+    topic.update!(
+      title: params[:title],
+      slug: params[:slug]
+    )
+
+    render json: {
+      id: topic.id.to_s,
+      title: topic.title,
+      slug: topic.slug
+    }
+  end
+
+  def destroy
+    topic = Topic.find(params[:id])
+
+    course_id = topic.course_id
+    destroyed_position = topic.position
+
+    topic.destroy!
+
+    Topic.where(course_id: course_id, :position.gt => destroyed_position)
+      .each do |remaining_topic|
+        remaining_topic.inc(position: -1)
+      end
+
+    head :no_content
+  end
+
   def index
     course = Course.find(params[:course_id])
 
