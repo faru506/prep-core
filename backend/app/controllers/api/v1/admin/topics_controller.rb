@@ -8,12 +8,15 @@ class Api::V1::Admin::TopicsController < ApplicationController
       course.topics.create!(
         title: params[:title],
         slug: params[:slug],
+        level: params[:level],
         position: course.topics.count + 1
       )
 
     render json: {
       id: topic.id.to_s,
-      title: topic.title
+      title: topic.title,
+      slug: topic.slug,
+      level: topic.level
     }
 
   end
@@ -23,13 +26,15 @@ class Api::V1::Admin::TopicsController < ApplicationController
 
     topic.update!(
       title: params[:title],
-      slug: params[:slug]
+      slug: params[:slug],
+      level: params[:level]
     )
 
     render json: {
       id: topic.id.to_s,
       title: topic.title,
-      slug: topic.slug
+      slug: topic.slug,
+      level: topic.level
     }
   end
 
@@ -58,7 +63,8 @@ class Api::V1::Admin::TopicsController < ApplicationController
       {
         id: t.id.to_s,
         title: t.title,
-        slug: t.slug
+        slug: t.slug,
+        level: t.level
       }
     }
   end

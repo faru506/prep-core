@@ -11,6 +11,7 @@ import {
 import SortableTopic from "./SortableTopic";
 import ActionIconButton from "./ActionIconButton";
 import EditCourseModal from "../Modal/EditCourseModal";
+import ConfirmDialog from "../Modal/ConfirmDialog";
 
 const SortableCourse = 
 ({
@@ -24,6 +25,8 @@ const SortableCourse =
   setExpandedTopics
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [pendingTopicReorder, setPendingTopicReorder] = useState(null);
 
   const {
     attributes,
@@ -78,10 +81,13 @@ const SortableCourse =
         )
       );
 
-      await reorderTopicsApi(
-        newTopics.map(t => t.id),
-        course.id
-      );
+      setPendingTopicReorder({
+        movedTopicTitle: moved.title,
+        oldPosition: oldIndex + 1,
+        newPosition: newIndex + 1,
+        previousTopics: course.topics,
+        nextTopics: newTopics
+      });
 
     }
 
@@ -133,17 +139,7 @@ const SortableCourse =
   };
 
   const handleDeleteCourse = async () => {
-
-    const confirmed = window.confirm(
-      `Delete the course "${course.title}" and all its topics/questions?`
-    );
-
-    if (!confirmed) return;
-
-    await deleteCourseApi(course.id);
-    setCourses(prev =>
-      prev.filter(c => c.id !== course.id)
-    );
+    setShowDeleteDialog(true);
   };
 
   return (
@@ -154,8 +150,7 @@ const SortableCourse =
     >
 
       <div
-        className="flex items-center justify-between
-                   gap-3 bg-slate-800 p-3 rounded"
+        className="flex items-center justify-between gap-3 rounded-xl border border-slate-700/80 bg-slate-800 px-3 py-3 shadow-sm shadow-black/20"
       >
 
         <div className="flex items-center gap-2 min-w-0">
@@ -163,7 +158,7 @@ const SortableCourse =
           <span
             {...attributes}
             {...listeners}
-            className="cursor-grab"
+            className="cursor-grab text-slate-300"
           >
             ⠿
           </span>
@@ -179,8 +174,11 @@ const SortableCourse =
               : "▶"}
           </span>
 
-          <span className="truncate">
-            {course.title}
+          <span className="flex min-w-0 items-center">
+            <span className="mr-2 inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-indigo-400/80 shadow-[0_0_0_4px_rgba(129,140,248,0.08)]" />
+            <span className="truncate">
+              {course.title}
+            </span>
           </span>
 
         </div>
@@ -289,6 +287,60 @@ const SortableCourse =
               )
             )
           }
+        />
+
+      )}
+
+      {showDeleteDialog && (
+
+        <ConfirmDialog
+          title="Delete this course?"
+          description={`"${course.title}" and all nested topics and questions will be permanently removed. This action cannot be undone.`}
+          confirmLabel="Delete course"
+          onCancel={() =>
+            setShowDeleteDialog(false)
+          }
+          onConfirm={async () => {
+            await deleteCourseApi(course.id);
+            setCourses(prev =>
+              prev.filter(c => c.id !== course.id)
+            );
+            setShowDeleteDialog(false);
+          }}
+        />
+
+      )}
+
+      {pendingTopicReorder && (
+
+        <ConfirmDialog
+          title="Save new topic order?"
+          description={`"${pendingTopicReorder.movedTopicTitle}" moved from position ${pendingTopicReorder.oldPosition} to ${pendingTopicReorder.newPosition} inside "${course.title}". Save this topic order to the database?`}
+          tone="primary"
+          confirmLabel="Save order"
+          onCancel={() => {
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      topics:
+                        pendingTopicReorder.previousTopics
+                    }
+                  : c
+              )
+            );
+            setPendingTopicReorder(null);
+          }}
+          onConfirm={async () => {
+            await reorderTopicsApi(
+              pendingTopicReorder.nextTopics.map(
+                t => t.id
+              ),
+              course.id
+            );
+            setPendingTopicReorder(null);
+          }}
         />
 
       )}

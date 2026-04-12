@@ -1,15 +1,19 @@
+import { useState } from "react";
+
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { reorderQuestionsApi } from "../../apis/course_manager";
 
 import SortableQuestion from "./SortableQuestion";
+import ConfirmDialog from "../Modal/ConfirmDialog";
 
 const QuestionsList = ({
   topic,
   course,
   setCourses
 }) => {
+  const [pendingQuestionReorder, setPendingQuestionReorder] = useState(null);
 
   const handleDragEnd = async (event) => {
 
@@ -60,12 +64,13 @@ const QuestionsList = ({
         )
       );
 
-      await reorderQuestionsApi(
-          newQuestions.map(
-            q => q.id
-          ),
-        topic.id
-      );
+      setPendingQuestionReorder({
+        movedQuestionTitle: moved.title,
+        oldPosition: oldIndex + 1,
+        newPosition: newIndex + 1,
+        previousQuestions: topic.questions,
+        nextQuestions: newQuestions
+      });
 
     }
 
@@ -98,6 +103,9 @@ const QuestionsList = ({
               <SortableQuestion
                 key={q.id}
                 question={q}
+                course={course}
+                topic={topic}
+                setCourses={setCourses}
               />
 
             ))}
@@ -106,6 +114,48 @@ const QuestionsList = ({
         </SortableContext>
 
       </DndContext>
+
+      {pendingQuestionReorder && (
+
+        <ConfirmDialog
+          title="Save new question order?"
+          description={`"${pendingQuestionReorder.movedQuestionTitle}" moved from position ${pendingQuestionReorder.oldPosition} to ${pendingQuestionReorder.newPosition} inside "${topic.title}". Save this question order to the database?`}
+          tone="primary"
+          confirmLabel="Save order"
+          onCancel={() => {
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      topics:
+                        c.topics.map(t =>
+                          t.id === topic.id
+                            ? {
+                                ...t,
+                                questions:
+                                  pendingQuestionReorder.previousQuestions
+                              }
+                            : t
+                        )
+                    }
+                  : c
+              )
+            );
+            setPendingQuestionReorder(null);
+          }}
+          onConfirm={async () => {
+            await reorderQuestionsApi(
+              pendingQuestionReorder.nextQuestions.map(
+                q => q.id
+              ),
+              topic.id
+            );
+            setPendingQuestionReorder(null);
+          }}
+        />
+
+      )}
 
     </>
 

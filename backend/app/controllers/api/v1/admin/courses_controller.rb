@@ -1,10 +1,13 @@
 class Api::V1::Admin::CoursesController < ApplicationController
 
   def create
+    next_position =
+      Course.max(:position).to_i + 1
+
     course = Course.create!(
       title: params[:title],
       slug: params[:slug],
-      position: params[:position]
+      position: next_position
     )
 
     render json: course
@@ -41,7 +44,14 @@ class Api::V1::Admin::CoursesController < ApplicationController
   end
 
   def index
-    courses = Course.order_by(position: :asc)
+    courses =
+      Course.all.to_a.sort_by do |course|
+        [
+          course.position.nil? ? 1 : 0,
+          course.position || Float::INFINITY,
+          course.created_at || Time.at(0)
+        ]
+      end
 
     render json: courses.map { |c|
       {

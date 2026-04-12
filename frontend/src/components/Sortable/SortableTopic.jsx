@@ -3,11 +3,13 @@ import { useState } from "react";
 import QuestionsList from "./QuestionsList";
 import CreateQuestionModal from "../Modal/CreateQuestionModal";
 import EditTopicModal from "../Modal/EditTopicModal";
+import ConfirmDialog from "../Modal/ConfirmDialog";
 import ActionIconButton from "./ActionIconButton";
 import {
   fetchAdminQuestions,
   deleteTopicApi
 } from "../../apis/course_manager";
+import { getLevelDotClasses } from "../../utilities/levels";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -21,6 +23,7 @@ const SortableTopic = ({
 }) => {
   const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const {
     attributes,
@@ -35,26 +38,7 @@ const SortableTopic = ({
   };
 
   const handleDeleteTopic = async () => {
-
-    const confirmed = window.confirm(
-      `Delete the topic "${topic.title}" and all its questions?`
-    );
-
-    if (!confirmed) return;
-
-    await deleteTopicApi(topic.id);
-
-    setCourses(prev =>
-      prev.map(c =>
-        c.id === course.id
-          ? {
-              ...c,
-              topics: c.topics.filter(t => t.id !== topic.id)
-            }
-          : c
-      )
-    );
-
+    setShowDeleteDialog(true);
   };
 
   return (
@@ -62,7 +46,7 @@ const SortableTopic = ({
     <div ref={setNodeRef} style={style}>
 
       <div
-        className="bg-slate-900 p-2 rounded flex items-center justify-between gap-3"
+        className="flex items-center justify-between gap-3 rounded-xl border border-slate-700/70 bg-slate-900 px-3 py-2.5 shadow-sm shadow-black/20"
       >
 
         <div className="flex items-center gap-2 min-w-0">
@@ -70,7 +54,7 @@ const SortableTopic = ({
           <span
             {...attributes}
             {...listeners}
-            className="cursor-grab"
+            className="cursor-grab text-slate-300"
           >
             ⠿
           </span>
@@ -86,8 +70,11 @@ const SortableTopic = ({
               : "▶"}
           </span>
 
-          <span className="truncate">
-            {topic.title}
+          <span className="flex min-w-0 items-center">
+            <span className={`mr-2 inline-flex h-2 w-2 shrink-0 rounded-full ${getLevelDotClasses(topic.level)}`} />
+            <span className="truncate">
+              {topic.title}
+            </span>
           </span>
 
         </div>
@@ -206,7 +193,8 @@ const SortableTopic = ({
                             ? {
                                 ...t,
                                 title: updatedTopic.title,
-                                slug: updatedTopic.slug
+                                slug: updatedTopic.slug,
+                                level: updatedTopic.level
                               }
                             : t
                         )
@@ -215,6 +203,35 @@ const SortableTopic = ({
               )
             );
 
+          }}
+        />
+
+      )}
+
+      {showDeleteDialog && (
+
+        <ConfirmDialog
+          title="Delete this topic?"
+          description={`"${topic.title}" and all of its questions will be permanently removed. This action cannot be undone.`}
+          confirmLabel="Delete topic"
+          onCancel={() =>
+            setShowDeleteDialog(false)
+          }
+          onConfirm={async () => {
+            await deleteTopicApi(topic.id);
+
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      topics: c.topics.filter(t => t.id !== topic.id)
+                    }
+                  : c
+              )
+            );
+
+            setShowDeleteDialog(false);
           }}
         />
 

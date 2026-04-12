@@ -101,6 +101,22 @@ export const createQuestionApi = (data) =>
     body: JSON.stringify(data)
   });
 
+export const updateQuestionApi =
+  (questionId, data) =>
+    fetch(`${DOMAIN}/api/v1/admin/questions/${questionId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+export const deleteQuestionApi =
+  (questionId) =>
+    fetch(`${DOMAIN}/api/v1/admin/questions/${questionId}`, {
+      method: "DELETE"
+    });
+
 export const fetchAdminQuestions =
   (topicId) =>
     fetch(

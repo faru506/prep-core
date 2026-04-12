@@ -15,7 +15,7 @@ Rails.application.routes.draw do
         resources :topics, only: [:index, :create, :update, :destroy] do
           resources :questions, only: [:index]
         end 
-        resources :questions, only: [:create]
+        resources :questions, only: [:create, :update, :destroy]
         post "courses/reorder", to: "courses#reorder"
         post "topics/reorder", to: "topics#reorder"
         post "questions/reorder", to: "questions#reorder"

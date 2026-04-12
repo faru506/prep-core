@@ -6,7 +6,8 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { reorderCoursesApi, fetchAdminCourses, fetchAdminTopics } from "../apis/course_manager";
 import CreateCourseModal from "../components/Modal/CreateCourseModal";
 import CreateTopicModal from "../components/Modal/CreateTopicModal";
-import SortableCourse from "../components/Sortable/SortableCourse"
+import ConfirmDialog from "../components/Modal/ConfirmDialog";
+import SortableCourse from "../components/Sortable/SortableCourse";
 
 const CourseManager = () => {
 
@@ -16,6 +17,7 @@ const CourseManager = () => {
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [expandedTopics, setExpandedTopics] = useState({});
+  const [pendingCourseReorder, setPendingCourseReorder] = useState(null);
 
   useEffect(() => {
     loadCourses();
@@ -64,44 +66,43 @@ const CourseManager = () => {
     };
 
   const handleDragEnd = async (event) => {
-      const { active, over } = event;
-      if (!over) return;
-      if (active.id !== over.id) {
-        const oldIndex =
-          courses.findIndex(
-            c => c.id === active.id
-          );
+    const { active, over } = event;
 
-        const newIndex =
-          courses.findIndex(
-            c => c.id === over.id
-          );
+    if (!over || active.id === over.id) return;
 
-        const newCourses = [...courses];
+    const oldIndex =
+      courses.findIndex(
+        c => c.id === active.id
+      );
 
-        const [moved] =
-          newCourses.splice(
-            oldIndex,
-            1
-          );
+    const newIndex =
+      courses.findIndex(
+        c => c.id === over.id
+      );
 
-        newCourses.splice(
-          newIndex,
-          0,
-          moved
-        );
+    const nextCourses = [...courses];
 
-        setCourses(newCourses);
+    const [moved] =
+      nextCourses.splice(
+        oldIndex,
+        1
+      );
 
-        await reorderCoursesApi(
-          newCourses.map(
-            c => c.id
-          )
-        );
+    nextCourses.splice(
+      newIndex,
+      0,
+      moved
+    );
 
-      }
-
-    };
+    setCourses(nextCourses);
+    setPendingCourseReorder({
+      movedCourseTitle: moved.title,
+      oldPosition: oldIndex + 1,
+      newPosition: newIndex + 1,
+      previousCourses: courses,
+      nextCourses
+    });
+  };
 
   return (
 
@@ -191,6 +192,31 @@ const CourseManager = () => {
               selectedCourse.id
             )
           }
+        />
+
+      )}
+
+      {pendingCourseReorder && (
+
+        <ConfirmDialog
+          title="Save new course order?"
+          description={`"${pendingCourseReorder.movedCourseTitle}" moved from position ${pendingCourseReorder.oldPosition} to ${pendingCourseReorder.newPosition}. Save this course order to the database?`}
+          tone="primary"
+          confirmLabel="Save order"
+          onCancel={() => {
+            setCourses(
+              pendingCourseReorder.previousCourses
+            );
+            setPendingCourseReorder(null);
+          }}
+          onConfirm={async () => {
+            await reorderCoursesApi(
+              pendingCourseReorder.nextCourses.map(
+                c => c.id
+              )
+            );
+            setPendingCourseReorder(null);
+          }}
         />
 
       )}

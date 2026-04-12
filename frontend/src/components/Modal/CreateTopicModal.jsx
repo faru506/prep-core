@@ -2,6 +2,7 @@ import { useState } from "react";
 import BaseModal from "./BaseModal";
 
 import { createTopicApi } from "../../apis/course_manager";
+import { LEVEL_OPTIONS } from "../../utilities/levels";
 
 const CreateTopicModal = ({
   course,
@@ -10,6 +11,7 @@ const CreateTopicModal = ({
 }) => {
 
   const [title, setTitle] = useState("");
+  const [level, setLevel] = useState("medium");
 
   const handleSubmit = async (e) => {
 
@@ -17,7 +19,12 @@ const CreateTopicModal = ({
 
     const slug = title.toLowerCase().replace(/\s+/g, "-");
 
-    await createTopicApi({ course_id: course.id, title, slug });
+    await createTopicApi({
+      course_id: course.id,
+      title,
+      slug,
+      level
+    });
 
     onCreated(course.id);
     onClose();
@@ -45,6 +52,23 @@ const CreateTopicModal = ({
           className="bg-slate-800 p-3 rounded"
           required
         />
+
+        <select
+          value={level}
+          onChange={(e) =>
+            setLevel(e.target.value)
+          }
+          className="bg-slate-800 p-3 rounded"
+        >
+          {LEVEL_OPTIONS.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
 
         <button
           type="submit"

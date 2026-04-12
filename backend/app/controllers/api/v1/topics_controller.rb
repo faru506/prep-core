@@ -10,7 +10,8 @@ class Api::V1::TopicsController < ApplicationController
       {
         id: topic.id.to_s,
         title: topic.title,
-        slug: topic.slug
+        slug: topic.slug,
+        level: topic.level
       }
     }
 
