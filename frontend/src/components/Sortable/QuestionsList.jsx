@@ -1,20 +1,15 @@
-import { useState } from "react";
-
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
-import { reorderQuestionsApi, fetchAdminQuestions } from "../../apis/course_manager";
+import { reorderQuestionsApi } from "../../apis/course_manager";
 
 import SortableQuestion from "./SortableQuestion";
-import CreateQuestionModal from "../Modal/CreateQuestionModal";
 
 const QuestionsList = ({
   topic,
   course,
   setCourses
 }) => {
-
-  const [showQuestionModal, setShowQuestionModal] = useState(false);
 
   const handleDragEnd = async (event) => {
 
@@ -106,62 +101,11 @@ const QuestionsList = ({
               />
 
             ))}
-
-            <button
-              onClick={() =>
-                setShowQuestionModal(true)
-              }
-              className="text-indigo-400 text-sm mt-2"
-            >
-              + Create Question
-            </button>
-
           </div>
 
         </SortableContext>
 
       </DndContext>
-
-      {showQuestionModal && (
-
-        <CreateQuestionModal
-          course={course}
-          topic={topic}
-          onClose={() =>
-            setShowQuestionModal(false)
-          }
-
-          onCreated={async () => {
-
-            const res =
-              await fetchAdminQuestions(topic.id);
-
-            const questions =
-              await res.json();
-
-            setCourses(prev =>
-              prev.map(c =>
-                c.id === course.id
-                  ? {
-                      ...c,
-                      topics:
-                        c.topics.map(t =>
-                          t.id === topic.id
-                            ? {
-                                ...t,
-                                questions
-                              }
-                            : t
-                        )
-                    }
-                  : c
-              )
-            );
-
-          }}
-        />
-
-      )}
 
     </>
 

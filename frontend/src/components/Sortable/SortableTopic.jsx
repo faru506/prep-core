@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 import QuestionsList from "./QuestionsList";
+import CreateQuestionModal from "../Modal/CreateQuestionModal";
+import { fetchAdminQuestions } from "../../apis/course_manager";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -10,6 +14,7 @@ const SortableTopic = ({
   expandedTopics,
   toggleTopic
 }) => {
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
 
   const {
     attributes,
@@ -28,29 +33,44 @@ const SortableTopic = ({
     <div ref={setNodeRef} style={style}>
 
       <div
-        className="bg-slate-900 p-2 rounded flex gap-2 items-center"
+        className="bg-slate-900 p-2 rounded flex items-center justify-between gap-3"
       >
 
-        <span
-          {...attributes}
-          {...listeners}
-          className="cursor-grab"
-        >
-          ⠿
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
 
-        <span
-          className="cursor-pointer"
+          <span
+            {...attributes}
+            {...listeners}
+            className="cursor-grab"
+          >
+            ⠿
+          </span>
+
+          <span
+            className="cursor-pointer"
+            onClick={() =>
+              toggleTopic(topic.id)
+            }
+          >
+            {expandedTopics[topic.id]
+              ? "▼"
+              : "▶"}
+          </span>
+
+          <span className="truncate">
+            {topic.title}
+          </span>
+
+        </div>
+
+        <button
           onClick={() =>
-            toggleTopic(topic.id)
+            setShowQuestionModal(true)
           }
+          className="text-indigo-400 text-sm shrink-0"
         >
-          {expandedTopics[topic.id]
-            ? "▼"
-            : "▶"}
-        </span>
-
-        {topic.title}
+          + Create Question
+        </button>
 
       </div>
 
@@ -61,6 +81,46 @@ const SortableTopic = ({
           topic={topic}
           course={course}
           setCourses={setCourses}
+        />
+
+      )}
+
+      {showQuestionModal && (
+
+        <CreateQuestionModal
+          course={course}
+          topic={topic}
+          onClose={() =>
+            setShowQuestionModal(false)
+          }
+          onCreated={async () => {
+
+            const res =
+              await fetchAdminQuestions(topic.id);
+
+            const questions =
+              await res.json();
+
+            setCourses(prev =>
+              prev.map(c =>
+                c.id === course.id
+                  ? {
+                      ...c,
+                      topics:
+                        c.topics.map(t =>
+                          t.id === topic.id
+                            ? {
+                                ...t,
+                                questions
+                              }
+                            : t
+                        )
+                    }
+                  : c
+              )
+            );
+
+          }}
         />
 
       )}

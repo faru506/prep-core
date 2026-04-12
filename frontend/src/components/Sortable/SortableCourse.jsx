@@ -1,5 +1,3 @@
-import Topic from "./SortableTopic";
-
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -134,30 +132,46 @@ const SortableCourse =
     >
 
       <div
-        className="flex items-center gap-2
-                   bg-slate-800 p-3 rounded"
+        className="flex items-center justify-between
+                   gap-3 bg-slate-800 p-3 rounded"
       >
 
-        <span
-          {...attributes}
-          {...listeners}
-          className="cursor-grab"
-        >
-          ⠿
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
 
-        <span
-          className="cursor-pointer"
-          onClick={() =>
-            toggleCourse(course.id)
-          }
-        >
-          {expanded[course.id]
-            ? "▼"
-            : "▶"}
-        </span>
+          <span
+            {...attributes}
+            {...listeners}
+            className="cursor-grab"
+          >
+            ⠿
+          </span>
 
-        {course.title}
+          <span
+            className="cursor-pointer"
+            onClick={() =>
+              toggleCourse(course.id)
+            }
+          >
+            {expanded[course.id]
+              ? "▼"
+              : "▶"}
+          </span>
+
+          <span className="truncate">
+            {course.title}
+          </span>
+
+        </div>
+
+        <button
+          onClick={() => {
+            setSelectedCourse(course);
+            setShowTopicModal(true);
+          }}
+          className="text-indigo-400 text-sm shrink-0"
+        >
+          + Create Topic
+        </button>
 
       </div>
 
@@ -193,17 +207,6 @@ const SortableCourse =
                 />
 
               ))}
-
-              <button
-                onClick={() => {
-                  setSelectedCourse(course);
-                  setShowTopicModal(true);
-                }}
-                className="text-indigo-400 text-sm mt-2"
-              >
-                + Create Topic
-              </button>
-
             </div>
 
           </SortableContext>
