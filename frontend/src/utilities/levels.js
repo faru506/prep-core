@@ -24,3 +24,27 @@ export const getLevelDotClasses = (level) => {
       return "bg-amber-400/90 shadow-[0_0_0_4px_rgba(251,191,36,0.10)]";
   }
 };
+
+export const getLevelLabel = (level) => {
+  switch (level) {
+    case "low":
+      return "Low";
+    case "hard":
+      return "Hard";
+    case "medium":
+    default:
+      return "Medium";
+  }
+};
+
+export const getLevelChipClasses = (level) => {
+  switch (level) {
+    case "low":
+      return "border-emerald-500/20 bg-emerald-500/10 text-emerald-200";
+    case "hard":
+      return "border-rose-500/20 bg-rose-500/10 text-rose-200";
+    case "medium":
+    default:
+      return "border-amber-500/20 bg-amber-500/10 text-amber-200";
+  }
+};

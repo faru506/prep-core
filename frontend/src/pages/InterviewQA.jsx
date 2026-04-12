@@ -3,6 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchCoursesApi } from "../apis/courses";
 import { fetchTopicsApi } from "../apis/topics";
 import { fetchQuestionsApi } from "../apis/questions";
+import {
+  LEVEL_OPTIONS,
+  getLevelDotClasses
+} from "../utilities/levels";
 
 import Prism from "prismjs";
 
@@ -23,11 +27,14 @@ const InterviewQA = () => {
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState("low");
 
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   const questionRefs = useRef({});
+  const topicsRequestRef = useRef(0);
+  const questionsRequestRef = useRef(0);
 
   // Load courses initially
   useEffect(() => {
@@ -38,10 +45,31 @@ const InterviewQA = () => {
   useEffect(() => {
 
     if (courseSlug) {
+      setSelectedLevel("low");
+      setTopics([]);
+      setQuestions([]);
+      setSelectedTopic(null);
       loadTopics(courseSlug);
     }
 
   }, [courseSlug]);
+
+  useEffect(() => {
+
+    if (!courseSlug && courses.length > 0) {
+
+      const firstCourse = courses[0];
+
+      setSelectedCourse(firstCourse);
+
+      navigate(
+        `/interview_qa/${firstCourse.slug}`,
+        { replace: true }
+      );
+
+    }
+
+  }, [courseSlug, courses, navigate]);
 
   // Reload questions when topicSlug changes
   useEffect(() => {
@@ -53,27 +81,13 @@ const InterviewQA = () => {
 
       if (topic) {
         setSelectedTopic(topic);
+        setSelectedLevel("low");
         loadQuestions(topic.id);
       }
 
     }
 
   }, [topicSlug, topics]);
-
-  useEffect(() => {
-
-    if (questions.length > 0) {
-
-      const firstQuestion = questionRefs.current[questions[0].id];
-
-      firstQuestion?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-
-    }
-
-  }, [questions]);
 
   useEffect(() => {
 
@@ -148,14 +162,12 @@ const InterviewQA = () => {
 
       if (data.length > 0) {
 
-        const selected = data.find(c => c.slug === courseSlug) || data[0];
+        const selected =
+          courseSlug
+            ? data.find(c => c.slug === courseSlug) || data[0]
+            : data[0];
 
         setSelectedCourse(selected);
-
-        navigate(
-          `/interview_qa/${selected.slug}`,
-          { replace: true }
-        );
 
       }
 
@@ -171,6 +183,8 @@ const InterviewQA = () => {
 
     if (!slug) return;
 
+    const requestId = ++topicsRequestRef.current;
+
     try {
 
       setLoadingTopics(true);
@@ -179,10 +193,15 @@ const InterviewQA = () => {
 
       const data = await response.json();
 
+      if (requestId !== topicsRequestRef.current) {
+        return;
+      }
+
       if (!response.ok) {
 
         setTopics([]);
         setQuestions([]);
+        setSelectedTopic(null);
         return;
 
       }
@@ -195,22 +214,33 @@ const InterviewQA = () => {
 
         setSelectedTopic(selected);
 
-        navigate(
-          `/interview_qa/${slug}/${selected.slug}`,
-          { replace: true }
-        );
+        if (!topicSlug || !data.find(t => t.slug === topicSlug)) {
+          navigate(
+            `/interview_qa/${slug}/${selected.slug}`,
+            { replace: true }
+          );
+        }
 
         loadQuestions(selected.id);
+
+      } else {
+
+        setSelectedTopic(null);
+        setQuestions([]);
 
       }
 
     } catch (error) {
 
-      console.error("Failed to load topics:", error);
+      if (requestId === topicsRequestRef.current) {
+        console.error("Failed to load topics:", error);
+      }
 
     } finally {
 
-      setLoadingTopics(false);
+      if (requestId === topicsRequestRef.current) {
+        setLoadingTopics(false);
+      }
 
     }
 
@@ -220,6 +250,8 @@ const InterviewQA = () => {
 
     if (!topicId) return;
 
+    const requestId = ++questionsRequestRef.current;
+
     try {
 
       setLoadingQuestions(true);
@@ -227,6 +259,10 @@ const InterviewQA = () => {
       const response = await fetchQuestionsApi(topicId);
 
       const data = await response.json();
+
+      if (requestId !== questionsRequestRef.current) {
+        return;
+      }
 
       if (!response.ok) {
 
@@ -239,15 +275,25 @@ const InterviewQA = () => {
 
     } catch (error) {
 
-      console.error("Failed to load questions:", error);
+      if (requestId === questionsRequestRef.current) {
+        console.error("Failed to load questions:", error);
+      }
 
     } finally {
 
-      setLoadingQuestions(false);
+      if (requestId === questionsRequestRef.current) {
+        setLoadingQuestions(false);
+      }
 
     }
 
   };
+
+  const filteredQuestions =
+    questions.filter(
+      (question) =>
+        (question.level || "medium") === selectedLevel
+    );
 
   return (
 
@@ -267,13 +313,14 @@ const InterviewQA = () => {
               onClick={() => {
 
                 setSelectedCourse(course);
+                setSelectedLevel("low");
 
                 navigate(
                   `/interview_qa/${course.slug}`
                 );
 
               }}
-              className={`px-4 py-2 rounded-lg transition
+              className={`rounded-lg border border-transparent px-4 py-2 outline-none transition focus:outline-none focus-visible:border-indigo-300/40
                 ${selectedCourse?.slug === course.slug
                   ? "bg-indigo-600"
                   : "bg-slate-800 hover:bg-slate-700"}
@@ -317,6 +364,7 @@ const InterviewQA = () => {
                   onClick={() => {
 
                     setSelectedTopic(topic);
+                    setSelectedLevel("low");
 
                     navigate(
                       `/interview_qa/${selectedCourse.slug}/${topic.slug}`
@@ -333,7 +381,12 @@ const InterviewQA = () => {
                   `}
                 >
 
-                  {topic.title}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className={`inline-flex h-2 w-2 shrink-0 rounded-full ${getLevelDotClasses(topic.level)}`} />
+                    <span className="truncate">
+                      {topic.title}
+                    </span>
+                  </span>
 
                 </button>
 
@@ -347,37 +400,96 @@ const InterviewQA = () => {
 
         <div className="flex-1 overflow-y-auto p-6">
 
+          {selectedTopic && questions.length > 0 && (
+            <div className="mb-6 flex items-center justify-between gap-4 border-b border-slate-800 pb-4">
+
+              <div>
+                <h1 className="text-lg font-semibold text-slate-100">
+                  {selectedTopic.title}
+                </h1>
+                <p className="mt-1 text-sm text-slate-400">
+                  Showing only {selectedLevel} level questions.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  Level
+                </span>
+
+                <select
+                  value={selectedLevel}
+                  onChange={(e) =>
+                    setSelectedLevel(e.target.value)
+                  }
+                  className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  {LEVEL_OPTIONS.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+              </div>
+
+            </div>
+          )}
+
           {loadingQuestions ? (
 
             <div className="text-slate-400">
               Loading questions...
             </div>
 
-          ) : questions.length === 0 ? (
+          ) : !selectedTopic || questions.length === 0 ? (
 
             <div className="text-slate-400">
               No questions found
             </div>
 
+          ) : filteredQuestions.length === 0 ? (
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-6 py-8 text-center text-slate-400">
+              No {selectedLevel} level questions found for this topic.
+            </div>
+
           ) : (
 
-            questions.map(q => (
+            filteredQuestions.map((q, index) => (
 
               <div
                 key={q.id}
                 data-id={q.topic_id}
                 ref={(el) => (questionRefs.current[q.id] = el)}
-                className="mb-10 border-b border-slate-800 pb-6"
+                className="mb-6 overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
               >
 
-                <h2 className="text-xl font-semibold mb-3">
+                <div className="flex items-center justify-between border-b border-slate-800/90 bg-slate-900/80 px-6 py-4">
 
-                  {q.title}
+                  <div className="flex min-w-0 items-center gap-4">
 
-                </h2>
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
+                      {index + 1}
+                    </span>
+
+                    <h2 className="truncate text-xl font-semibold text-slate-50">
+                      {q.title}
+                    </h2>
+
+                  </div>
+
+                  <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+                    Question
+                  </span>
+                </div>
 
                 <div
-                  className="prose prose-invert max-w-none"
+                  className="prose prose-invert max-w-none px-6 py-5"
                   dangerouslySetInnerHTML={{
                     __html: q.answer
                   }}
