@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :admin do
-        resources :users, only: [:index]
+        resources :users, only: [:index, :create, :update, :destroy]
         resources :courses, only: [:index, :create, :update, :destroy]
         resources :topics, only: [:index, :create, :update, :destroy] do
           resources :questions, only: [:index]
@@ -21,12 +21,12 @@ Rails.application.routes.draw do
         post "questions/reorder", to: "questions#reorder"
       end
 
-      resources :courses, only: [:index] do
-        resources :topics, only: [:index]
+      resources :courses, only: [:index], controller: "admin/courses" do
+        resources :topics, only: [:index], controller: "admin/topics"
       end
 
       resources :topics, only: [] do
-        resources :questions, only: [:index]
+        resources :questions, only: [:index], controller: "admin/questions"
       end
 
     end

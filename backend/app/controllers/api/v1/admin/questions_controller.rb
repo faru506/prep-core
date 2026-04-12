@@ -74,7 +74,8 @@ class Api::V1::Admin::QuestionsController < ApplicationController
           id: q.id.to_s,
           title: q.title,
           answer: q.answer&.content,
-          level: q.level
+          level: q.level,
+          topic_id: q.topic_id.to_s
         }
       }
 

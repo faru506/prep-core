@@ -55,7 +55,12 @@ class Api::V1::Admin::TopicsController < ApplicationController
   end
 
   def index
-    course = Course.find(params[:course_id])
+    course =
+      if BSON::ObjectId.legal?(params[:course_id].to_s)
+        Course.find(params[:course_id])
+      else
+        Course.find_by!(slug: params[:course_id])
+      end
 
     topics = course.topics.order_by(position: :asc)
 
