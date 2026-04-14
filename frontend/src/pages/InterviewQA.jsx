@@ -36,6 +36,82 @@ const InterviewQA = () => {
   const questionRefs = useRef({});
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
+
+  const loadQuestions = async (topicId) => {
+    if (!topicId) return;
+    const requestId = ++questionsRequestRef.current;
+    try {
+      setLoadingQuestions(true);
+      const response = await fetchQuestionsApi(topicId);
+      const data = await response.json();
+      if (requestId !== questionsRequestRef.current) return;
+      if (!response.ok) {
+        setQuestions([]);
+        return;
+      }
+      setQuestions(data);
+    } catch (error) {
+      if (requestId === questionsRequestRef.current) {
+        console.error("Failed to load questions:", error);
+      }
+    } finally {
+      if (requestId === questionsRequestRef.current) {
+        setLoadingQuestions(false);
+      }
+    }
+  };
+
+  const loadTopics = async (slug) => {
+    if (!slug) return;
+    const requestId = ++topicsRequestRef.current;
+    try {
+      setLoadingTopics(true);
+      const response = await fetchTopicsApi(slug);
+      const data = await response.json();
+      if (requestId !== topicsRequestRef.current) return;
+      if (!response.ok) {
+        setTopics([]);
+        setQuestions([]);
+        setSelectedTopic(null);
+        return;
+      }
+      setTopics(data);
+      if (data.length > 0) {
+        const selected = data.find(t => t.slug === topicSlug) || data[0];
+        setSelectedTopic(selected);
+        if (!topicSlug || !data.find(t => t.slug === topicSlug)) {
+          navigate(`/interview_qa/${slug}/${selected.slug}`, { replace: true });
+        }
+        loadQuestions(selected.id);
+      } else {
+        setSelectedTopic(null);
+        setQuestions([]);
+      }
+    } catch (error) {
+      if (requestId === topicsRequestRef.current) {
+        console.error("Failed to load topics:", error);
+      }
+    } finally {
+      if (requestId === topicsRequestRef.current) {
+        setLoadingTopics(false);
+      }
+    }
+  };
+
+  const loadCourses = async () => {
+    try {
+      const response = await fetchCoursesApi();
+      const data = await response.json();
+      setCourses(data);
+      if (data.length > 0) {
+        const selected = courseSlug ? data.find(c => c.slug === courseSlug) || data[0] : data[0];
+        setSelectedCourse(selected);
+      }
+    } catch (error) {
+      console.error("Failed to load courses:", error);
+    }
+  };
+
   const loadCoursesRef = useRef(loadCourses);
   loadCoursesRef.current = loadCourses;
 
@@ -163,144 +239,6 @@ const InterviewQA = () => {
     }
   }, []);
 
-  const loadCourses = async () => {
-
-    try {
-
-      const response = await fetchCoursesApi();
-      const data = await response.json();
-
-      setCourses(data);
-
-      if (data.length > 0) {
-
-        const selected =
-          courseSlug
-            ? data.find(c => c.slug === courseSlug) || data[0]
-            : data[0];
-
-        setSelectedCourse(selected);
-
-      }
-
-    } catch (error) {
-
-      console.error("Failed to load courses:", error);
-
-    }
-
-  };
-
-  const loadTopics = async (slug) => {
-
-    if (!slug) return;
-
-    const requestId = ++topicsRequestRef.current;
-
-    try {
-
-      setLoadingTopics(true);
-
-      const response = await fetchTopicsApi(slug);
-
-      const data = await response.json();
-
-      if (requestId !== topicsRequestRef.current) {
-        return;
-      }
-
-      if (!response.ok) {
-
-        setTopics([]);
-        setQuestions([]);
-        setSelectedTopic(null);
-        return;
-
-      }
-
-      setTopics(data);
-
-      if (data.length > 0) {
-
-        const selected = data.find(t => t.slug === topicSlug) || data[0];
-
-        setSelectedTopic(selected);
-
-        if (!topicSlug || !data.find(t => t.slug === topicSlug)) {
-          navigate(
-            `/interview_qa/${slug}/${selected.slug}`,
-            { replace: true }
-          );
-        }
-
-        loadQuestions(selected.id);
-
-      } else {
-
-        setSelectedTopic(null);
-        setQuestions([]);
-
-      }
-
-    } catch (error) {
-
-      if (requestId === topicsRequestRef.current) {
-        console.error("Failed to load topics:", error);
-      }
-
-    } finally {
-
-      if (requestId === topicsRequestRef.current) {
-        setLoadingTopics(false);
-      }
-
-    }
-
-  };
-
-  const loadQuestions = async (topicId) => {
-
-    if (!topicId) return;
-
-    const requestId = ++questionsRequestRef.current;
-
-    try {
-
-      setLoadingQuestions(true);
-
-      const response = await fetchQuestionsApi(topicId);
-
-      const data = await response.json();
-
-      if (requestId !== questionsRequestRef.current) {
-        return;
-      }
-
-      if (!response.ok) {
-
-        setQuestions([]);
-        return;
-
-      }
-
-      setQuestions(data);
-
-    } catch (error) {
-
-      if (requestId === questionsRequestRef.current) {
-        console.error("Failed to load questions:", error);
-      }
-
-    } finally {
-
-      if (requestId === questionsRequestRef.current) {
-        setLoadingQuestions(false);
-      }
-
-    }
-
-  };
-
   const filteredQuestions =
     questions.filter(
       (question) =>
@@ -329,10 +267,10 @@ const InterviewQA = () => {
                 );
 
               }}
-              className={`rounded-lg border border-transparent px-3 md:px-4 py-2 text-sm md:text-base outline-none transition duration-200 focus:outline-none focus-visible:border-indigo-300/40
+              className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm md:text-base font-medium outline-none transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50
                 ${selectedCourse?.slug === course.slug
-                  ? "bg-indigo-600"
-                  : "bg-slate-800 hover:bg-slate-700"}
+                  ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
+                  : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white"}
               `}
             >
 
