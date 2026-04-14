@@ -62,6 +62,14 @@ bundle exec rubocop -A  # Auto-fix offenses
 - **Frontend**: ESLint for JavaScript/React (`make lint-frontend`)
 - Both can be run together with `make lint`
 
+## Course Content
+
+- **Courses**: Ruby, Rails, React, JavaScript, System Design
+- **Topic Levels**: 
+  - `low` (SDE 1 - Foundations)
+  - `medium` (SDE 2 - Intermediate Mastery)
+  - `hard` (SDE 3 - Expert & Architecture)
+
 ## Gotchas
 
 - CI runs `bundle exec rails test || true` - tests don't fail CI
