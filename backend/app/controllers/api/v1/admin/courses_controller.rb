@@ -1,5 +1,4 @@
 class Api::V1::Admin::CoursesController < ApplicationController
-
   def create
     next_position =
       Course.max(:position).to_i + 1
@@ -69,5 +68,4 @@ class Api::V1::Admin::CoursesController < ApplicationController
 
     head :ok
   end
-
 end

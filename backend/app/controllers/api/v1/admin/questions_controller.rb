@@ -1,5 +1,4 @@
 class Api::V1::Admin::QuestionsController < ApplicationController
-
   def create
     topic = Topic.find(params[:topic_id])
     next_position =
@@ -78,7 +77,6 @@ class Api::V1::Admin::QuestionsController < ApplicationController
           topic_id: q.topic_id.to_s
         }
       }
-
   end
 
   def reorder
@@ -90,5 +88,4 @@ class Api::V1::Admin::QuestionsController < ApplicationController
 
     head :ok
   end
-
 end

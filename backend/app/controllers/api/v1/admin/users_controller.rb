@@ -1,5 +1,4 @@
 class Api::V1::Admin::UsersController < ApplicationController
-
   def index
     users = User.order_by(created_at: :desc)
 
@@ -63,5 +62,4 @@ class Api::V1::Admin::UsersController < ApplicationController
       role: user.role
     }
   end
-
 end

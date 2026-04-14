@@ -1,7 +1,5 @@
 class Api::V1::Admin::TopicsController < ApplicationController
-
   def create
-
     course = Course.find(params[:course_id])
 
     topic =
@@ -18,7 +16,6 @@ class Api::V1::Admin::TopicsController < ApplicationController
       slug: topic.slug,
       level: topic.level
     }
-
   end
 
   def update
@@ -81,5 +78,4 @@ class Api::V1::Admin::TopicsController < ApplicationController
 
     head :ok
   end
-
 end
