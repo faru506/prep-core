@@ -73,3 +73,14 @@ npm-install:
 # Install specific npm package
 npm-add:
 	docker compose -f $(COMPOSE_FILE) exec frontend npm install $(pkg)
+
+# Run frontend lint
+lint-frontend:
+	cd frontend && npm run lint
+
+# Run backend rubocop
+lint-backend:
+	docker compose -f $(COMPOSE_FILE) exec backend bundle exec rubocop
+
+# Run both linters
+lint: lint-frontend lint-backend

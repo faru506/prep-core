@@ -36,10 +36,15 @@ const InterviewQA = () => {
   const questionRefs = useRef({});
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
+  const loadCoursesRef = useRef(loadCourses);
+  loadCoursesRef.current = loadCourses;
 
   useEffect(() => {
-    loadCourses();
+    loadCoursesRef.current();
   }, []);
+
+  const loadTopicsRef = useRef(loadTopics);
+  loadTopicsRef.current = loadTopics;
 
   useEffect(() => {
 
@@ -48,7 +53,7 @@ const InterviewQA = () => {
       setTopics([]);
       setQuestions([]);
       setSelectedTopic(null);
-      loadTopics(courseSlug);
+      loadTopicsRef.current(courseSlug);
     }
 
   }, [courseSlug]);
@@ -124,7 +129,9 @@ const InterviewQA = () => {
 
     );
 
-    Object.values(questionRefs.current)
+    const currentRefs = questionRefs.current;
+    
+    Object.values(currentRefs)
       .forEach(el => {
 
         if (el) observer.observe(el);
@@ -133,7 +140,7 @@ const InterviewQA = () => {
 
     return () => {
 
-      Object.values(questionRefs.current)
+      Object.values(currentRefs)
         .forEach(el => {
 
           if (el) observer.unobserve(el);

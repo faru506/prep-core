@@ -37,7 +37,7 @@ const Users = () => {
       const data = await response.json();
       setUsers(data);
 
-    } catch (error) {
+    } catch {
       setUsers([]);
     } finally {
       setLoading(false);
@@ -216,7 +216,7 @@ const Users = () => {
                   </td>
                 </tr>
               ) : (
-                paginatedUsers.map((user, index) => (
+                paginatedUsers.map((user) => (
                   <tr
                     key={user.id}
                     className="transition hover:bg-slate-800/50 group"
