@@ -10,7 +10,6 @@ import {
 
 import Prism from "prismjs";
 
-// Load languages
 import "prismjs/components/prism-ruby";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-css";
@@ -32,16 +31,16 @@ const InterviewQA = () => {
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const questionRefs = useRef({});
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
 
-  // Load courses initially
   useEffect(() => {
     loadCourses();
   }, []);
 
-  // Reload topics when courseSlug changes
   useEffect(() => {
 
     if (courseSlug) {
@@ -71,7 +70,6 @@ const InterviewQA = () => {
 
   }, [courseSlug, courses, navigate]);
 
-  // Reload questions when topicSlug changes
   useEffect(() => {
 
     if (topicSlug && topics.length > 0) {
@@ -121,6 +119,7 @@ const InterviewQA = () => {
         root: null,
         rootMargin: "-100px 0px -60% 0px",
         threshold: 0.1
+
       }
 
     );
@@ -150,6 +149,12 @@ const InterviewQA = () => {
     Prism.highlightAll();
 
   }, [questions]);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) {
+      setSidebarOpen(false);
+    }
+  }, []);
 
   const loadCourses = async () => {
 
@@ -299,12 +304,9 @@ const InterviewQA = () => {
 
     <div className="h-screen flex flex-col bg-slate-950 text-white">
 
-      <div className="sticky bg-slate-950 z-40 px-6 py-3 border-b border-slate-800">
+      <div className="sticky bg-slate-950 z-40 px-4 md:px-6 py-3 border-b border-slate-800">
 
-        <div
-          className="flex gap-4 overflow-x-auto
-          [&::-webkit-scrollbar]:hidden"
-        >
+        <div className="flex gap-3 md:gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
           {courses.map(course => (
 
@@ -320,7 +322,7 @@ const InterviewQA = () => {
                 );
 
               }}
-              className={`rounded-lg border border-transparent px-4 py-2 outline-none transition focus:outline-none focus-visible:border-indigo-300/40
+              className={`rounded-lg border border-transparent px-3 md:px-4 py-2 text-sm md:text-base outline-none transition duration-200 focus:outline-none focus-visible:border-indigo-300/40
                 ${selectedCourse?.slug === course.slug
                   ? "bg-indigo-600"
                   : "bg-slate-800 hover:bg-slate-700"}
@@ -337,9 +339,27 @@ const InterviewQA = () => {
 
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
 
-        <div className="w-64 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto">
+        <div className={`
+          md:relative md:w-64 md:bg-slate-900 md:border-r md:border-slate-800 md:p-4 
+          fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0
+        `}>
+
+          <div className="flex items-center justify-between mb-4 md:hidden">
+            <h2 className="text-lg font-semibold text-slate-100">Topics</h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 text-slate-400 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
           <div className="flex flex-col gap-2">
 
@@ -370,9 +390,13 @@ const InterviewQA = () => {
                       `/interview_qa/${selectedCourse.slug}/${topic.slug}`
                     );
 
+                    if (window.innerWidth < 768) {
+                      setSidebarOpen(false);
+                    }
+
                   }}
                   className={`text-left px-4 py-2 rounded-lg
-                    transition hover:bg-slate-800
+                    transition duration-200 hover:bg-slate-800
                     ${
                       selectedTopic?.slug === topic.slug
                         ? "bg-slate-800"
@@ -398,13 +422,29 @@ const InterviewQA = () => {
 
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="md:hidden fixed bottom-6 left-6 z-30 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
 
           {selectedTopic && questions.length > 0 && (
-            <div className="mb-6 flex items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
 
               <div>
-                <h1 className="text-lg font-semibold text-slate-100">
+                <h1 className="text-lg md:text-xl font-semibold text-slate-100">
                   {selectedTopic.title}
                 </h1>
                 <p className="mt-1 text-sm text-slate-400">
@@ -423,7 +463,7 @@ const InterviewQA = () => {
                   onChange={(e) =>
                     setSelectedLevel(e.target.value)
                   }
-                  className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                  className="rounded-xl border border-slate-700 bg-slate-900 px-3 md:px-4 py-2 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
                 >
                   {LEVEL_OPTIONS.map((option) => (
                     <option
@@ -466,30 +506,31 @@ const InterviewQA = () => {
                 key={q.id}
                 data-id={q.topic_id}
                 ref={(el) => (questionRefs.current[q.id] = el)}
-                className="mb-6 overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
+                className="mb-4 md:mb-6 overflow-hidden rounded-xl md:rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
               >
 
-                <div className="flex items-center justify-between border-b border-slate-800/90 bg-slate-900/80 px-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/90 bg-slate-900/80 px-4 md:px-6 py-3 md:py-4">
 
-                  <div className="flex min-w-0 items-center gap-4">
+                  <div className="flex min-w-0 items-center gap-3 md:gap-4">
 
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
+                    <span className="flex h-8 md:h-9 w-8 md:w-9 shrink-0 items-center justify-center rounded-lg md:rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
                       {index + 1}
                     </span>
 
-                    <h2 className="truncate text-xl font-semibold text-slate-50">
+                    <h2 className="truncate text-base md:text-xl font-semibold text-slate-50">
                       {q.title}
                     </h2>
 
                   </div>
 
-                  <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+                  <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
                     Question
                   </span>
+
                 </div>
 
                 <div
-                  className="prose prose-invert max-w-none px-6 py-5"
+                  className="prose prose-invert max-w-none px-4 md:px-6 py-4 md:py-5"
                   dangerouslySetInnerHTML={{
                     __html: q.answer
                   }}
