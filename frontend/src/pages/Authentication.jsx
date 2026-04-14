@@ -2,6 +2,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { loginApi, registerApi } from "../apis/authentication";
 import { saveToken } from "../utilities/storage";
+import { EyeIcon } from "../components/Icons";
 
 const Authentication = () => {
   const location = useLocation();
@@ -22,6 +23,8 @@ const Authentication = () => {
     email: "",
     password: ""
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setErrors({ first_name: "", last_name: "", email: "", password: "" });
@@ -156,14 +159,21 @@ const Authentication = () => {
             <div className="relative group">
               <label className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-2 mb-1 block transition-colors group-hover:text-white">Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 rounded-2xl bg-white/5 border transition-all duration-300 outline-none text-white placeholder-slate-500
+                className={`w-full px-4 py-3 pr-12 rounded-2xl bg-white/5 border transition-all duration-300 outline-none text-white placeholder-slate-500
                   ${errors.password ? "border-red-500/50 ring-1 ring-red-500/50" : "border-white/10 hover:border-indigo-400/50 hover:bg-white/10 focus:border-indigo-400 focus:bg-white/10"}`}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[34px] text-slate-400 hover:text-white transition-colors"
+              >
+                <EyeIcon isOpen={showPassword} />
+              </button>
               {errors.password && <p className="text-red-400 text-[11px] mt-1 ml-2">{errors.password}</p>}
             </div>
 

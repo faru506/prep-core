@@ -5,6 +5,7 @@ import {
   createUserApi,
   updateUserApi
 } from "../../apis/users";
+import { EyeIcon } from "../Icons";
 
 const ROLE_OPTIONS = ["user", "admin"];
 
@@ -26,6 +27,7 @@ const UserModal = ({
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -141,15 +143,24 @@ const UserModal = ({
             ))}
           </select>
 
-          <input
-            name="password"
-            type="password"
-            placeholder={isEdit ? "New password (optional)" : "Password"}
-            value={form.password}
-            onChange={handleChange}
-            className="rounded-xl border border-slate-700 bg-slate-800/90 p-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
-            required={!isEdit}
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder={isEdit ? "New password (optional)" : "Password"}
+              value={form.password}
+              onChange={handleChange}
+              className="w-full rounded-xl border border-slate-700 bg-slate-800/90 p-3 pr-12 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+              required={!isEdit}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+            >
+              <EyeIcon isOpen={showPassword} />
+            </button>
+          </div>
 
         </div>
 
