@@ -13,6 +13,7 @@ const CourseManager = () => {
 
   const [courses, setCourses] = useState([]);
   const [expanded, setExpanded] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -27,6 +28,19 @@ const CourseManager = () => {
     const res = await fetchAdminCourses();
     const data = await res.json();
     setCourses(data);
+
+    // Load topics for all courses to enable search functionality
+    await Promise.all(
+      data.map(async (course) => {
+        const topicRes = await fetchAdminTopics(course.id);
+        const topics = await topicRes.json();
+        setCourses((prev) =>
+          prev.map((c) =>
+            c.id === course.id ? { ...c, topics } : c
+          )
+        );
+      })
+    );
   };
 
   const loadTopics = async (courseId) => {
@@ -107,21 +121,29 @@ const CourseManager = () => {
   return (
 
     <div className="p-6 text-white">
-      <div className="flex justify-between mb-6">
-
+      <div className="flex justify-between items-center mb-6 gap-4">
         <h1 className="text-2xl">
           Course Manager
         </h1>
 
-        <button
-          onClick={() =>
-            setShowCourseModal(true)
-          }
-          className="bg-indigo-600 px-4 py-2 rounded"
-        >
-          + Create Course
-        </button>
+        <div className="flex items-center gap-4 flex-1 justify-end">
+          <input
+            type="text"
+            placeholder="Search courses or topics..."
+            className="bg-slate-800 border border-slate-700 px-4 py-2 rounded text-white w-full max-w-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
 
+          <button
+            onClick={() =>
+              setShowCourseModal(true)
+            }
+            className="bg-indigo-600 px-4 py-2 rounded whitespace-nowrap"
+          >
+            + Create Course
+          </button>
+        </div>
       </div>
 
       <DndContext
@@ -135,9 +157,17 @@ const CourseManager = () => {
 
         <SortableContext
           items={
-            courses.map(
-              c => c.id
-            )
+            courses
+              .filter(course => {
+                if (searchQuery.length < 3) return true;
+                const query = searchQuery.toLowerCase();
+                const courseMatches = course.title.toLowerCase().includes(query);
+                const topicsMatch = course.topics?.some(t => t.title.toLowerCase().includes(query));
+                return courseMatches || topicsMatch;
+              })
+              .map(
+                c => c.id
+              )
           }
           strategy={
             verticalListSortingStrategy
@@ -146,21 +176,30 @@ const CourseManager = () => {
 
           <div className="space-y-2">
 
-            {courses.map(course => (
+            {courses
+              .filter(course => {
+                if (searchQuery.length < 3) return true;
+                const query = searchQuery.toLowerCase();
+                const courseMatches = course.title.toLowerCase().includes(query);
+                const topicsMatch = course.topics?.some(t => t.title.toLowerCase().includes(query));
+                return courseMatches || topicsMatch;
+              })
+              .map(course => (
 
-              <SortableCourse
-                key={course.id}
-                course={course}
-                expanded={expanded}
-                toggleCourse={toggleCourse}
-                setSelectedCourse={setSelectedCourse}
-                setShowTopicModal={setShowTopicModal}
-                setCourses={setCourses}
-                expandedTopics={expandedTopics}
-                setExpandedTopics={setExpandedTopics}
-              />
+                <SortableCourse
+                  key={course.id}
+                  course={course}
+                  expanded={expanded}
+                  toggleCourse={toggleCourse}
+                  setSelectedCourse={setSelectedCourse}
+                  setShowTopicModal={setShowTopicModal}
+                  setCourses={setCourses}
+                  expandedTopics={expandedTopics}
+                  setExpandedTopics={setExpandedTopics}
+                  searchQuery={searchQuery}
+                />
 
-            ))}
+              ))}
 
           </div>
 

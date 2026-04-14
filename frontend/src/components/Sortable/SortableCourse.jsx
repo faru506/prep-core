@@ -22,7 +22,8 @@ const SortableCourse =
   setShowTopicModal,
   setCourses,
   expandedTopics,
-  setExpandedTopics
+  setExpandedTopics,
+  searchQuery
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -35,6 +36,17 @@ const SortableCourse =
     transform,
     transition
   } = useSortable({ id: course.id });
+
+  const isExpandedBySearch = 
+    searchQuery?.length >= 3 && 
+    course.topics?.some(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const isExpanded = expanded[course.id] || isExpandedBySearch;
+
+  const filteredTopics = 
+    searchQuery?.length >= 3 
+      ? course.topics?.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      : course.topics;
 
   const style = {
     transform: CSS.Transform.toString(transform), transition
@@ -128,7 +140,7 @@ const SortableCourse =
                           questions
                         }
                       : t
-                  )
+                    )
               }
             : c
         )
@@ -163,23 +175,23 @@ const SortableCourse =
             ⠿
           </span>
 
-          <span
-            className="cursor-pointer"
-            onClick={() =>
-              toggleCourse(course.id)
-            }
-          >
-            {expanded[course.id]
-              ? "▼"
-              : "▶"}
-          </span>
-
-          <span className="flex min-w-0 items-center">
-            <span className="mr-2 inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-indigo-400/80 shadow-[0_0_0_4px_rgba(129,140,248,0.08)]" />
-            <span className="truncate">
-              {course.title}
+           <span
+              className="cursor-pointer"
+              onClick={() =>
+                toggleCourse(course.id)
+              }
+            >
+              {isExpanded
+                ? "▼"
+                : "▶"}
             </span>
-          </span>
+
+           <span className="flex min-w-0 items-center">
+             <span className="mr-2 inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-indigo-400/80 shadow-[0_0_0_4px_rgba(129,140,248,0.08)]" />
+             <span className="truncate">
+               {course.title}
+             </span>
+           </span>
 
         </div>
 
@@ -227,123 +239,115 @@ const SortableCourse =
 
       </div>
 
-      {expanded[course.id] &&
-        course.topics && (
+       {isExpanded &&
+         filteredTopics && (
+         <DndContext
+           collisionDetection={closestCenter}
+           onDragEnd={(event) =>
+             handleTopicDragEnd(event)
+           }
+         >
+           <SortableContext
+             items={filteredTopics.map(
+               t => t.id
+             )}
+             strategy={
+               verticalListSortingStrategy
+             }
+           >
+             <div className="ml-6 mt-2 space-y-1">
+               {filteredTopics.map(topic => (
+                 <SortableTopic
+                   key={topic.id}
+                   topic={topic}
+                   course={course}
+                   setCourses={setCourses}
+                   expandedTopics={expandedTopics}
+                   toggleTopic={toggleTopic}
+                 />
+               ))}
+             </div>
+           </SortableContext>
+         </DndContext>
+       )}
 
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={(event) =>
-            handleTopicDragEnd(event)
-          }
-        >
+       {showEditModal && (
 
-          <SortableContext
-            items={course.topics.map(
-              t => t.id
-            )}
-            strategy={
-              verticalListSortingStrategy
-            }
-          >
+         <EditCourseModal
+           course={course}
+           onClose={() =>
+             setShowEditModal(false)
+           }
+           onUpdated={(updatedCourse) =>
+             setCourses(prev =>
+               prev.map(c =>
+                 c.id === course.id
+                   ? {
+                       ...c,
+                       title: updatedCourse.title,
+                       slug: updatedCourse.slug
+                     }
+                   : c
+                 )
+             )
+           }
+         />
 
-            <div className="ml-6 mt-2 space-y-1">
+       )}
 
-              {course.topics.map(topic => (
-                <SortableTopic
-                  key={topic.id}
-                  topic={topic}
-                  course={course}
-                  setCourses={setCourses}
-                  expandedTopics={expandedTopics}
-                  toggleTopic={toggleTopic}
-                />
+       {showDeleteDialog && (
 
-              ))}
-            </div>
+         <ConfirmDialog
+           title="Delete this course?"
+           description={`"${course.title}" and all nested topics and questions will be permanently removed. This action cannot be undone.`}
+           confirmLabel="Delete course"
+           onCancel={() =>
+             setShowDeleteDialog(false)
+           }
+           onConfirm={async () => {
+             await deleteCourseApi(course.id);
+             setCourses(prev =>
+               prev.filter(c => c.id !== course.id)
+             );
+             setShowDeleteDialog(false);
+           }}
+         />
 
-          </SortableContext>
+       )}
 
-        </DndContext>
+       {pendingTopicReorder && (
 
-      )}
+         <ConfirmDialog
+           title="Save new topic order?"
+           description={`"${pendingTopicReorder.movedTopicTitle}" moved from position ${pendingTopicReorder.oldPosition} to ${pendingTopicReorder.newPosition} inside "${course.title}". Save this topic order to the database?`}
+           tone="primary"
+           confirmLabel="Save order"
+           onCancel={() => {
+             setCourses(prev =>
+               prev.map(c =>
+                 c.id === course.id
+                   ? {
+                       ...c,
+                       topics:
+                         pendingTopicReorder.previousTopics
+                     }
+                   : c
+                 )
+             );
+             setPendingTopicReorder(null);
+           }}
+           onConfirm={async () => {
+             await reorderTopicsApi(
+               pendingTopicReorder.nextTopics.map(
+                 t => t.id
+               ),
+               course.id
+             );
+             setPendingTopicReorder(null);
+           }}
+         />
 
-      {showEditModal && (
-
-        <EditCourseModal
-          course={course}
-          onClose={() =>
-            setShowEditModal(false)
-          }
-          onUpdated={(updatedCourse) =>
-            setCourses(prev =>
-              prev.map(c =>
-                c.id === course.id
-                  ? {
-                      ...c,
-                      title: updatedCourse.title,
-                      slug: updatedCourse.slug
-                    }
-                  : c
-              )
-            )
-          }
-        />
-
-      )}
-
-      {showDeleteDialog && (
-
-        <ConfirmDialog
-          title="Delete this course?"
-          description={`"${course.title}" and all nested topics and questions will be permanently removed. This action cannot be undone.`}
-          confirmLabel="Delete course"
-          onCancel={() =>
-            setShowDeleteDialog(false)
-          }
-          onConfirm={async () => {
-            await deleteCourseApi(course.id);
-            setCourses(prev =>
-              prev.filter(c => c.id !== course.id)
-            );
-            setShowDeleteDialog(false);
-          }}
-        />
-
-      )}
-
-      {pendingTopicReorder && (
-
-        <ConfirmDialog
-          title="Save new topic order?"
-          description={`"${pendingTopicReorder.movedTopicTitle}" moved from position ${pendingTopicReorder.oldPosition} to ${pendingTopicReorder.newPosition} inside "${course.title}". Save this topic order to the database?`}
-          tone="primary"
-          confirmLabel="Save order"
-          onCancel={() => {
-            setCourses(prev =>
-              prev.map(c =>
-                c.id === course.id
-                  ? {
-                      ...c,
-                      topics:
-                        pendingTopicReorder.previousTopics
-                    }
-                  : c
-              )
-            );
-            setPendingTopicReorder(null);
-          }}
-          onConfirm={async () => {
-            await reorderTopicsApi(
-              pendingTopicReorder.nextTopics.map(
-                t => t.id
-              ),
-              course.id
-            );
-            setPendingTopicReorder(null);
-          }}
-        />
-
-      )}
+       )}
 
     </div>
 
