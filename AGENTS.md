@@ -12,6 +12,14 @@ make rails         # Open Rails console
 make migrate       # Run migrations
 make seed          # Seed database
 make reset-db      # ⚠️ Deletes DB, recreates
+make rebuild       # Force rebuild without cache
+```
+
+### Linting
+```bash
+make lint-frontend  # Run ESLint on frontend (npm run lint)
+make lint-backend   # Run RuboCop on backend (bundle exec rubocop)
+make lint           # Run both linters
 ```
 
 ### Frontend (inside container or locally)
@@ -19,12 +27,14 @@ make reset-db      # ⚠️ Deletes DB, recreates
 npm run dev     # Start Vite dev server (port 5173)
 npm run build  # Production build
 npm run lint   # ESLint check
+npm run preview # Preview production build
 ```
 
 ### Backend (inside container or locally)
 ```bash
- rails console
- bundle exec rubocop
+rails console
+bundle exec rubocop
+bundle exec rubocop -A  # Auto-fix offenses
 ```
 
 ## Stack
@@ -46,9 +56,17 @@ npm run lint   # ESLint check
 - Admin: `/api/v1/admin/*` (courses, topics, questions CRUD)
 - Public: `/api/v1/courses`, `/api/v1/topics`, `/api/v1/questions`
 
+## Code Quality
+
+- **Backend**: RuboCop for Ruby linting (`make lint-backend`)
+- **Frontend**: ESLint for JavaScript/React (`make lint-frontend`)
+- Both can be run together with `make lint`
+
 ## Gotchas
 
 - CI runs `bundle exec rails test || true` - tests don't fail CI
 - Frontend has no TypeScript config (plain JS)
 - MongoDB volumes persist across container restarts
 - Use `make rebuild` to force rebuild without cache
+- ESLint requires `--legacy-peer-deps` when installing packages
+- Run `make lint` before committing to catch style issues
