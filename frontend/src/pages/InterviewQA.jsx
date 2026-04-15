@@ -35,7 +35,37 @@ const InterviewQA = () => {
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [likedQuestions, setLikedQuestions] = useState(new Set());
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState(new Set());
+  const [facedQuestions, setFacedQuestions] = useState(new Set());
+ 
+  const toggleLike = (id) => {
+    setLikedQuestions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
+  const toggleBookmark = (id) => {
+    setBookmarkedQuestions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleFaced = (id) => {
+    setFacedQuestions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+ 
   const questionRefs = useRef({});
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
@@ -366,41 +396,10 @@ const InterviewQA = () => {
 
                 </button>
 
-             ))
-           )}
- 
-           {paginationMeta && paginationMeta.total_pages > 1 && (
-             <div className="mt-8 mb-12 flex items-center justify-center gap-4">
-               <button
-                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                 disabled={currentPage === 1}
-                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
-                   ${currentPage === 1 
-                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
-                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
-                 `}
-               >
-                 Previous
-               </button>
-               
-               <span className="text-sm font-medium text-slate-400">
-                 Page {currentPage} of {paginationMeta.total_pages}
-               </span>
-               
-               <button
-                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
-                 disabled={currentPage === paginationMeta.total_pages}
-                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
-                   ${currentPage === paginationMeta.total_pages 
-                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
-                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
-                 `}
-               >
-                 Next
-               </button>
-             </div>
-           )}
-         </div>
+              ))
+            )}
+          </div>
+
 
 
         </div>
@@ -484,45 +483,109 @@ const InterviewQA = () => {
  
            ) : (
  
-             questions.map((q, index) => (
- 
-               <div
-                 key={q.id}
-                 data-id={q.topic_id}
-                 ref={(el) => (questionRefs.current[q.id] = el)}
-                 className="mb-4 md:mb-6 overflow-hidden rounded-xl md:rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
-               >
- 
-                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/90 bg-slate-900/80 px-4 md:px-6 py-3 md:py-4">
- 
-                   <div className="flex min-w-0 items-center gap-3 md:gap-4">
- 
-                     <span className="flex h-8 md:h-9 w-8 md:w-9 shrink-0 items-center justify-center rounded-lg md:rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
-                       {(currentPage - 1) * 10 + index + 1}
-                     </span>
- 
-                     <h2 className="truncate text-base md:text-xl font-semibold text-slate-50">
-                       {q.title}
-                     </h2>
- 
-                   </div>
- 
-                   <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
-                     Question
-                   </span>
- 
-                 </div>
- 
-                 <div
-                   className="prose prose-invert max-w-none px-4 md:px-6 py-4 md:py-5"
-                   dangerouslySetInnerHTML={{
-                     __html: q.answer
-                   }}
-                 />
- 
-               </div>
- 
-             ))
+            questions.map((q, index) => (
+              <div
+                key={q.id}
+                className="mb-6 md:mb-8"
+              >
+                <div
+                  data-id={q.topic_id}
+                  ref={(el) => (questionRefs.current[q.id] = el)}
+                  className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm shadow-xl transition-all duration-300 group hover:border-slate-700 hover:bg-slate-900/60 hover:shadow-indigo-500/5"
+                >
+                  <div className="flex flex-col">
+                    <div className="flex">
+                      <div className="flex items-center justify-center p-4 md:p-6 bg-slate-900/80 border-r border-slate-800">
+                        <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:text-indigo-400 group-hover:border-indigo-500/50 transition-colors duration-300">
+                          {(currentPage - 1) * 10 + index + 1}
+                        </div>
+                      </div>
+
+                      <div className="flex-1 px-5 py-4 flex items-center justify-between bg-slate-900/60">
+                        <h2 className="text-base md:text-lg font-semibold text-slate-100 group-hover:text-white transition-colors leading-snug">
+                          {q.title}
+                        </h2>
+                      </div>
+
+                      <div className="flex items-center justify-center p-4 md:p-6 bg-slate-900/80 border-l border-slate-800">
+                        <button 
+                          onClick={() => toggleLike(q.id)}
+                          className={`p-2 rounded-lg transition-all duration-200 active:scale-90 ${
+                            likedQuestions.has(q.id) 
+                              ? "text-red-400 bg-red-500/10" 
+                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                          }`}
+                          title="Like"
+                        >
+                          <svg 
+                            className={`w-5 h-5 ${likedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.128-4.312 2.733-.715-1.605-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-800 flex">
+                      <div className="flex items-center justify-center p-4 md:p-6 bg-slate-900/80 border-r border-slate-800">
+                        <button 
+                          onClick={() => toggleBookmark(q.id)}
+                          className={`p-2 rounded-lg transition-all duration-200 active:scale-90 ${
+                            bookmarkedQuestions.has(q.id) 
+                              ? "text-red-400 bg-red-500/10" 
+                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                          }`}
+                          title="Bookmark"
+                        >
+                          <svg 
+                            className={`w-5 h-5 ${bookmarkedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 5h14v11l-7 4-7-4V5z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="flex-1 relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500/30 group-hover:bg-indigo-500 transition-colors duration-300" />
+                        <div
+                          className="px-6 py-5 prose prose-invert max-w-none text-slate-300 pl-8"
+                          dangerouslySetInnerHTML={{
+                            __html: q.answer
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/80 border-l border-slate-800">
+                        <button 
+                          onClick={() => toggleFaced(q.id)}
+                          className={`group relative p-2 rounded-lg transition-all duration-200 active:scale-90 ${
+                            facedQuestions.has(q.id) 
+                              ? "text-indigo-400 bg-indigo-500/10" 
+                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                          }`}
+                          title="Did you face this question in an interview?"
+                        >
+                          <svg 
+                            className={`w-6 h-6 ${facedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                          <span className="absolute hidden group-hover:block right-full mr-2 px-2 py-1 bg-slate-800 text-slate-200 text-[10px] rounded whitespace-nowrap z-10">
+                            Faced in interview?
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
            )}
  
            {paginationMeta && paginationMeta.total_pages > 1 && (
