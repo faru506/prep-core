@@ -51,10 +51,13 @@ bundle exec rubocop -A  # Auto-fix offenses
 - Rails API at `localhost:3000`, frontend at `localhost:5173`
 
 ## API Routes
-
+ 
 - Auth: `POST /api/v1/users/sign_up`, `POST /api/v1/users/sign_in`
 - Admin: `/api/v1/admin/*` (courses, topics, questions CRUD)
-- Public: `/api/v1/courses`, `/api/v1/topics`, `/api/v1/questions`
+- Public: 
+  - `GET /api/v1/courses`
+  - `GET /api/v1/courses/:course_id/topics`
+  - `GET /api/v1/topics/:topic_id/questions` (Params: `level`, `page`)
 
 ## Code Quality
 

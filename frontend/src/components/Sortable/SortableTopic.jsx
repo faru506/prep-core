@@ -158,10 +158,11 @@ const SortableTopic = ({
                         c.topics.map(t =>
                           t.id === topic.id
                             ? {
-                                ...t,
-                                questions
-                              }
-                            : t
+                                 ...t,
+                                 questions: questions.questions
+                               }
+                             : t
+
                         )
                     }
                   : c

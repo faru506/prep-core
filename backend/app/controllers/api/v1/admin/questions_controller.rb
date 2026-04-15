@@ -65,10 +65,19 @@ class Api::V1::Admin::QuestionsController < ApplicationController
 
   def index
     topic = Topic.find(params[:topic_id])
-    questions = topic.questions.order_by(position: :asc)
+    questions = topic.questions
 
-    render json:
-      questions.map { |q|
+    questions = questions.where(level: params[:level]) if params[:level].present?
+
+    page = (params[:page] || 1).to_i
+    per_page = 10
+    offset = (page - 1) * per_page
+
+    total_count = questions.count
+    paginated_questions = questions.order_by(position: :asc).skip(offset).limit(per_page)
+
+    render json: {
+      questions: paginated_questions.map { |q|
         {
           id: q.id.to_s,
           title: q.title,
@@ -76,7 +85,14 @@ class Api::V1::Admin::QuestionsController < ApplicationController
           level: q.level,
           topic_id: q.topic_id.to_s
         }
+      },
+      meta: {
+        current_page: page,
+        per_page: per_page,
+        total_pages: (total_count.to_f / per_page).ceil,
+        total_count: total_count
       }
+    }
   end
 
   def reorder

@@ -136,10 +136,11 @@ const SortableCourse =
                   c.topics.map(t =>
                     t.id === topicId
                       ? {
-                          ...t,
-                          questions
-                        }
-                      : t
+                                 ...t,
+                                 questions: questions.questions
+                               }
+                             : t
+
                     )
               }
             : c

@@ -45,7 +45,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full bg-slate-900/95 backdrop-blur-sm border border-slate-800 px-4 md:px-6 py-3 sticky top-0 z-50">
+    <nav className="w-full bg-slate-900/95 backdrop-blur-sm border border-slate-800 px-4 md:px-6 py-3 sticky top-0 z-[100]">
 
       <div className="flex items-center justify-between">
 

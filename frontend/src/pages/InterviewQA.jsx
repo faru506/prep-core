@@ -23,6 +23,9 @@ const InterviewQA = () => {
   const [courses, setCourses] = useState([]);
   const [topics, setTopics] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [paginationMeta, setPaginationMeta] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -37,19 +40,21 @@ const InterviewQA = () => {
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
 
-  const loadQuestions = async (topicId) => {
+  const loadQuestions = async (topicId, level, page = 1) => {
     if (!topicId) return;
     const requestId = ++questionsRequestRef.current;
     try {
       setLoadingQuestions(true);
-      const response = await fetchQuestionsApi(topicId);
+      const response = await fetchQuestionsApi(topicId, level, page);
       const data = await response.json();
       if (requestId !== questionsRequestRef.current) return;
       if (!response.ok) {
         setQuestions([]);
+        setPaginationMeta(null);
         return;
       }
-      setQuestions(data);
+      setQuestions(data.questions);
+      setPaginationMeta(data.meta);
     } catch (error) {
       if (requestId === questionsRequestRef.current) {
         console.error("Failed to load questions:", error);
@@ -82,11 +87,11 @@ const InterviewQA = () => {
         if (!topicSlug || !data.find(t => t.slug === topicSlug)) {
           navigate(`/interview_qa/${slug}/${selected.slug}`, { replace: true });
         }
-        loadQuestions(selected.id);
       } else {
         setSelectedTopic(null);
         setQuestions([]);
       }
+
     } catch (error) {
       if (requestId === topicsRequestRef.current) {
         console.error("Failed to load topics:", error);
@@ -152,21 +157,28 @@ const InterviewQA = () => {
   }, [courseSlug, courses, navigate]);
 
   useEffect(() => {
-
+ 
     if (topicSlug && topics.length > 0) {
-
+ 
       const topic =
         topics.find(t => t.slug === topicSlug);
-
+ 
       if (topic) {
         setSelectedTopic(topic);
         setSelectedLevel("low");
-        loadQuestions(topic.id);
+        setCurrentPage(1);
       }
-
+ 
     }
-
+ 
   }, [topicSlug, topics]);
+
+  useEffect(() => {
+    if (selectedTopic) {
+      loadQuestions(selectedTopic.id, selectedLevel, currentPage);
+    }
+  }, [selectedTopic, selectedLevel, currentPage]);
+
 
   useEffect(() => {
 
@@ -239,17 +251,12 @@ const InterviewQA = () => {
     }
   }, []);
 
-  const filteredQuestions =
-    questions.filter(
-      (question) =>
-        (question.level || "medium") === selectedLevel
-    );
-
   return (
+
 
     <div className="h-screen flex flex-col bg-slate-950 text-white">
 
-      <div className="sticky bg-slate-950 z-40 px-4 md:px-6 py-3 border-b border-slate-800">
+      <div className="sticky bg-slate-950 z-[60] px-4 md:px-6 py-3 border-b border-slate-800">
 
         <div className="flex gap-3 md:gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
@@ -359,11 +366,42 @@ const InterviewQA = () => {
 
                 </button>
 
-              ))
+             ))
+           )}
+ 
+           {paginationMeta && paginationMeta.total_pages > 1 && (
+             <div className="mt-8 mb-12 flex items-center justify-center gap-4">
+               <button
+                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                 disabled={currentPage === 1}
+                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
+                   ${currentPage === 1 
+                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
+                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
+                 `}
+               >
+                 Previous
+               </button>
+               
+               <span className="text-sm font-medium text-slate-400">
+                 Page {currentPage} of {paginationMeta.total_pages}
+               </span>
+               
+               <button
+                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
+                 disabled={currentPage === paginationMeta.total_pages}
+                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
+                   ${currentPage === paginationMeta.total_pages 
+                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
+                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
+                 `}
+               >
+                 Next
+               </button>
+             </div>
+           )}
+         </div>
 
-            )}
-
-          </div>
 
         </div>
 
@@ -405,9 +443,10 @@ const InterviewQA = () => {
 
                 <select
                   value={selectedLevel}
-                  onChange={(e) =>
-                    setSelectedLevel(e.target.value)
-                  }
+                  onChange={(e) => {
+                    setSelectedLevel(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="rounded-xl border border-slate-700 bg-slate-900 px-3 md:px-4 py-2 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
                 >
                   {LEVEL_OPTIONS.map((option) => (
@@ -437,57 +476,88 @@ const InterviewQA = () => {
               No questions found
             </div>
 
-          ) : filteredQuestions.length === 0 ? (
+           ) : questions.length === 0 ? (
+ 
+             <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-6 py-8 text-center text-slate-400">
+               No {selectedLevel} level questions found for this topic.
+             </div>
+ 
+           ) : (
+ 
+             questions.map((q, index) => (
+ 
+               <div
+                 key={q.id}
+                 data-id={q.topic_id}
+                 ref={(el) => (questionRefs.current[q.id] = el)}
+                 className="mb-4 md:mb-6 overflow-hidden rounded-xl md:rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
+               >
+ 
+                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/90 bg-slate-900/80 px-4 md:px-6 py-3 md:py-4">
+ 
+                   <div className="flex min-w-0 items-center gap-3 md:gap-4">
+ 
+                     <span className="flex h-8 md:h-9 w-8 md:w-9 shrink-0 items-center justify-center rounded-lg md:rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
+                       {(currentPage - 1) * 10 + index + 1}
+                     </span>
+ 
+                     <h2 className="truncate text-base md:text-xl font-semibold text-slate-50">
+                       {q.title}
+                     </h2>
+ 
+                   </div>
+ 
+                   <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
+                     Question
+                   </span>
+ 
+                 </div>
+ 
+                 <div
+                   className="prose prose-invert max-w-none px-4 md:px-6 py-4 md:py-5"
+                   dangerouslySetInnerHTML={{
+                     __html: q.answer
+                   }}
+                 />
+ 
+               </div>
+ 
+             ))
+           )}
+ 
+           {paginationMeta && paginationMeta.total_pages > 1 && (
+             <div className="mt-8 mb-12 flex items-center justify-center gap-4">
+               <button
+                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                 disabled={currentPage === 1}
+                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
+                   ${currentPage === 1 
+                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
+                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
+                 `}
+               >
+                 Previous
+               </button>
+               
+               <span className="text-sm font-medium text-slate-400">
+                 Page {currentPage} of {paginationMeta.total_pages}
+               </span>
+               
+               <button
+                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
+                 disabled={currentPage === paginationMeta.total_pages}
+                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
+                   ${currentPage === paginationMeta.total_pages 
+                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
+                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
+                 `}
+               >
+                 Next
+               </button>
+             </div>
+           )}
+         </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-6 py-8 text-center text-slate-400">
-              No {selectedLevel} level questions found for this topic.
-            </div>
-
-          ) : (
-
-            filteredQuestions.map((q, index) => (
-
-              <div
-                key={q.id}
-                data-id={q.topic_id}
-                ref={(el) => (questionRefs.current[q.id] = el)}
-                className="mb-4 md:mb-6 overflow-hidden rounded-xl md:rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_18px_40px_rgba(2,6,23,0.28)]"
-              >
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/90 bg-slate-900/80 px-4 md:px-6 py-3 md:py-4">
-
-                  <div className="flex min-w-0 items-center gap-3 md:gap-4">
-
-                    <span className="flex h-8 md:h-9 w-8 md:w-9 shrink-0 items-center justify-center rounded-lg md:rounded-xl border border-slate-700 bg-slate-950 text-sm font-semibold text-slate-200">
-                      {index + 1}
-                    </span>
-
-                    <h2 className="truncate text-base md:text-xl font-semibold text-slate-50">
-                      {q.title}
-                    </h2>
-
-                  </div>
-
-                  <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
-                    Question
-                  </span>
-
-                </div>
-
-                <div
-                  className="prose prose-invert max-w-none px-4 md:px-6 py-4 md:py-5"
-                  dangerouslySetInnerHTML={{
-                    __html: q.answer
-                  }}
-                />
-
-              </div>
-
-            ))
-
-          )}
-
-        </div>
 
       </div>
 
