@@ -582,37 +582,53 @@ const InterviewQA = () => {
             ))
            )}
  
-           {paginationMeta && paginationMeta.total_pages > 1 && (
-             <div className="mt-8 mb-12 flex items-center justify-center gap-4">
-               <button
-                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                 disabled={currentPage === 1}
-                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
-                   ${currentPage === 1 
-                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
-                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
-                 `}
-               >
-                 Previous
-               </button>
-               
-               <span className="text-sm font-medium text-slate-400">
-                 Page {currentPage} of {paginationMeta.total_pages}
-               </span>
-               
-               <button
-                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
-                 disabled={currentPage === paginationMeta.total_pages}
-                 className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
-                   ${currentPage === paginationMeta.total_pages 
-                     ? "bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed" 
-                     : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white"}
-                 `}
-               >
-                 Next
-               </button>
-             </div>
-           )}
+            {paginationMeta && paginationMeta.total_pages > 1 && (
+              <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 px-4 md:px-6 py-4">
+                <p className="text-sm text-slate-400">
+                  Showing <span className="text-white font-medium">{(currentPage - 1) * paginationMeta.per_page + 1}</span> to <span className="text-white font-medium">{Math.min(currentPage * paginationMeta.per_page, paginationMeta.total_count)}</span> of <span className="text-white font-medium">{paginationMeta.total_count}</span> questions
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {[...Array(paginationMeta.total_pages)].map((_, i) => (
+                      <button
+                        key={i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-9 h-9 rounded-lg text-sm font-medium transition
+                          ${currentPage === i + 1 
+                            ? "bg-indigo-600 text-white" 
+                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                          }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
+                    disabled={currentPage === paginationMeta.total_pages}
+                    className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  >
+                    Next
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
          </div>
 
 
