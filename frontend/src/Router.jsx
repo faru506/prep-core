@@ -13,8 +13,13 @@ import Contests from "./pages/Contests";
 import InterviewQA from "./pages/InterviewQA";
 import Users from "./pages/Users";
 import CourseManager from "./pages/CourseManager"
+import LandingPage from "./pages/LandingPage";
 
 import { getToken } from "./utilities/storage";
+
+const Root = () => {
+  return getToken() ? <App /> : <LandingPage />;
+};
 
 const router = createBrowserRouter([
 
@@ -37,14 +42,10 @@ const router = createBrowserRouter([
     )
   },
 
-  // Protected Layout
+  // Main Layout (Conditional Root)
   {
     path: "/",
-    element: (
-      <ProtectedRoute>
-        <App />
-      </ProtectedRoute>
-    ),
+    element: <Root />,
 
     children: [
 

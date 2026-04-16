@@ -51,9 +51,9 @@ const Navbar = () => {
 
         <div className="flex items-center gap-4 md:gap-10 font-medium">
 
-          <NavLink to="/" className="text-xl md:text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-            PrepMaster
-          </NavLink>
+           <NavLink to="/" className="text-xl md:text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+             PrepCore
+           </NavLink>
 
           <div className="hidden md:flex items-center gap-2">
             {navItems.map((item) => (
