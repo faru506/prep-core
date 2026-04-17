@@ -73,6 +73,17 @@ bundle exec rubocop -A  # Auto-fix offenses
   - `medium` (SDE 2 - Intermediate Mastery)
   - `hard` (SDE 3 - Expert & Architecture)
 
+## State Management
+
+- Local state (`useState`) and `localStorage` (via `utilities/storage`) for auth and roles.
+- Redux is intentionally omitted as the current scale does not justify the boilerplate.
+
+## React Patterns
+
+- Standard hooks (`useState`, `useEffect`, `useRef`) are used.
+- `useMemo` and `useCallback` are avoided unless performance bottlenecks are identified.
+- Custom hooks should be implemented to encapsulate repetitive data fetching logic.
+
 ## Gotchas
 
 - CI runs `bundle exec rails test || true` - tests don't fail CI
