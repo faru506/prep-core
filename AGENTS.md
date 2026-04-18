@@ -59,6 +59,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 - Monorepo: `frontend/` and `backend/` directories
 - `docker-compose.dev.yml` defines all services
 - Rails API at `localhost:3000`, frontend at `localhost:5173`
+- Root `README.md` is the canonical project documentation; subfolder README files may be stale templates unless updated explicitly.
 
 ## API Routes
 
