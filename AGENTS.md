@@ -50,7 +50,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 ## Stack
 
 - **Frontend**: React 19 + Vite + TailwindCSS v4 + TipTap + dnd-kit + Lucide-React + PrismJS + DOMPurify
-- **Backend**: Rails 8.1 + Ruby 3.4.1 + MongoDB 7 (Mongoid)
+- **Backend**: Rails 8.1.3 + Ruby 3.4.1 + MongoDB 7 (Mongoid)
 - **Auth**: JWT via Devise (routes under `/api/v1/users`)
 - **Testing**: RSpec (backend only)
 
