@@ -40,6 +40,9 @@ jobs:
         with:
           ruby-version: 3.4.1
           bundler-cache: true
+      - name: Install dependencies
+        working-directory: backend
+        run: bundle install
       - name: Security scan (Brakeman)
         working-directory: backend
         run: bin/brakeman --no-pager
@@ -58,6 +61,9 @@ jobs:
         with:
           ruby-version: 3.4.1
           bundler-cache: true
+      - name: Install dependencies
+        working-directory: backend
+        run: bundle install
       - name: Lint code (RuboCop)
         working-directory: backend
         run: bin/rubocop -f github
