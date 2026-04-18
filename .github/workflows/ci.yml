@@ -6,51 +6,75 @@ on:
   pull_request:
 
 jobs:
-  backend:
-    name: Rails Backend CI
+  backend_test:
+    name: Rails Backend Tests
     runs-on: ubuntu-latest
-
     services:
       mongodb:
         image: mongo:7
         ports:
           - 27017:27017
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.1
           bundler-cache: true
-
       - name: Install dependencies
         working-directory: backend
         run: bundle install
+      - name: Run tests
+        working-directory: backend
+        run: bundle exec rails test
 
-       - name: Run tests
-         working-directory: backend
-         run: bundle exec rails test
-
-  frontend:
-    name: React Frontend CI
+  backend_security:
+    name: Rails Backend Security Scan
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+      - name: Security scan (Brakeman)
+        working-directory: backend
+        run: bin/brakeman --no-pager
+      - name: Security scan (Bundler Audit)
+        working-directory: backend
+        run: bin/bundler-audit
 
+  backend_lint:
+    name: Rails Backend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+      - name: Lint code (RuboCop)
+        working-directory: backend
+        run: bin/rubocop -f github
+
+  frontend_ci:
+    name: React Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         working-directory: frontend
         run: npm install
-
-       - name: Build frontend
-         working-directory: frontend
-         run: npm run build
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
