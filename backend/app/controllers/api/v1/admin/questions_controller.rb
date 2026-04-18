@@ -79,6 +79,22 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     total_count = questions.count
     paginated_questions = questions.order_by(position: :asc).skip(offset).limit(per_page)
 
+    question_ids = paginated_questions.map(&:_id)
+    bookmarked_ids = []
+    upvoted_ids = []
+
+    if current_user
+      bookmarked_ids =
+        current_user.bookmarks.where(
+          :question_id.in => question_ids
+        ).pluck(:question_id).map(&:to_s)
+
+      upvoted_ids =
+        current_user.upvotes.where(
+          :question_id.in => question_ids
+        ).pluck(:question_id).map(&:to_s)
+    end
+
     render json: {
       questions: paginated_questions.map { |q|
         {
@@ -86,7 +102,10 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
           title: q.title,
           answer: q.answer&.content,
           level: q.level,
-          topic_id: q.topic_id.to_s
+          topic_id: q.topic_id.to_s,
+          upvote_count: q.upvote_count.to_i,
+          bookmarked_by_current_user: bookmarked_ids.include?(q.id.to_s),
+          upvoted_by_current_user: upvoted_ids.include?(q.id.to_s)
         }
       },
       meta: {

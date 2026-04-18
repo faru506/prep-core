@@ -1,25 +1,35 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import DOMPurify from "dompurify";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  fetchCoursesApi,
-  fetchTopicsApi,
-  fetchQuestionsApi
-} from "../apis/content";
-import {
-  LEVEL_OPTIONS,
-  getLevelDotClasses
-} from "../utilities/levels";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowUp, Bookmark } from "lucide-react";
 import Prism from "prismjs";
+
+import {
+  createBookmarkApi,
+  createUpvoteApi,
+  deleteBookmarkApi,
+  deleteUpvoteApi,
+  fetchCoursesApi,
+  fetchQuestionsApi,
+  fetchTopicsApi
+} from "../apis/content";
+import { getToken } from "../utilities/storage";
+import { LEVEL_OPTIONS, getLevelDotClasses } from "../utilities/levels";
 
 import "prismjs/components/prism-ruby";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-css";
 import "prismjs/components/prism-markup";
 
-const InterviewQA = () => {
+const parseJsonSafely = async (response) => {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+};
 
+const InterviewQA = () => {
   const { courseSlug, topicSlug } = useParams();
   const navigate = useNavigate();
 
@@ -28,68 +38,75 @@ const InterviewQA = () => {
   const [questions, setQuestions] = useState([]);
   const [paginationMeta, setPaginationMeta] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
-
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState("low");
-
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [likedQuestions, setLikedQuestions] = useState(new Set());
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState(new Set());
-  const [facedQuestions, setFacedQuestions] = useState(new Set());
- 
-  const toggleLike = (id) => {
-    setLikedQuestions(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const [interactionError, setInteractionError] = useState("");
+  const [pendingInteractions, setPendingInteractions] = useState(new Set());
 
-  const toggleBookmark = (id) => {
-    setBookmarkedQuestions(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleFaced = (id) => {
-    setFacedQuestions(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
- 
   const questionRefs = useRef({});
   const topicsRequestRef = useRef(0);
   const questionsRequestRef = useRef(0);
 
+  const isLoggedIn = Boolean(getToken());
+
+  const markInteractionPending = (key, isPending) => {
+    setPendingInteractions((prev) => {
+      const next = new Set(prev);
+
+      if (isPending) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+
+      return next;
+    });
+  };
+
+  const updateQuestionInState = (questionId, updater) => {
+    setQuestions((prev) =>
+      prev.map((question) =>
+        question.id === questionId
+          ? { ...question, ...updater(question) }
+          : question
+      )
+    );
+  };
+
   const loadQuestions = async (topicId, level, page = 1) => {
-    if (!topicId) return;
+    if (!topicId) {
+      return;
+    }
+
     const requestId = ++questionsRequestRef.current;
+
     try {
       setLoadingQuestions(true);
+      setInteractionError("");
+
       const response = await fetchQuestionsApi(topicId, level, page);
-      const data = await response.json();
-      if (requestId !== questionsRequestRef.current) return;
-      if (!response.ok) {
+      const data = await parseJsonSafely(response);
+
+      if (requestId !== questionsRequestRef.current) {
+        return;
+      }
+
+      if (!response.ok || !data) {
         setQuestions([]);
         setPaginationMeta(null);
         return;
       }
-      setQuestions(data.questions);
-      setPaginationMeta(data.meta);
+
+      setQuestions(data.questions || []);
+      setPaginationMeta(data.meta || null);
     } catch (error) {
       if (requestId === questionsRequestRef.current) {
+        setQuestions([]);
+        setPaginationMeta(null);
         console.error("Failed to load questions:", error);
       }
     } finally {
@@ -100,33 +117,49 @@ const InterviewQA = () => {
   };
 
   const loadTopics = async (slug) => {
-    if (!slug) return;
+    if (!slug) {
+      return;
+    }
+
     const requestId = ++topicsRequestRef.current;
+
     try {
       setLoadingTopics(true);
       const response = await fetchTopicsApi(slug);
-      const data = await response.json();
-      if (requestId !== topicsRequestRef.current) return;
-      if (!response.ok) {
+      const data = await parseJsonSafely(response);
+
+      if (requestId !== topicsRequestRef.current) {
+        return;
+      }
+
+      if (!response.ok || !data) {
         setTopics([]);
         setQuestions([]);
         setSelectedTopic(null);
         return;
       }
+
       setTopics(data);
+
       if (data.length > 0) {
-        const selected = data.find(t => t.slug === topicSlug) || data[0];
-        setSelectedTopic(selected);
-        if (!topicSlug || !data.find(t => t.slug === topicSlug)) {
-          navigate(`/interview_qa/${slug}/${selected.slug}`, { replace: true });
+        const nextTopic = data.find((topic) => topic.slug === topicSlug) || data[0];
+
+        setSelectedTopic(nextTopic);
+
+        if (!topicSlug || !data.find((topic) => topic.slug === topicSlug)) {
+          navigate(`/interview_qa/${slug}/${nextTopic.slug}`, { replace: true });
         }
       } else {
         setSelectedTopic(null);
         setQuestions([]);
+        setPaginationMeta(null);
       }
-
     } catch (error) {
       if (requestId === topicsRequestRef.current) {
+        setTopics([]);
+        setQuestions([]);
+        setPaginationMeta(null);
+        setSelectedTopic(null);
         console.error("Failed to load topics:", error);
       }
     } finally {
@@ -139,14 +172,133 @@ const InterviewQA = () => {
   const loadCourses = async () => {
     try {
       const response = await fetchCoursesApi();
-      const data = await response.json();
+      const data = await parseJsonSafely(response);
+
+      if (!response.ok || !data) {
+        setCourses([]);
+        return;
+      }
+
       setCourses(data);
+
       if (data.length > 0) {
-        const selected = courseSlug ? data.find(c => c.slug === courseSlug) || data[0] : data[0];
-        setSelectedCourse(selected);
+        const nextCourse = courseSlug
+          ? data.find((course) => course.slug === courseSlug) || data[0]
+          : data[0];
+
+        setSelectedCourse(nextCourse);
       }
     } catch (error) {
+      setCourses([]);
       console.error("Failed to load courses:", error);
+    }
+  };
+
+  const handleBookmarkToggle = async (question) => {
+    if (!isLoggedIn) {
+      setInteractionError("Please sign in to bookmark questions.");
+      return;
+    }
+
+    const actionKey = `bookmark:${question.id}`;
+
+    if (pendingInteractions.has(actionKey)) {
+      return;
+    }
+
+    setInteractionError("");
+    markInteractionPending(actionKey, true);
+
+    const nextBookmarkedState = !question.bookmarked_by_current_user;
+
+    updateQuestionInState(question.id, () => ({
+      bookmarked_by_current_user: nextBookmarkedState
+    }));
+
+    try {
+      const response = nextBookmarkedState
+        ? await createBookmarkApi(question.id)
+        : await deleteBookmarkApi(question.id);
+
+      if (response.status === 401) {
+        throw new Error("Unauthorized");
+      }
+
+      if (!response.ok) {
+        throw new Error("Bookmark request failed");
+      }
+    } catch (error) {
+      updateQuestionInState(question.id, () => ({
+        bookmarked_by_current_user: question.bookmarked_by_current_user
+      }));
+      setInteractionError(
+        error.message === "Unauthorized"
+          ? "Your session has expired. Please sign in again to use bookmarks."
+          : "We couldn't update the bookmark right now."
+      );
+      console.error("Failed to update bookmark:", error);
+    } finally {
+      markInteractionPending(actionKey, false);
+    }
+  };
+
+  const handleUpvoteToggle = async (question) => {
+    if (!isLoggedIn) {
+      setInteractionError("Please sign in to upvote questions.");
+      return;
+    }
+
+    const actionKey = `upvote:${question.id}`;
+
+    if (pendingInteractions.has(actionKey)) {
+      return;
+    }
+
+    setInteractionError("");
+    markInteractionPending(actionKey, true);
+
+    const nextUpvotedState = !question.upvoted_by_current_user;
+    const currentCount = question.upvote_count || 0;
+    const nextCount = nextUpvotedState
+      ? currentCount + 1
+      : Math.max(currentCount - 1, 0);
+
+    updateQuestionInState(question.id, () => ({
+      upvoted_by_current_user: nextUpvotedState,
+      upvote_count: nextCount
+    }));
+
+    try {
+      const response = nextUpvotedState
+        ? await createUpvoteApi(question.id)
+        : await deleteUpvoteApi(question.id);
+      const data = await parseJsonSafely(response);
+
+      if (response.status === 401) {
+        throw new Error("Unauthorized");
+      }
+
+      if (!response.ok || !data) {
+        throw new Error("Upvote request failed");
+      }
+
+      updateQuestionInState(question.id, () => ({
+        upvoted_by_current_user: data.upvoted_by_current_user,
+        upvote_count: data.upvote_count
+      }));
+    } catch (error) {
+      updateQuestionInState(question.id, () => ({
+        upvoted_by_current_user: question.upvoted_by_current_user,
+        upvote_count: question.upvote_count
+      }));
+      setInteractionError(
+        error.message === "Unauthorized"
+          ? "Your session has expired. Please sign in again to use upvotes."
+          : "We couldn't update the upvote right now."
+      );
+      console.error("Failed to update upvote:", error);
+    } finally {
+      markInteractionPending(actionKey, false);
     }
   };
 
@@ -161,49 +313,38 @@ const InterviewQA = () => {
   loadTopicsRef.current = loadTopics;
 
   useEffect(() => {
-
     if (courseSlug) {
       setSelectedLevel("low");
+      setCurrentPage(1);
       setTopics([]);
       setQuestions([]);
+      setPaginationMeta(null);
       setSelectedTopic(null);
+      setInteractionError("");
       loadTopicsRef.current(courseSlug);
     }
-
   }, [courseSlug]);
 
   useEffect(() => {
-
     if (!courseSlug && courses.length > 0) {
-
       const firstCourse = courses[0];
 
       setSelectedCourse(firstCourse);
-
-      navigate(
-        `/interview_qa/${firstCourse.slug}`,
-        { replace: true }
-      );
-
+      navigate(`/interview_qa/${firstCourse.slug}`, { replace: true });
     }
-
   }, [courseSlug, courses, navigate]);
 
   useEffect(() => {
- 
     if (topicSlug && topics.length > 0) {
- 
-      const topic =
-        topics.find(t => t.slug === topicSlug);
- 
-      if (topic) {
-        setSelectedTopic(topic);
+      const nextTopic = topics.find((topic) => topic.slug === topicSlug);
+
+      if (nextTopic) {
+        setSelectedTopic(nextTopic);
         setSelectedLevel("low");
         setCurrentPage(1);
+        setInteractionError("");
       }
- 
     }
- 
   }, [topicSlug, topics]);
 
   useEffect(() => {
@@ -212,70 +353,48 @@ const InterviewQA = () => {
     }
   }, [selectedTopic, selectedLevel, currentPage]);
 
-
   useEffect(() => {
-
     const observer = new IntersectionObserver(
-
       (entries) => {
-
-        entries.forEach(entry => {
-
-          if (entry.isIntersecting) {
-
-            const visibleId =
-              entry.target.getAttribute("data-id");
-
-            const topic =
-              topics.find(
-                t => t.id === visibleId
-              );
-
-            if (topic) {
-              setSelectedTopic(topic);
-            }
-
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
           }
 
+          const visibleTopicId = entry.target.getAttribute("data-id");
+          const nextTopic = topics.find((topic) => topic.id === visibleTopicId);
+
+          if (nextTopic) {
+            setSelectedTopic(nextTopic);
+          }
         });
-
       },
-
       {
         root: null,
         rootMargin: "-100px 0px -60% 0px",
         threshold: 0.1
-
       }
-
     );
 
     const currentRefs = questionRefs.current;
-    
-    Object.values(currentRefs)
-      .forEach(el => {
 
-        if (el) observer.observe(el);
-
-      });
+    Object.values(currentRefs).forEach((element) => {
+      if (element) {
+        observer.observe(element);
+      }
+    });
 
     return () => {
-
-      Object.values(currentRefs)
-        .forEach(el => {
-
-          if (el) observer.unobserve(el);
-
-        });
-
+      Object.values(currentRefs).forEach((element) => {
+        if (element) {
+          observer.unobserve(element);
+        }
+      });
     };
-
   }, [questions, topics]);
 
   useEffect(() => {
-
     Prism.highlightAll();
-
   }, [questions]);
 
   useEffect(() => {
@@ -285,55 +404,41 @@ const InterviewQA = () => {
   }, []);
 
   return (
-
-
     <div className="h-screen flex flex-col bg-slate-950 text-white">
-
       <div className="sticky bg-slate-950 z-[60] px-4 md:px-6 py-3 border-b border-slate-800">
-
         <div className="flex gap-3 md:gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-
-          {courses.map(course => (
-
+          {courses.map((course) => (
             <button
               key={course.slug}
               onClick={() => {
-
                 setSelectedCourse(course);
                 setSelectedLevel("low");
-
-                navigate(
-                  `/interview_qa/${course.slug}`
-                );
-
+                setCurrentPage(1);
+                setInteractionError("");
+                navigate(`/interview_qa/${course.slug}`);
               }}
-              className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm md:text-base font-medium outline-none transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50
-                ${selectedCourse?.slug === course.slug
+              className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm md:text-base font-medium outline-none transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${
+                selectedCourse?.slug === course.slug
                   ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
-                  : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white"}
-              `}
+                  : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white"
+              }`}
             >
-
               {course.title}
-
             </button>
-
           ))}
-
         </div>
-
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-
-        <div className={`
-          md:relative md:w-64 md:bg-slate-900 md:border-r md:border-slate-800 md:p-4 
-          fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto
-          transform transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0
-        `}>
-
+        <div
+          className={`
+            md:relative md:w-64 md:bg-slate-900 md:border-r md:border-slate-800 md:p-4
+            fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto
+            transform transition-transform duration-300 ease-in-out
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+            md:translate-x-0
+          `}
+        >
           <div className="flex items-center justify-between mb-4 md:hidden">
             <h2 className="text-lg font-semibold text-slate-100">Topics</h2>
             <button
@@ -347,68 +452,41 @@ const InterviewQA = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-
             {loadingTopics ? (
-
-              <div className="text-slate-400">
-                Loading topics...
-              </div>
-
+              <div className="text-slate-400">Loading topics...</div>
             ) : topics.length === 0 ? (
-
-              <div className="text-slate-400">
-                No topics found
-              </div>
-
+              <div className="text-slate-400">No topics found</div>
             ) : (
-
-              topics.map(topic => (
-
+              topics.map((topic) => (
                 <button
                   key={topic.slug}
                   onClick={() => {
-
                     setSelectedTopic(topic);
                     setSelectedLevel("low");
-
-                    navigate(
-                      `/interview_qa/${selectedCourse.slug}/${topic.slug}`
-                    );
+                    setCurrentPage(1);
+                    setInteractionError("");
+                    navigate(`/interview_qa/${selectedCourse.slug}/${topic.slug}`);
 
                     if (window.innerWidth < 768) {
                       setSidebarOpen(false);
                     }
-
                   }}
-                  className={`text-left px-4 py-2 rounded-lg
-                    transition duration-200 hover:bg-slate-800
-                    ${
-                      selectedTopic?.slug === topic.slug
-                        ? "bg-slate-800"
-                        : ""
-                    }
-                  `}
+                  className={`text-left px-4 py-2 rounded-lg transition duration-200 hover:bg-slate-800 ${
+                    selectedTopic?.slug === topic.slug ? "bg-slate-800" : ""
+                  }`}
                 >
-
                   <span className="flex min-w-0 items-center gap-2">
                     <span className={`inline-flex h-2 w-2 shrink-0 rounded-full ${getLevelDotClasses(topic.level)}`} />
-                    <span className="truncate">
-                      {topic.title}
-                    </span>
+                    <span className="truncate">{topic.title}</span>
                   </span>
-
                 </button>
-
               ))
             )}
           </div>
-
-
-
         </div>
 
         {sidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 z-40 md:hidden"
             onClick={() => setSidebarOpen(false)}
           />
@@ -424,10 +502,8 @@ const InterviewQA = () => {
         </button>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
-
           {selectedTopic && questions.length > 0 && (
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-
               <div>
                 <h1 className="text-lg md:text-xl font-semibold text-slate-100">
                   {selectedTopic.title}
@@ -438,175 +514,190 @@ const InterviewQA = () => {
               </div>
 
               <div className="flex items-center gap-3">
-
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                   Level
                 </span>
 
                 <select
                   value={selectedLevel}
-                  onChange={(e) => {
-                    setSelectedLevel(e.target.value);
+                  onChange={(event) => {
+                    setSelectedLevel(event.target.value);
                     setCurrentPage(1);
+                    setInteractionError("");
                   }}
                   className="rounded-xl border border-slate-700 bg-slate-900 px-3 md:px-4 py-2 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
                 >
                   {LEVEL_OPTIONS.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-
               </div>
+            </div>
+          )}
 
+          {interactionError && (
+            <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+              {interactionError}
             </div>
           )}
 
           {loadingQuestions ? (
-
-            <div className="text-slate-400">
-              Loading questions...
-            </div>
-
+            <div className="text-slate-400">Loading questions...</div>
           ) : !selectedTopic || questions.length === 0 ? (
-
-            <div className="text-slate-400">
-              No questions found
-            </div>
-
-           ) : questions.length === 0 ? (
- 
-             <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-6 py-8 text-center text-slate-400">
-               No {selectedLevel} level questions found for this topic.
-             </div>
- 
-           ) : (
- 
-            questions.map((q, index) => (
+            <div className="text-slate-400">No questions found</div>
+          ) : (
+            questions.map((question, index) => (
+              <div key={question.id} className="mb-6 md:mb-8">
                 <div
-                  key={q.id}
-                  className="mb-6 md:mb-8"
+                  data-id={question.topic_id}
+                  ref={(element) => {
+                    questionRefs.current[question.id] = element;
+                  }}
+                  className="flex flex-col"
                 >
-                  <div
-                    data-id={q.topic_id}
-                    ref={(el) => (questionRefs.current[q.id] = el)}
-                    className="flex flex-col"
-                  >
-                    <div className="rounded-t-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
-                      <div className="flex items-center gap-4 p-4 md:p-6">
-                        <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
-                          {(currentPage - 1) * 10 + index + 1}
-                        </div>
-
-                        <h2 className="flex-1 text-base md:text-lg font-semibold text-slate-100 transition-colors leading-snug">
-                          {q.title}
-                        </h2>
-
-                        <div className="flex items-center gap-2">
-
-                          <button 
-                            onClick={() => toggleBookmark(q.id)}
-                            className={`p-2 rounded-lg transition-all duration-200 active:scale-90 ${
-                              bookmarkedQuestions.has(q.id) 
-                               ? "text-red-400 bg-red-500/10" 
-                               : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
-                            }`}
-                            title="Bookmark"
-                          >
-                            <svg 
-                              className={`w-5 h-5 ${bookmarkedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5h14v11l-7 4-7-4V5z" />
-                            </svg>
-                          </button>
-
-                        </div>
+                  <div className="rounded-t-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
+                    <div className="flex items-center gap-4 p-4 md:p-6">
+                      <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
+                        {(currentPage - 1) * 10 + index + 1}
                       </div>
-                    </div>
 
-                    <div className="rounded-b-2xl border border-slate-800 border-t-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
-                      <div className="flex items-start gap-4 p-4 md:p-6">
-                        <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
-                          A
-                        </div>
+                      <h2 className="flex-1 text-base md:text-lg font-semibold text-slate-100 transition-colors leading-snug">
+                        {question.title}
+                      </h2>
 
-                        <div className="flex-1 relative pl-1">
-                          <div
-                            className="prose prose-invert max-w-none text-slate-300"
-                            dangerouslySetInnerHTML={{
-                               __html: DOMPurify.sanitize(q.answer)
-                             }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            ))
-           )}
- 
-            {paginationMeta && paginationMeta.total_pages > 1 && (
-              <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 px-4 md:px-6 py-4">
-                <p className="text-sm text-slate-400">
-                  Showing <span className="text-white font-medium">{(currentPage - 1) * paginationMeta.per_page + 1}</span> to <span className="text-white font-medium">{Math.min(currentPage * paginationMeta.per_page, paginationMeta.total_count)}</span> of <span className="text-white font-medium">{paginationMeta.total_count}</span> questions
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Previous
-                  </button>
-
-                  <div className="flex items-center gap-1">
-                    {[...Array(paginationMeta.total_pages)].map((_, i) => (
-                      <button
-                        key={i + 1}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`w-9 h-9 rounded-lg text-sm font-medium transition
-                          ${currentPage === i + 1 
-                            ? "bg-indigo-600 text-white" 
-                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleUpvoteToggle(question)}
+                          disabled={pendingInteractions.has(`upvote:${question.id}`)}
+                          className={`relative p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
+                            question.upvoted_by_current_user
+                              ? "text-emerald-300 bg-emerald-500/10"
+                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
                           }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                          title={
+                            question.upvoted_by_current_user
+                              ? "Remove Upvote"
+                              : "Upvote Question"
+                          }
+                        >
+                          <ArrowUp
+                            className={`w-5 h-5 ${
+                              question.upvoted_by_current_user ? "fill-current" : "fill-none stroke-current"
+                            }`}
+                          />
+
+                          {question.upvote_count > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-4 rounded-full bg-slate-950 px-1 text-center text-[10px] font-bold leading-4 text-emerald-300">
+                              {question.upvote_count}
+                            </span>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => handleBookmarkToggle(question)}
+                          disabled={pendingInteractions.has(`bookmark:${question.id}`)}
+                          className={`p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
+                            question.bookmarked_by_current_user
+                              ? "text-amber-300 bg-amber-500/10"
+                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                          }`}
+                          title={question.bookmarked_by_current_user ? "Remove Bookmark" : "Bookmark"}
+                        >
+                          <Bookmark
+                            className={`w-5 h-5 ${
+                              question.bookmarked_by_current_user ? "fill-current" : "fill-none stroke-current"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationMeta.total_pages))}
-                    disabled={currentPage === paginationMeta.total_pages}
-                    className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-                  >
-                    Next
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                  <div className="rounded-b-2xl border border-slate-800 border-t-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
+                    <div className="flex items-start gap-4 p-4 md:p-6">
+                      <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
+                        A
+                      </div>
+
+                      <div className="flex-1 relative pl-1">
+                        <div
+                          className="prose prose-invert max-w-none text-slate-300"
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(question.answer || "")
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-         </div>
+            ))
+          )}
 
+          {paginationMeta && paginationMeta.total_pages > 1 && questions.length > 0 && (
+            <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 px-4 md:px-6 py-4">
+              <p className="text-sm text-slate-400">
+                Showing{" "}
+                <span className="text-white font-medium">
+                  {(currentPage - 1) * paginationMeta.per_page + 1}
+                </span>{" "}
+                to{" "}
+                <span className="text-white font-medium">
+                  {Math.min(currentPage * paginationMeta.per_page, paginationMeta.total_count)}
+                </span>{" "}
+                of{" "}
+                <span className="text-white font-medium">{paginationMeta.total_count}</span> questions
+              </p>
 
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {[...Array(paginationMeta.total_pages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => setCurrentPage(index + 1)}
+                      className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
+                        currentPage === index + 1
+                          ? "bg-indigo-600 text-white"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, paginationMeta.total_pages))
+                  }
+                  disabled={currentPage === paginationMeta.total_pages}
+                  className="flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                >
+                  Next
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-
     </div>
-
   );
-
 };
 
 export default InterviewQA;

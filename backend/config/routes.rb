@@ -27,6 +27,11 @@ Rails.application.routes.draw do
       resources :topics, only: [] do
         resources :questions, only: [ :index ], controller: "admin/questions"
       end
+
+      resources :questions, only: [] do
+        resource :bookmark, only: [ :create, :destroy ], controller: "bookmarks"
+        resource :upvote, only: [ :create, :destroy ], controller: "upvotes"
+      end
     end
   end
 end

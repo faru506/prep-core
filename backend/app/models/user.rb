@@ -32,6 +32,9 @@ class User
 
   ROLES = %w[user admin]
 
+  has_many :bookmarks, dependent: :destroy
+  has_many :upvotes, dependent: :destroy
+
   # ── Validations ───────────────────
 
   validates :first_name, :last_name, presence: true

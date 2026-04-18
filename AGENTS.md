@@ -78,6 +78,15 @@ bundle exec rubocop -A  # Auto-fix offenses
 - **Courses**: `GET /api/v1/courses`
 - **Topics**: `GET /api/v1/courses/:course_id/topics`
 - **Questions**: `GET /api/v1/topics/:topic_id/questions` (Params: `level`, `page`)
+- **Question Interactions**:
+  - `POST /api/v1/questions/:question_id/bookmark`
+  - `DELETE /api/v1/questions/:question_id/bookmark`
+  - `POST /api/v1/questions/:question_id/upvote`
+  - `DELETE /api/v1/questions/:question_id/upvote`
+- Use generic resource names for interaction files and models:
+  - `Bookmark` / `bookmarks_controller.rb`
+  - `Upvote` / `upvotes_controller.rb`
+  - avoid `question_bookmark`, `question_upvote`, or similar prefixed naming
 
 ## Code Quality
 
@@ -97,6 +106,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 
 - Local state (`useState`) and `localStorage` (via `utilities/storage`) for auth and roles.
 - Redux is intentionally omitted as the current scale does not justify the boilerplate.
+- `InterviewQA` reads bookmark/upvote state from the backend question payload; bookmark is user-specific and upvote uses a persisted per-user toggle plus question-level aggregate count.
 
 ## React Patterns
 
