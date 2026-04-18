@@ -115,6 +115,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 - Standard hooks (`useState`, `useEffect`, `useRef`) are used.
 - `useMemo` and `useCallback` are avoided unless performance bottlenecks are identified.
 - Custom hooks should be implemented to encapsulate repetitive data fetching logic.
+- Shared presentational logic for question reading views should be centralized in reusable components/utilities instead of duplicated across `InterviewQA` and `Bookmarked Items`.
 
 ## CI Pipeline
 

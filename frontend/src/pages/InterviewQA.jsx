@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowUp, Bookmark } from "lucide-react";
 import Prism from "prismjs";
 
+import QuestionCards from "../components/QuestionCards";
 import {
   createBookmarkApi,
   createUpvoteApi,
@@ -14,25 +13,18 @@ import {
   fetchTopicsApi
 } from "../apis/content";
 import { getToken } from "../utilities/storage";
-import { LEVEL_OPTIONS, getLevelDotClasses } from "../utilities/levels";
+import { getLevelDotClasses } from "../utilities/levels";
+import {
+  getQuestionFilterDescription,
+  parseJsonSafely,
+  QUESTION_FILTER_OPTIONS,
+  sortQuestionsByUpvotes
+} from "../utilities/questions";
 
 import "prismjs/components/prism-ruby";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-css";
 import "prismjs/components/prism-markup";
-
-const QUESTION_FILTER_OPTIONS = [
-  ...LEVEL_OPTIONS,
-  { value: "upvote", label: "Upvote" }
-];
-
-const parseJsonSafely = async (response) => {
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
-};
 
 const InterviewQA = () => {
   const { courseSlug, topicSlug } = useParams();
@@ -82,15 +74,7 @@ const InterviewQA = () => {
         );
 
       if (selectedLevel === "upvote") {
-        return [...nextQuestions].sort((left, right) => {
-          const upvoteDelta = (right.upvote_count || 0) - (left.upvote_count || 0);
-
-          if (upvoteDelta !== 0) {
-            return upvoteDelta;
-          }
-
-          return left.title.localeCompare(right.title);
-        });
+        return sortQuestionsByUpvotes(nextQuestions);
       }
 
       return nextQuestions;
@@ -529,9 +513,7 @@ const InterviewQA = () => {
                   {selectedTopic.title}
                 </h1>
                 <p className="mt-1 text-sm text-slate-400">
-                  {selectedLevel === "upvote"
-                    ? "Showing questions sorted by highest upvotes."
-                    : `Showing only ${selectedLevel} level questions.`}
+                  {getQuestionFilterDescription(selectedLevel)}
                 </p>
               </div>
 
@@ -570,92 +552,17 @@ const InterviewQA = () => {
           ) : !selectedTopic || questions.length === 0 ? (
             <div className="text-slate-400">No questions found</div>
           ) : (
-            questions.map((question, index) => (
-              <div key={question.id} className="mb-6 md:mb-8">
-                <div
-                  data-id={question.topic_id}
-                  ref={(element) => {
-                    questionRefs.current[question.id] = element;
-                  }}
-                  className="flex flex-col"
-                >
-                  <div className="rounded-t-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
-                    <div className="flex items-center gap-4 p-4 md:p-6">
-                      <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
-                        {(currentPage - 1) * 10 + index + 1}
-                      </div>
-
-                      <h2 className="flex-1 text-base md:text-lg font-semibold text-slate-100 transition-colors leading-snug">
-                        {question.title}
-                      </h2>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleUpvoteToggle(question)}
-                          disabled={pendingInteractions.has(`upvote:${question.id}`)}
-                          className={`relative p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
-                            question.upvoted_by_current_user
-                              ? "text-emerald-300 bg-emerald-500/10"
-                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
-                          }`}
-                          title={
-                            question.upvoted_by_current_user
-                              ? "Remove Upvote"
-                              : "Upvote Question"
-                          }
-                        >
-                          <ArrowUp
-                            className={`w-5 h-5 ${
-                              question.upvoted_by_current_user ? "fill-current" : "fill-none stroke-current"
-                            }`}
-                          />
-
-                          {question.upvote_count > 0 && (
-                            <span className="absolute -top-1 -right-1 min-w-4 rounded-full bg-slate-950 px-1 text-center text-[10px] font-bold leading-4 text-emerald-300">
-                              {question.upvote_count}
-                            </span>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => handleBookmarkToggle(question)}
-                          disabled={pendingInteractions.has(`bookmark:${question.id}`)}
-                          className={`p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
-                            question.bookmarked_by_current_user
-                              ? "text-amber-300 bg-amber-500/10"
-                              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
-                          }`}
-                          title={question.bookmarked_by_current_user ? "Remove Bookmark" : "Bookmark"}
-                        >
-                          <Bookmark
-                            className={`w-5 h-5 ${
-                              question.bookmarked_by_current_user ? "fill-current" : "fill-none stroke-current"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-b-2xl border border-slate-800 border-t-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
-                    <div className="flex items-start gap-4 p-4 md:p-6">
-                      <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
-                        A
-                      </div>
-
-                      <div className="flex-1 relative pl-1">
-                        <div
-                          className="prose prose-invert max-w-none text-slate-300"
-                          dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(question.answer || "")
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
+            <QuestionCards
+              questions={questions}
+              pendingInteractions={pendingInteractions}
+              onUpvoteToggle={handleUpvoteToggle}
+              onBookmarkToggle={handleBookmarkToggle}
+              numberOffset={(currentPage - 1) * 10}
+              getQuestionDataId={(question) => question.topic_id}
+              getQuestionRef={(question, element) => {
+                questionRefs.current[question.id] = element;
+              }}
+            />
           )}
 
           {paginationMeta && paginationMeta.total_pages > 1 && questions.length > 0 && (
