@@ -30,9 +30,9 @@ jobs:
         working-directory: backend
         run: bundle install
 
-      - name: Run tests
-        working-directory: backend
-        run: bundle exec rails test || true
+       - name: Run tests
+         working-directory: backend
+         run: bundle exec rails test
 
   frontend:
     name: React Frontend CI
@@ -51,6 +51,6 @@ jobs:
         working-directory: frontend
         run: npm install
 
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build || true
+       - name: Build frontend
+         working-directory: frontend
+         run: npm run build

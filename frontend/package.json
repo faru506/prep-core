@@ -20,6 +20,7 @@
     "@tiptap/pm": "^3.22.3",
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
+    "dompurify": "^3.4.0",
     "highlight.js": "^11.11.1",
     "lucide-react": "^1.8.0",
     "prismjs": "^1.30.0",

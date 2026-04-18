@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import DOMPurify from "dompurify";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchCoursesApi } from "../apis/courses";
 import { fetchTopicsApi } from "../apis/topics";
@@ -571,8 +572,8 @@ const InterviewQA = () => {
                           <div
                             className="prose prose-invert max-w-none text-slate-300"
                             dangerouslySetInnerHTML={{
-                              __html: q.answer
-                            }}
+                               __html: DOMPurify.sanitize(q.answer)
+                             }}
                           />
                         </div>
                       </div>

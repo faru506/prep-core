@@ -58,6 +58,7 @@ bundle exec rubocop -A  # Auto-fix offenses
   - `GET /api/v1/courses`
   - `GET /api/v1/courses/:course_id/topics`
   - `GET /api/v1/topics/:topic_id/questions` (Params: `level`, `page`)
+- Admin endpoints now require JWT Authorization header in the frontend.
 
 ## Code Quality
 
@@ -89,6 +90,8 @@ bundle exec rubocop -A  # Auto-fix offenses
 - CI runs `bundle exec rails test || true` - tests don't fail CI
 - Frontend has no TypeScript config (plain JS)
 - MongoDB volumes persist across container restarts
+- Frontend node_modules are in an anonymous volume; run `docker compose -f docker-compose.dev.yml exec frontend npm install <package>` to add dependencies to the container
 - Use `make rebuild` to force rebuild without cache
 - ESLint requires `--legacy-peer-deps` when installing packages
 - Run `make lint` before committing to catch style issues
+- Whenever changes are made to the codebase, update AGENTS.md to reflect the changes.

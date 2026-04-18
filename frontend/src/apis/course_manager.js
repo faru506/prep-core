@@ -1,11 +1,13 @@
 import { DOMAIN } from "./config";
+import { getToken } from "../utilities/storage";
 
 export const createCourseApi =
   (data) =>
     fetch(`${DOMAIN}/api/v1/admin/courses`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
@@ -15,7 +17,8 @@ export const updateCourseApi =
     fetch(`${DOMAIN}/api/v1/admin/courses/${courseId}`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
@@ -23,7 +26,10 @@ export const updateCourseApi =
 export const deleteCourseApi =
   (courseId) =>
     fetch(`${DOMAIN}/api/v1/admin/courses/${courseId}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
     });
 
 export const createTopicApi =
@@ -31,7 +37,8 @@ export const createTopicApi =
     fetch(`${DOMAIN}/api/v1/admin/topics`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
@@ -41,7 +48,8 @@ export const updateTopicApi =
     fetch(`${DOMAIN}/api/v1/admin/topics/${topicId}`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
@@ -49,7 +57,10 @@ export const updateTopicApi =
 export const deleteTopicApi =
   (topicId) =>
     fetch(`${DOMAIN}/api/v1/admin/topics/${topicId}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
     });
 
 export const reorderCoursesApi =
@@ -60,7 +71,8 @@ export const reorderCoursesApi =
         method: "POST",
         headers: {
           "Content-Type":
-            "application/json"
+            "application/json",
+          Authorization: `Bearer ${getToken()}`
         },
         body: JSON.stringify({
           course_ids: courseIds
@@ -76,7 +88,8 @@ export const reorderTopicsApi =
         method: "POST",
         headers: {
           "Content-Type":
-            "application/json"
+            "application/json",
+          Authorization: `Bearer ${getToken()}`
         },
         body: JSON.stringify({
           topic_ids: topicIds
@@ -85,18 +98,28 @@ export const reorderTopicsApi =
     );
 
 export const fetchAdminCourses = () =>
-  fetch(`${DOMAIN}/api/v1/admin/courses`);
+  fetch(`${DOMAIN}/api/v1/admin/courses`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  });
 
 export const fetchAdminTopics = (courseId) =>
   fetch(
-    `${DOMAIN}/api/v1/admin/topics?course_id=${courseId}`
+    `${DOMAIN}/api/v1/admin/topics?course_id=${courseId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    }
   );
 
 export const createQuestionApi = (data) =>
   fetch(`${DOMAIN}/api/v1/admin/questions`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`
     },
     body: JSON.stringify(data)
   });
@@ -106,7 +129,8 @@ export const updateQuestionApi =
     fetch(`${DOMAIN}/api/v1/admin/questions/${questionId}`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
@@ -114,13 +138,21 @@ export const updateQuestionApi =
 export const deleteQuestionApi =
   (questionId) =>
     fetch(`${DOMAIN}/api/v1/admin/questions/${questionId}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
     });
 
 export const fetchAdminQuestions =
   (topicId) =>
     fetch(
-      `${DOMAIN}/api/v1/admin/topics/${topicId}/questions`
+      `${DOMAIN}/api/v1/admin/topics/${topicId}/questions`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      }
     );
 
 export const reorderQuestionsApi =
@@ -131,7 +163,8 @@ export const reorderQuestionsApi =
         method: "POST",
         headers: {
           "Content-Type":
-            "application/json"
+            "application/json",
+          Authorization: `Bearer ${getToken()}`
         },
         body: JSON.stringify({
           question_ids: questionIds,

@@ -1,4 +1,7 @@
-class Api::V1::Admin::QuestionsController < ApplicationController
+class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
+  skip_before_action :authenticate_user!, only: [:index]
+  skip_before_action :authorize_admin!, only: [:index]
+
   def create
     topic = Topic.find(params[:topic_id])
     next_position =
@@ -67,7 +70,7 @@ class Api::V1::Admin::QuestionsController < ApplicationController
     topic = Topic.find(params[:topic_id])
     questions = topic.questions
 
-    questions = questions.where(level: params[:level]) if params[:level].present?
+    questions = questions.where(level: params[:level].to_s) if params[:level].present?
 
     page = (params[:page] || 1).to_i
     per_page = 10
