@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import DOMPurify from "dompurify";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchCoursesApi } from "../apis/courses";
-import { fetchTopicsApi } from "../apis/topics";
-import { fetchQuestionsApi } from "../apis/questions";
+import {
+  fetchCoursesApi,
+  fetchTopicsApi,
+  fetchQuestionsApi
+} from "../apis/content";
 import {
   LEVEL_OPTIONS,
   getLevelDotClasses
