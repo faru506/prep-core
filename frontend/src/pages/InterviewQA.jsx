@@ -21,6 +21,11 @@ import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-css";
 import "prismjs/components/prism-markup";
 
+const QUESTION_FILTER_OPTIONS = [
+  ...LEVEL_OPTIONS,
+  { value: "upvote", label: "Upvote" }
+];
+
 const parseJsonSafely = async (response) => {
   try {
     return await response.json();
@@ -68,13 +73,28 @@ const InterviewQA = () => {
   };
 
   const updateQuestionInState = (questionId, updater) => {
-    setQuestions((prev) =>
-      prev.map((question) =>
-        question.id === questionId
-          ? { ...question, ...updater(question) }
-          : question
-      )
-    );
+    setQuestions((prev) => {
+      const nextQuestions =
+        prev.map((question) =>
+          question.id === questionId
+            ? { ...question, ...updater(question) }
+            : question
+        );
+
+      if (selectedLevel === "upvote") {
+        return [...nextQuestions].sort((left, right) => {
+          const upvoteDelta = (right.upvote_count || 0) - (left.upvote_count || 0);
+
+          if (upvoteDelta !== 0) {
+            return upvoteDelta;
+          }
+
+          return left.title.localeCompare(right.title);
+        });
+      }
+
+      return nextQuestions;
+    });
   };
 
   const loadQuestions = async (topicId, level, page = 1) => {
@@ -509,7 +529,9 @@ const InterviewQA = () => {
                   {selectedTopic.title}
                 </h1>
                 <p className="mt-1 text-sm text-slate-400">
-                  Showing only {selectedLevel} level questions.
+                  {selectedLevel === "upvote"
+                    ? "Showing questions sorted by highest upvotes."
+                    : `Showing only ${selectedLevel} level questions.`}
                 </p>
               </div>
 
@@ -527,7 +549,7 @@ const InterviewQA = () => {
                   }}
                   className="rounded-xl border border-slate-700 bg-slate-900 px-3 md:px-4 py-2 text-sm font-medium text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
                 >
-                  {LEVEL_OPTIONS.map((option) => (
+                  {QUESTION_FILTER_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>

@@ -28,6 +28,8 @@ Rails.application.routes.draw do
         resources :questions, only: [ :index ], controller: "admin/questions"
       end
 
+      resources :bookmarks, only: [ :index ]
+
       resources :questions, only: [] do
         resource :bookmark, only: [ :create, :destroy ], controller: "bookmarks"
         resource :upvote, only: [ :create, :destroy ], controller: "upvotes"

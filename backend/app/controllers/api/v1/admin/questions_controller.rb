@@ -70,14 +70,20 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     topic = Topic.find(params[:topic_id])
     questions = topic.questions
 
-    questions = questions.where(level: params[:level].to_s) if params[:level].present?
+    if params[:level].present? && Question::LEVELS.include?(params[:level].to_s)
+      questions = questions.where(level: params[:level].to_s)
+    end
 
     page = (params[:page] || 1).to_i
     per_page = 10
     offset = (page - 1) * per_page
 
     total_count = questions.count
-    paginated_questions = questions.order_by(position: :asc).skip(offset).limit(per_page)
+    paginated_questions =
+      questions
+        .order_by(*sort_order)
+        .skip(offset)
+        .limit(per_page)
 
     question_ids = paginated_questions.map(&:_id)
     bookmarked_ids = []
@@ -115,6 +121,14 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
         total_count: total_count
       }
     }
+  end
+
+  private
+
+  def sort_order
+    return { upvote_count: :desc, position: :asc } if params[:sort].to_s == "upvotes"
+
+    { position: :asc }
   end
 
   def reorder

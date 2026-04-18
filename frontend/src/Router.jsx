@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Programs from "./pages/Programs";
 import Contests from "./pages/Contests";
 import InterviewQA from "./pages/InterviewQA";
+import BookmarkedItems from "./pages/BookmarkedItems";
 import Users from "./pages/Users";
 import CourseManager from "./pages/CourseManager"
 import LandingPage from "./pages/LandingPage";
@@ -62,6 +63,15 @@ const router = createBrowserRouter([
       {
         path: "interview_qa/:courseSlug/:topicSlug?",
         element: <InterviewQA />
+      },
+
+      {
+        path: "bookmarks",
+        element: (
+          <ProtectedRoute>
+            <BookmarkedItems />
+          </ProtectedRoute>
+        )
       },
 
       {
