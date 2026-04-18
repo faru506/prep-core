@@ -507,23 +507,6 @@ const InterviewQA = () => {
                         </h2>
 
                         <div className="flex items-center gap-2">
-                          <button 
-                            onClick={() => toggleLike(q.id)}
-                            className={`p-2 rounded-lg transition-all duration-200 active:scale-90 ${
-                              likedQuestions.has(q.id) 
-                               ? "text-red-400 bg-red-500/10" 
-                               : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
-                            }`}
-                            title="Like"
-                          >
-                            <svg 
-                              className={`w-5 h-5 ${likedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.128-4.312 2.733-.715-1.605-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                            </svg>
-                          </button>
 
                           <button 
                             onClick={() => toggleBookmark(q.id)}
@@ -543,23 +526,6 @@ const InterviewQA = () => {
                             </svg>
                           </button>
 
-                          <button 
-                            onClick={() => toggleFaced(q.id)}
-                            className={`p-2 rounded-lg transition-all duration-200 active:scale-90 ${
-                              facedQuestions.has(q.id) 
-                                ? "text-red-400 bg-red-500/10" 
-                                : "text-slate-500 hover:text-red-400 hover:bg-red-500/10"
-                            }`}
-                            title="Did you face this question in an interview?"
-                          >
-                            <svg 
-                              className={`w-5 h-5 ${facedQuestions.has(q.id) ? "fill-current" : "fill-none stroke-current"}`} 
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
-                            </svg>
-                          </button>
                         </div>
                       </div>
                     </div>
