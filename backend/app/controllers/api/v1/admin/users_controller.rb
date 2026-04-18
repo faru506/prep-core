@@ -6,7 +6,9 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
   end
 
   def create
-    user = User.create!(create_params)
+    user = User.new(create_params)
+    user.role = params[:role] if params[:role].present?
+    user.save!
 
     render json: user_payload(user), status: :created
   end
@@ -14,7 +16,9 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
   def update
     user = User.find(params[:id])
 
-    user.update!(update_params)
+    user.assign_attributes(update_params)
+    user.role = params[:role] if params[:role].present?
+    user.save!
 
     render json: user_payload(user)
   end
@@ -34,7 +38,6 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
       :first_name,
       :last_name,
       :email,
-      :role,
       :password
     )
   end
@@ -45,7 +48,6 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
         :first_name,
         :last_name,
         :email,
-        :role,
         :password
       )
 
