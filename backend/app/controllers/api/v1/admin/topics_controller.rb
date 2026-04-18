@@ -1,6 +1,6 @@
 class Api::V1::Admin::TopicsController < Api::V1::Admin::AdminController
-  skip_before_action :authenticate_user!, only: [:index]
-  skip_before_action :authorize_admin!, only: [:index]
+  skip_before_action :authenticate_user!, only: [ :index ]
+  skip_before_action :authorize_admin!, only: [ :index ]
 
   def create
     course = Course.find(params[:course_id])

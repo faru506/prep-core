@@ -116,6 +116,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 - MongoDB volumes persist across container restarts
 - Frontend `node_modules` are in an anonymous volume; use `make npm-install` or `make npm-add` to manage packages in the container
 - Use `make rebuild` to force rebuild without cache
-- Run `make lint` before committing to catch style issues
+- Run `make lint` before committing to catch style issues.
+- After any code change, the model MUST run the relevant lint and test commands to verify the changes.
 - Whenever a task is assigned to an AI model, the model MUST first read AGENTS.md to gather codebase context and conventions.
 - Whenever changes are made to the codebase, the model MUST update AGENTS.md to reflect those changes.
