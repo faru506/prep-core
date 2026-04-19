@@ -15,4 +15,4 @@ test:
 production:
   clients:
     default:
-      uri: mongodb://localhost:27017/backend_production
+      uri: <%= ENV['MONGODB_URI'] %>
