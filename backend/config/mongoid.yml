@@ -16,3 +16,6 @@ production:
   clients:
     default:
       uri: <%= ENV['MONGODB_URI'] %>
+      options:
+        ssl: true
+        ssl_verify: false
