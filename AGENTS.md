@@ -134,6 +134,15 @@ bundle exec rubocop -A  # Auto-fix offenses
 - **Frontend**: Installs dependencies in `frontend/` directory, then runs build process
 - Triggered on push to `main` and all pull requests
 
+## Data Safety & Deployment
+
+- **Environment Separation**: Always use different MongoDB databases/clusters for development and production.
+- **URI Management**: Use the `MONGODB_URI` environment variable across all environments. While the key is the same, the value must differ (e.g., local Docker URI for development, Atlas/Cloud URI for production) to ensure absolute data isolation.
+- **Local Dev**: Use a local MongoDB instance (via Docker) or a dedicated Dev cluster.
+- **Production**: Use MongoDB Atlas with strict RBAC (Role-Based Access Control) to prevent accidental `dropDatabase` operations.
+- **Backups**: Production data should be backed up via MongoDB Atlas Cloud Backups.
+- **Destructive Commands**: `make reset-db` deletes all local volumes and MUST NOT be run against production data.
+
 ## Gotchas
 
 - Frontend has no TypeScript config (plain JS)
