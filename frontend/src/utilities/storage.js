@@ -7,17 +7,8 @@ export const saveRole = ( role ) => {
 }
 
 export const getRole = () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) return null;
-
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.role;
-
-  } catch {
-    return null;
-  }
+  const payload = getTokenPayload();
+  return payload?.role || null;
 };
 
 export const getToken = () => {
@@ -26,4 +17,14 @@ export const getToken = () => {
 
 export const removeToken = () => {
   localStorage.removeItem("token");
+};
+
+export const getTokenPayload = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
 };

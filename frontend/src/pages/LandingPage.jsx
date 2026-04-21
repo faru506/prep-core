@@ -142,7 +142,7 @@ const LandingPage = () => {
               Ready to land your dream job?
             </h2>
             <p className="text-indigo-100 mb-10 max-w-2xl mx-auto text-lg">
-              Join the community of developers mastering their technical interviews with PrepMaster.
+              Join the community of developers mastering their technical interviews with PrepCore.
             </p>
             <Link 
               to="/register" 
@@ -161,7 +161,7 @@ const LandingPage = () => {
             PrepCore
           </div>
           <div className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} PrepMaster. All rights reserved.
+            © {new Date().getFullYear()} PrepCore. All rights reserved.
           </div>
           <div className="flex gap-6">
             <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">Terms</a>

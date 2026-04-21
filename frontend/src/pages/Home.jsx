@@ -109,7 +109,7 @@ const Home = () => {
               Ready to Start Your Journey?
             </h2>
             <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-              Join thousands of developers who have improved their interview skills with PrepMaster.
+              Join thousands of developers who have improved their interview skills with PrepCore.
             </p>
             <Link 
               to="/interview_qa" 

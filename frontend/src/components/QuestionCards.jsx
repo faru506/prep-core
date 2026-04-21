@@ -18,9 +18,9 @@ const QuestionCards = ({
         ref={getQuestionRef ? (element) => getQuestionRef(question, element) : undefined}
         className="flex flex-col"
       >
-        <div className="rounded-t-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
+         <div className="rounded-t-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/80 shadow-xl">
           <div className="flex items-center gap-4 p-4 md:p-6">
-            <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
+             <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
               {numberOffset + index + 1}
             </div>
 
@@ -38,7 +38,7 @@ const QuestionCards = ({
                 className={`relative p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
                   question.upvoted_by_current_user
                     ? "text-emerald-300 bg-emerald-500/10"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                     : "text-slate-500 hover:text-slate-300 hover:bg-white/10"
                 }`}
                 title={
                   question.upvoted_by_current_user
@@ -65,7 +65,7 @@ const QuestionCards = ({
                 className={`p-2 rounded-lg transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
                   question.bookmarked_by_current_user
                     ? "text-amber-300 bg-amber-500/10"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                     : "text-slate-500 hover:text-slate-300 hover:bg-white/10"
                 }`}
                 title={question.bookmarked_by_current_user ? "Remove Bookmark" : "Bookmark"}
               >
@@ -79,9 +79,9 @@ const QuestionCards = ({
           </div>
         </div>
 
-        <div className="rounded-b-2xl border border-slate-800 border-t-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/60 shadow-xl">
+         <div className="rounded-b-2xl border border-white/10 border-t-0 bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:border-indigo-500/50 hover:bg-slate-900/80 shadow-xl">
           <div className="flex items-start gap-4 p-4 md:p-6">
-            <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
+             <div className="flex-shrink-0 w-8 md:w-10 h-8 md:h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors duration-300">
               A
             </div>
 
