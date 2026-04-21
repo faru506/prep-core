@@ -15,7 +15,4 @@ test:
 production:
   clients:
     default:
-      uri: <%= ENV['MONGODB_URI'] %>
-      options:
-        ssl: true
-        ssl_verify: false
+      uri: mongodb://localhost:27017/backend_production

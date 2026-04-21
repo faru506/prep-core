@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  get "/healthz", to: proc { [ 200, {}, [ "OK" ] ] }
   devise_for :users,
     path: "api/v1/users",
     controllers: {
