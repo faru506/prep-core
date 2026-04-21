@@ -92,10 +92,10 @@ const Navbar = () => {
   ];
 
   const navLinkClass = ({ isActive }) =>
-    `relative px-1 py-2 transition duration-300 ${
+    `relative px-4 py-2 rounded-full border transition-all duration-300 ${
       isActive
-        ? "text-white"
-        : "text-slate-300 hover:text-white"
+        ? "border-cyan-400/40 bg-slate-800/95 text-white shadow-[0_4px_12px_rgba(34,211,238,0.1)]"
+        : "border-slate-700/80 bg-slate-900/90 text-slate-300 hover:border-slate-500 hover:bg-slate-800/95 hover:text-white"
     }`;
 
   const logoutUser = () => {
@@ -121,20 +121,13 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-2">
             {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={navLinkClass}
-              >
-                {({ isActive }) => (
-                  <span className="relative">
-                    {item.name}
-                    {isActive && (
-                      <span className="absolute left-0 -bottom-2 w-full h-[2px] bg-indigo-500 rounded"></span>
-                    )}
-                  </span>
-                )}
-              </NavLink>
+               <NavLink
+                 key={item.path}
+                 to={item.path}
+                 className={navLinkClass}
+               >
+                 {item.name}
+               </NavLink>
             ))}
           </div>
         </div>
@@ -301,20 +294,20 @@ const Navbar = () => {
       <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 mt-4' : 'max-h-0'}`}>
         <div className="flex flex-col gap-2 py-2">
           {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={handleNavClick}
-              className={({ isActive }) =>
-                `px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-indigo-600 text-white"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`
-              }
-            >
-              {item.name}
-            </NavLink>
+               <NavLink
+                 key={item.path}
+                 to={item.path}
+                 onClick={handleNavClick}
+                 className={({ isActive }) =>
+                   `px-4 py-2 rounded-full border transition-all duration-300 ${
+                     isActive
+                       ? "border-cyan-400/40 bg-slate-800/95 text-white shadow-[0_4px_12px_rgba(34,211,238,0.1)]"
+                       : "border-slate-700/80 bg-slate-900/90 text-slate-300 hover:border-slate-500 hover:bg-slate-800/95 hover:text-white"
+                   }`
+                 }
+               >
+                 {item.name}
+               </NavLink>
           ))}
         </div>
       </div>
