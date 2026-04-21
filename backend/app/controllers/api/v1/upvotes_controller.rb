@@ -1,6 +1,7 @@
 class Api::V1::UpvotesController < Api::V1::BaseController
   def create
-    question = Question.find(params[:question_id])
+    question = Question.find_by(id: params[:question_id])
+    return render json: { error: "Question not found" }, status: :not_found unless question
 
     upvote =
       current_user.upvotes.where(
@@ -21,7 +22,8 @@ class Api::V1::UpvotesController < Api::V1::BaseController
   end
 
   def destroy
-    question = Question.find(params[:question_id])
+    question = Question.find_by(id: params[:question_id])
+    return render json: { error: "Question not found" }, status: :not_found unless question
 
     upvote =
       current_user.upvotes.where(

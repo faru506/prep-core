@@ -105,11 +105,21 @@ bundle exec rubocop -A  # Auto-fix offenses
   - `hard` (SDE 3 - Expert & Architecture)
 
 ## State Management
-
+ 
 - Local state (`useState`) and `localStorage` (via `utilities/storage`) for auth and roles.
 - Redux is intentionally omitted as the current scale does not justify the boilerplate.
 - `InterviewQA` reads bookmark/upvote state from the backend question payload; bookmark is user-specific and upvote uses a persisted per-user toggle plus question-level aggregate count.
 - `InterviewQA` and `Bookmarked Items` use a question dropdown with `low`, `medium`, `hard`, and `upvote`; `upvote` sorts by `upvote_count` descending, while level selections keep the default content order.
+
+## Session & Auth
+
+- **Global 401 Handling**: `apiFetch` in `frontend/src/apis/config.js` automatically removes the token and redirects to `/login` on any 401 Unauthorized response.
+- **Token Expiration**: `getToken` in `frontend/src/utilities/storage.js` checks the JWT `exp` claim and clears the token if expired.
+- **Navigation Utility**: `frontend/src/utilities/navigation.js` provides a way to trigger redirects from outside React components (used by the global 401 handler).
+- **Route Guards**:
+  - `ProtectedRoute`: Redirects to `/login` if no valid token exists.
+  - `AdminRoute`: Redirects to `/login` if the role is missing, or to `/` if the user is not an admin.
+
 
 ## React Patterns
 

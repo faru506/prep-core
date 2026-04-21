@@ -12,7 +12,16 @@ export const getRole = () => {
 };
 
 export const getToken = () => {
-  return localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  const payload = getTokenPayload();
+  if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+    removeToken();
+    return null;
+  }
+
+  return token;
 };
 
 export const removeToken = () => {

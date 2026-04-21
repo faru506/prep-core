@@ -1,4 +1,5 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 import Authentication from "./pages/Authentication";
 import App from "./App";
@@ -17,8 +18,15 @@ import CourseManager from "./pages/CourseManager"
 import LandingPage from "./pages/LandingPage";
 
 import { getToken } from "./utilities/storage";
+import { setNavigate } from "./utilities/navigation";
 
 const Root = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate]);
+
   return getToken() ? <App /> : <LandingPage />;
 };
 

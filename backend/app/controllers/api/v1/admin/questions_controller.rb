@@ -3,7 +3,9 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
   skip_before_action :authorize_admin!, only: [ :index ]
 
   def create
-    topic = Topic.find(params[:topic_id])
+    topic = Topic.find_by(id: params[:topic_id])
+    return render json: { error: "Topic not found" }, status: :not_found unless topic
+
     next_position =
       topic.questions.max(:position).to_i + 1
 
@@ -28,7 +30,8 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
   end
 
   def update
-    question = Question.find(params[:id])
+    question = Question.find_by(id: params[:id])
+    return render json: { error: "Question not found" }, status: :not_found unless question
 
     question.update!(
       title: params[:title],
@@ -51,7 +54,8 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
   end
 
   def destroy
-    question = Question.find(params[:id])
+    question = Question.find_by(id: params[:id])
+    return render json: { error: "Question not found" }, status: :not_found unless question
 
     topic_id = question.topic_id
     destroyed_position = question.position
@@ -59,16 +63,17 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     question.destroy!
 
     Question.where(topic_id: topic_id, :position.gt => destroyed_position)
-      .each do |remaining_question|
-        remaining_question.inc(position: -1)
-      end
+      .update_all("$inc" => { position: -1 })
 
     head :no_content
   end
 
   def index
-    topic = Topic.find(params[:topic_id])
+    topic = Topic.find_by(id: params[:topic_id])
+    return render json: { error: "Topic not found" }, status: :not_found unless topic
+
     questions = topic.questions
+
 
     if params[:level].present? && Question::LEVELS.include?(params[:level].to_s)
       questions = questions.where(level: params[:level].to_s)

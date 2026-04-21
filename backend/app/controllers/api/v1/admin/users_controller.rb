@@ -14,7 +14,8 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
   end
 
   def update
-    user = User.find(params[:id])
+    user = User.find_by(id: params[:id])
+    return render json: { error: "User not found" }, status: :not_found unless user
 
     user.assign_attributes(update_params)
     user.role = params[:role] if params[:role].present?
@@ -24,7 +25,8 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
   end
 
   def destroy
-    user = User.find(params[:id])
+    user = User.find_by(id: params[:id])
+    return render json: { error: "User not found" }, status: :not_found unless user
 
     user.destroy!
 

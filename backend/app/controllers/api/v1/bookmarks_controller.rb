@@ -29,7 +29,9 @@ class Api::V1::BookmarksController < Api::V1::BaseController
   end
 
   def create
-    question = Question.find(params[:question_id])
+    question = Question.find_by(id: params[:question_id])
+    return render json: { error: "Question not found" }, status: :not_found unless question
+
     topic = question.topic
     course = topic.course
 

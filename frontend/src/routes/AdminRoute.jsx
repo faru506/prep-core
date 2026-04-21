@@ -5,6 +5,12 @@ import { getRole } from "../utilities/storage";
 const AdminRoute = ({ children }) => {
   const role = getRole();
 
+  if (!role) {
+    return (
+      <Navigate to="/login" replace />
+    );
+  }
+
   if (role !== 'admin') {
     return (
       <Navigate to="/" replace />

@@ -1,4 +1,4 @@
-import { DOMAIN } from "./config";
+import { DOMAIN, apiFetch } from "./config";
 import { getToken } from "../utilities/storage";
 
 const authHeaders = () => {
@@ -14,11 +14,11 @@ const authHeaders = () => {
 };
 
 export const fetchCoursesApi = async () => {
-  return fetch(`${DOMAIN}/api/v1/courses`);
+  return apiFetch(`${DOMAIN}/api/v1/courses`);
 };
 
 export const fetchTopicsApi = async (courseId) => {
-  return fetch(`${DOMAIN}/api/v1/courses/${courseId}/topics`);
+  return apiFetch(`${DOMAIN}/api/v1/courses/${courseId}/topics`);
 };
 
 export const fetchQuestionsApi = async (topicId, filter, page = 1) => {
@@ -30,7 +30,7 @@ export const fetchQuestionsApi = async (topicId, filter, page = 1) => {
   }
   params.append("page", page);
 
-  return fetch(
+  return apiFetch(
     `${DOMAIN}/api/v1/topics/${topicId}/questions?${params.toString()}`,
     {
       headers: authHeaders()
@@ -39,30 +39,30 @@ export const fetchQuestionsApi = async (topicId, filter, page = 1) => {
 };
 
 export const fetchBookmarkedItemsApi = async () =>
-  fetch(`${DOMAIN}/api/v1/bookmarks`, {
+  apiFetch(`${DOMAIN}/api/v1/bookmarks`, {
     headers: authHeaders()
   });
 
 export const createBookmarkApi = async (questionId) =>
-  fetch(`${DOMAIN}/api/v1/questions/${questionId}/bookmark`, {
+  apiFetch(`${DOMAIN}/api/v1/questions/${questionId}/bookmark`, {
     method: "POST",
     headers: authHeaders()
   });
 
 export const deleteBookmarkApi = async (questionId) =>
-  fetch(`${DOMAIN}/api/v1/questions/${questionId}/bookmark`, {
+  apiFetch(`${DOMAIN}/api/v1/questions/${questionId}/bookmark`, {
     method: "DELETE",
     headers: authHeaders()
   });
 
 export const createUpvoteApi = async (questionId) =>
-  fetch(`${DOMAIN}/api/v1/questions/${questionId}/upvote`, {
+  apiFetch(`${DOMAIN}/api/v1/questions/${questionId}/upvote`, {
     method: "POST",
     headers: authHeaders()
   });
 
 export const deleteUpvoteApi = async (questionId) =>
-  fetch(`${DOMAIN}/api/v1/questions/${questionId}/upvote`, {
+  apiFetch(`${DOMAIN}/api/v1/questions/${questionId}/upvote`, {
     method: "DELETE",
     headers: authHeaders()
   });

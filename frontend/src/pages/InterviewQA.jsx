@@ -235,11 +235,9 @@ const InterviewQA = () => {
       updateQuestionInState(question.id, () => ({
         bookmarked_by_current_user: question.bookmarked_by_current_user
       }));
-      setInteractionError(
-        error.message === "Unauthorized"
-          ? "Your session has expired. Please sign in again to use bookmarks."
-          : "We couldn't update the bookmark right now."
-      );
+      if (error.message !== "Unauthorized") {
+        setInteractionError("We couldn't update the bookmark right now.");
+      }
       console.error("Failed to update bookmark:", error);
     } finally {
       markInteractionPending(actionKey, false);
@@ -295,11 +293,9 @@ const InterviewQA = () => {
         upvoted_by_current_user: question.upvoted_by_current_user,
         upvote_count: question.upvote_count
       }));
-      setInteractionError(
-        error.message === "Unauthorized"
-          ? "Your session has expired. Please sign in again to use upvotes."
-          : "We couldn't update the upvote right now."
-      );
+      if (error.message !== "Unauthorized") {
+        setInteractionError("We couldn't update the upvote right now.");
+      }
       console.error("Failed to update upvote:", error);
     } finally {
       markInteractionPending(actionKey, false);
