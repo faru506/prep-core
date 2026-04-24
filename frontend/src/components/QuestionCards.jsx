@@ -41,8 +41,8 @@ const QuestionCards = ({
               disabled={pendingInteractions.has(`upvote:${question.id}`)}
               className={`group/btn relative p-2.5 rounded-xl transition-all duration-300 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
                 question.upvoted_by_current_user
-                  ? "text-emerald-400 bg-emerald-500/10 ring-1 ring-emerald-500/20"
-                  : "text-slate-500 bg-slate-800/50 hover:text-slate-300 hover:bg-slate-800 ring-1 ring-white/5"
+                  ? "text-indigo-400 bg-indigo-500/10 ring-1 ring-indigo-500/20"
+                  : "text-slate-500 bg-slate-800/50 hover:text-indigo-300 hover:bg-indigo-800 ring-1 ring-white/5"
               }`}
               title={
                 question.upvoted_by_current_user
@@ -56,7 +56,7 @@ const QuestionCards = ({
                 }`}
               />
               {question.upvote_count > 0 && (
-                <span className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-slate-950 border border-slate-800 px-1 flex items-center justify-center text-[10px] font-bold text-emerald-400 shadow-lg">
+                <span className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-slate-950 border border-slate-800 px-1 flex items-center justify-center text-[10px] font-bold text-indigo-400 shadow-lg">
                   {question.upvote_count}
                 </span>
               )}
@@ -67,8 +67,8 @@ const QuestionCards = ({
               disabled={pendingInteractions.has(`bookmark:${question.id}`)}
               className={`p-2.5 rounded-xl transition-all duration-300 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
                 question.bookmarked_by_current_user
-                  ? "text-amber-400 bg-amber-500/10 ring-1 ring-amber-500/20"
-                  : "text-slate-500 bg-slate-800/50 hover:text-slate-300 hover:bg-slate-800 ring-1 ring-white/5"
+                  ? "text-indigo-400 bg-indigo-500/10 ring-1 ring-indigo-500/20"
+                  : "text-slate-500 bg-slate-800/50 hover:text-indigo-300 hover:bg-indigo-800 ring-1 ring-white/5"
               }`}
               title={question.bookmarked_by_current_user ? "Remove Bookmark" : "Bookmark"}
             >
