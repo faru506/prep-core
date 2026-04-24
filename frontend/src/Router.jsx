@@ -1,13 +1,9 @@
-import { createBrowserRouter, Navigate, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Authentication from "./pages/Authentication";
-import App from "./App";
-
+import Root from "./components/Root";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import AdminRoute from "./routes/AdminRoute";
-
 import Home from "./pages/Home";
 import Programs from "./pages/Programs";
 import Contests from "./pages/Contests";
@@ -15,20 +11,7 @@ import InterviewQA from "./pages/InterviewQA";
 import BookmarkedItems from "./pages/BookmarkedItems";
 import Users from "./pages/Users";
 import CourseManager from "./pages/CourseManager"
-import LandingPage from "./pages/LandingPage";
-
 import { getToken } from "./utilities/storage";
-import { setNavigate } from "./utilities/navigation";
-
-const Root = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setNavigate(navigate);
-  }, [navigate]);
-
-  return getToken() ? <App /> : <LandingPage />;
-};
 
 const router = createBrowserRouter([
 
