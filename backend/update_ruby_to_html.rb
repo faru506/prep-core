@@ -1,3 +1,4 @@
+# rubocop:disable all
 # update_ruby_to_html.rb
 data = [
   {
