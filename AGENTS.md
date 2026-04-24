@@ -96,13 +96,29 @@ bundle exec rubocop -A  # Auto-fix offenses
 - **Frontend**: ESLint for JavaScript/React (`make lint-frontend`)
 - Both can be run together with `make lint`
 
-## Course Content
+## Course Content Generation Workflow
 
-- **Courses**: Ruby, Rails, React, JavaScript, System Design
-- **Topic Levels**: 
-  - `low` (SDE 1 - Foundations)
-  - `medium` (SDE 2 - Intermediate Mastery)
-  - `hard` (SDE 3 - Expert & Architecture)
+When asked to populate courses, topics, and questions from an image or list:
+
+1.  **Analyze Input**: Identify the Course title, Level (SDE 1/2/3), and Topics/Sub-topics.
+2.  **Plan Content**:
+    - Create at least 10 questions per topic.
+    - Distribute questions across `low`, `medium`, and `hard` levels.
+    - Craft rich answers in **HTML format** (compatible with TipTap editor), including:
+      - `<p>` for paragraphs.
+      - `<ul>` and `<li>` for lists.
+      - `<strong>` for emphasis.
+      - `<pre class="editor-code-block"><code>...</code></pre>` for all code examples.
+      - Refer to `backend/update_ruby_to_html.rb` for a complete example of correctly formatted rich content.
+3.  **Implement Seeding**:
+    - Create a **single** temporary Ruby seed script (e.g., `backend/seed_<course>_<level>.rb`).
+    - Use `find_or_create_by!` for `Course` and `Topic` to avoid duplicates.
+    - Use `find_or_create_by!` for `Question` and check for existing `Answer` before creating/updating.
+    - Use **single quotes** for the outer string in Ruby seed scripts to avoid interpolation errors with `#{}`.
+4.  **Execute and Verify**:
+    - Run the script: `docker compose -f docker-compose.dev.yml exec backend bundle exec rails runner <script_path>`.
+    - Verify data in the UI or via Rails console.
+5.  **Cleanup**: Remove the seed script after successful verification.
 
 ## State Management
  

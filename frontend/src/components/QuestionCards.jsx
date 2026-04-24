@@ -1,4 +1,7 @@
 import DOMPurify from "dompurify";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { ArrowUp, Bookmark } from "lucide-react";
 
 const QuestionCards = ({
@@ -86,14 +89,16 @@ const QuestionCards = ({
                 Ans
               </div>
 
-              <div className="flex-1 relative pl-1">
-                <div
-                  className="prose prose-invert max-w-none text-slate-300 leading-relaxed"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(question.answer || "")
-                  }}
-                />
-              </div>
+                <div className="flex-1 relative pl-1">
+                  <div className="prose prose-invert max-w-none text-slate-300 leading-relaxed">
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]} 
+                      rehypePlugins={[rehypeRaw]}
+                    >
+                      {question.answer || ""}
+                    </ReactMarkdown>
+                  </div>
+                </div>
             </div>
           </div>
         </div>
