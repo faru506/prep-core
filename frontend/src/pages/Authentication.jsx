@@ -69,9 +69,15 @@ const Authentication = () => {
         response = await registerApi(form);
       }
       if (!response.ok) {
-        const errorData = await response.json();
+        const contentType = response.headers.get("content-type");
+        let errorData;
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await response.json();
+        } else {
+          errorData = { message: await response.text() };
+        }
         console.error(errorData);
-        alert("Authentication failed");
+        alert(errorData.message || "Authentication failed");
         return;
       }
       const token = response.headers?.get("Authorization");
