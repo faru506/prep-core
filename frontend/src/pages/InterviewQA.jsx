@@ -354,6 +354,8 @@ const InterviewQA = () => {
   }, [selectedTopic, selectedLevel, currentPage]);
 
   useEffect(() => {
+    let timeoutId;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -361,18 +363,22 @@ const InterviewQA = () => {
             return;
           }
 
-          const visibleTopicId = entry.target.getAttribute("data-id");
-          const nextTopic = topics.find((topic) => topic.id === visibleTopicId);
+          // Debounce topic switching during rapid scrolling
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            const visibleTopicId = entry.target.getAttribute("data-id");
+            const nextTopic = topics.find((topic) => topic.id === visibleTopicId);
 
-          if (nextTopic) {
-            setSelectedTopic(nextTopic);
-          }
+            if (nextTopic && selectedTopic?.id !== nextTopic.id) {
+              setSelectedTopic(nextTopic);
+            }
+          }, 100);
         });
       },
       {
         root: null,
-        rootMargin: "-100px 0px -60% 0px",
-        threshold: 0.1
+        rootMargin: "-50px 0px -50% 0px",
+        threshold: 0.25
       }
     );
 
@@ -385,16 +391,21 @@ const InterviewQA = () => {
     });
 
     return () => {
+      clearTimeout(timeoutId);
       Object.values(currentRefs).forEach((element) => {
         if (element) {
           observer.unobserve(element);
         }
       });
     };
-  }, [questions, topics]);
+  }, [questions, topics, selectedTopic?.id]);
 
   useEffect(() => {
-    Prism.highlightAll();
+    const timeoutId = setTimeout(() => {
+      Prism.highlightAll();
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
   }, [questions]);
 
   useEffect(() => {
@@ -501,7 +512,7 @@ const InterviewQA = () => {
           </svg>
         </button>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 optimize-scrolling">
           {selectedTopic && questions.length > 0 && (
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
               <div>

@@ -1,3 +1,4 @@
+import React from "react";
 import DOMPurify from "dompurify";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -5,22 +6,22 @@ import rehypeRaw from "rehype-raw";
 import { ArrowUp, Bookmark } from "lucide-react";
 import { getQuestionNumberBgClasses } from "../utilities/levels";
 
-const QuestionCards = ({
-  questions,
+const QuestionCard = React.memo(({
+  question,
+  index,
+  numberOffset,
   pendingInteractions,
   onUpvoteToggle,
   onBookmarkToggle,
-  numberOffset = 0,
   getQuestionRef,
   getQuestionDataId,
   renderQuestionContext
-}) =>
-  questions.map((question, index) => (
-    <div key={question.id} className="mb-8 group">
+}) => (
+  <div key={question.id} className="mb-8 group">
       <div
         data-id={getQuestionDataId ? getQuestionDataId(question) : undefined}
         ref={getQuestionRef ? (element) => getQuestionRef(question, element) : undefined}
-        className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl transition-all duration-500 hover:border-indigo-500/40 hover:bg-slate-900/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] shadow-xl"
+        className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 transition-colors duration-200 hover:border-indigo-500/40 hover:bg-slate-900/60 shadow-xl"
       >
         {/* Question Header */}
         <div className="flex items-center gap-4 p-5 md:p-7">
@@ -36,25 +37,25 @@ const QuestionCards = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => onUpvoteToggle(question)}
-              disabled={pendingInteractions.has(`upvote:${question.id}`)}
-              className={`group/btn relative p-2.5 rounded-xl transition-all duration-300 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
-                question.upvoted_by_current_user
-                  ? "text-indigo-400 bg-indigo-500/10 ring-1 ring-indigo-500/20"
-                  : "text-slate-500 bg-slate-800/50 hover:text-indigo-300 hover:bg-indigo-800 ring-1 ring-white/5"
-              }`}
-              title={
-                question.upvoted_by_current_user
-                  ? "Remove Upvote"
-                  : "Upvote Question"
-              }
-            >
-              <ArrowUp
-                className={`w-5 h-5 transition-all duration-300 ${
-                  question.upvoted_by_current_user ? "fill-current scale-110" : "fill-none stroke-current"
-                }`}
-              />
+             <button
+               onClick={() => onUpvoteToggle(question)}
+               disabled={pendingInteractions.has(`upvote:${question.id}`)}
+               className={`group/btn relative p-2.5 rounded-xl transition-colors duration-150 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
+                 question.upvoted_by_current_user
+                   ? "text-indigo-400 bg-indigo-500/10 ring-1 ring-indigo-500/20"
+                   : "text-slate-500 bg-slate-800/50 hover:text-indigo-300 hover:bg-indigo-800 ring-1 ring-white/5"
+               }`}
+               title={
+                 question.upvoted_by_current_user
+                   ? "Remove Upvote"
+                   : "Upvote Question"
+               }
+             >
+               <ArrowUp
+                 className={`w-5 h-5 transition-colors duration-150 ${
+                   question.upvoted_by_current_user ? "fill-current scale-110" : "fill-none stroke-current"
+                 }`}
+               />
               {question.upvote_count > 0 && (
                 <span className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-slate-950 border border-slate-800 px-1 flex items-center justify-center text-[10px] font-bold text-indigo-400 shadow-lg">
                   {question.upvote_count}
@@ -65,7 +66,7 @@ const QuestionCards = ({
             <button
               onClick={() => onBookmarkToggle(question)}
               disabled={pendingInteractions.has(`bookmark:${question.id}`)}
-              className={`p-2.5 rounded-xl transition-all duration-300 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
+               className={`p-2.5 rounded-xl transition-colors duration-150 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 ${
                 question.bookmarked_by_current_user
                   ? "text-indigo-400 bg-indigo-500/10 ring-1 ring-indigo-500/20"
                   : "text-slate-500 bg-slate-800/50 hover:text-indigo-300 hover:bg-indigo-800 ring-1 ring-white/5"
@@ -73,7 +74,7 @@ const QuestionCards = ({
               title={question.bookmarked_by_current_user ? "Remove Bookmark" : "Bookmark"}
             >
               <Bookmark
-                className={`w-5 h-5 transition-all duration-300 ${
+                 className={`w-5 h-5 transition-colors duration-150 ${
                   question.bookmarked_by_current_user ? "fill-current scale-110" : "fill-none stroke-current"
                 }`}
               />
@@ -107,5 +108,35 @@ const QuestionCards = ({
     </div>
   ));
 
-export default QuestionCards;
+QuestionCard.displayName = 'QuestionCard';
+
+const QuestionCards = ({
+  questions,
+  pendingInteractions,
+  onUpvoteToggle,
+  onBookmarkToggle,
+  numberOffset = 0,
+  getQuestionRef,
+  getQuestionDataId,
+  renderQuestionContext
+}) => (
+  <>
+    {questions.map((question, index) => (
+      <QuestionCard
+        key={question.id}
+        question={question}
+        index={index}
+        numberOffset={numberOffset}
+        pendingInteractions={pendingInteractions}
+        onUpvoteToggle={onUpvoteToggle}
+        onBookmarkToggle={onBookmarkToggle}
+        getQuestionRef={getQuestionRef}
+        getQuestionDataId={getQuestionDataId}
+        renderQuestionContext={renderQuestionContext}
+      />
+    ))}
+  </>
+);
+
+export default React.memo(QuestionCards);
 

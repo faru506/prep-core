@@ -113,7 +113,11 @@ const BookmarkedItems = () => {
   }, []);
 
   useEffect(() => {
-    Prism.highlightAll();
+    const timeoutId = setTimeout(() => {
+      Prism.highlightAll();
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
   }, [courses, selectedTopicId, selectedLevel]);
 
   useEffect(() => {
@@ -375,7 +379,7 @@ const BookmarkedItems = () => {
           </svg>
         </button>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 optimize-scrolling">
           {selectedTopic && visibleQuestions.length > 0 && (
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
               <div>

@@ -144,3 +144,16 @@ code {
   padding: 0;
   color: #e2e8f0;
 }
+
+.optimize-scrolling {
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: scroll-position;
+}
+
+.optimize-scrolling * {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
