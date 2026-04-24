@@ -37,7 +37,7 @@ const InterviewQA = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState("low");
+  const [selectedLevel, setSelectedLevel] = useState("");
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -340,7 +340,7 @@ const InterviewQA = () => {
 
       if (nextTopic) {
         setSelectedTopic(nextTopic);
-        setSelectedLevel("low");
+      setSelectedLevel("");
         setCurrentPage(1);
         setInteractionError("");
       }
@@ -412,7 +412,7 @@ const InterviewQA = () => {
               key={course.slug}
               onClick={() => {
                 setSelectedCourse(course);
-                setSelectedLevel("low");
+        setSelectedLevel("");
                 setCurrentPage(1);
                 setInteractionError("");
                 navigate(`/interview_qa/${course.slug}`);
@@ -462,7 +462,7 @@ const InterviewQA = () => {
                   key={topic.slug}
                   onClick={() => {
                     setSelectedTopic(topic);
-                    setSelectedLevel("low");
+      setSelectedLevel("");
                     setCurrentPage(1);
                     setInteractionError("");
                     navigate(`/interview_qa/${selectedCourse.slug}/${topic.slug}`);

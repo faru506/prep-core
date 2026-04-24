@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { ArrowUp, Bookmark } from "lucide-react";
+import { getQuestionNumberBgClasses } from "../utilities/levels";
 
 const QuestionCards = ({
   questions,
@@ -23,7 +24,7 @@ const QuestionCards = ({
       >
         {/* Question Header */}
         <div className="flex items-center gap-4 p-5 md:p-7">
-          <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:text-indigo-400 transition-colors duration-300 shadow-inner">
+          <div className={`flex-shrink-0 w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-sm font-bold transition-colors duration-300 shadow-inner ${getQuestionNumberBgClasses(question.level)}`}>
             {numberOffset + index + 1}
           </div>
 

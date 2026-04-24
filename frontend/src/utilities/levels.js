@@ -48,3 +48,15 @@ export const getLevelChipClasses = (level) => {
       return "border-amber-500/20 bg-amber-500/10 text-amber-200";
   }
 };
+
+export const getQuestionNumberBgClasses = (level) => {
+  switch (level) {
+    case "low":
+      return "bg-gradient-to-br from-emerald-500/90 to-emerald-600 text-white";
+    case "hard":
+      return "bg-gradient-to-br from-rose-500/90 to-rose-600 text-white";
+    case "medium":
+    default:
+      return "bg-gradient-to-br from-amber-500/90 to-amber-600 text-white";
+  }
+};
