@@ -144,6 +144,36 @@ When asked to populate courses, topics, and questions from an image or list:
 - Custom hooks should be implemented to encapsulate repetitive data fetching logic.
 - Shared presentational logic for question reading views should be centralized in reusable components/utilities instead of duplicated across `InterviewQA` and `Bookmarked Items`.
 
+## Performance Optimizations
+
+### UI Scrolling Performance
+- **Issue**: Rapid scrolling caused UI deflection, black screens, and flickering
+- **Root Causes**:
+  - Long CSS transitions (`transition-all duration-500`) causing visual artifacts
+  - CPU-intensive ReactMarkdown parsing on every render
+  - GPU-heavy backdrop blur effects slowing down rendering
+  - No debouncing on expensive operations (Prism highlighting, IntersectionObserver)
+- **Solutions Implemented**:
+  - Reduced CSS transition durations (300-500ms → 150-200ms)
+  - Changed from `transition-all` to `transition-colors` to minimize repaints
+  - Removed expensive backdrop blur effects (`backdrop-blur-xl`)
+  - Added React.memo to QuestionCards component to prevent unnecessary re-renders
+  - Added debouncing to Prism.highlightAll() calls (300ms delay)
+  - Optimized IntersectionObserver with debouncing and better thresholds
+  - Added CSS optimizations with `optimize-scrolling` class for GPU acceleration
+- **Files Modified**:
+  - `frontend/src/components/QuestionCards.jsx` - Performance optimizations
+  - `frontend/src/pages/InterviewQA.jsx` - Observer and Prism optimizations
+  - `frontend/src/pages/BookmarkedItems.jsx` - Prism optimization
+  - `frontend/src/index.css` - Scroll optimization CSS
+
+### Best Practices for Smooth Scrolling:
+1. Avoid `transition-all` - use specific property transitions
+2. Keep CSS transition durations under 200ms for interactive elements
+3. Use `React.memo` for expensive list components
+4. Debounce expensive operations during rapid user interactions
+5. Minimize GPU-intensive effects (backdrop filters, heavy shadows) in scrollable areas
+
 ## CI Pipeline
 
 - **Backend**: Installs dependencies in `backend/` directory, then runs tests, RuboCop linting, and security scans (Brakeman, Bundler Audit)
