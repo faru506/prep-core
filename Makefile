@@ -36,6 +36,10 @@ migrate:
 seed:
 	docker compose -f $(COMPOSE_FILE) exec backend rails db:seed
 
+# Add Questions and Answers
+questions-and-answers:
+	docker compose -f $(COMPOSE_FILE) exec backend bundle exec rails runner add_questions_and_answers_script.rb
+
 # Open bash inside Rails container
 bash:
 	docker compose -f $(COMPOSE_FILE) exec backend bash
