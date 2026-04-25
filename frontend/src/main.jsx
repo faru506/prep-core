@@ -5,8 +5,6 @@ import { RouterProvider } from "react-router-dom";
 import "./index.css";
 import router from "./Router";
 
-import "prismjs/themes/prism.css";
-
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(

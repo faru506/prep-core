@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Prism from "prismjs";
 
 import QuestionCards from "../components/QuestionCards";
 import {
@@ -20,11 +19,6 @@ import {
   QUESTION_FILTER_OPTIONS,
   sortQuestionsByUpvotes
 } from "../utilities/questions";
-
-import "prismjs/components/prism-ruby";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-markup";
 
 const InterviewQA = () => {
   const { courseSlug, topicSlug } = useParams();
@@ -399,14 +393,6 @@ const InterviewQA = () => {
       });
     };
   }, [questions, topics, selectedTopic?.id]);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      Prism.highlightAll();
-    }, 300);
-    
-    return () => clearTimeout(timeoutId);
-  }, [questions]);
 
   useEffect(() => {
     if (window.innerWidth >= 768) {

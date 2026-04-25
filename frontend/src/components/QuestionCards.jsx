@@ -1,9 +1,7 @@
 import React from "react";
-import DOMPurify from "dompurify";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
 import { ArrowUp, Bookmark } from "lucide-react";
+
+import MarkdownPreview from "./Editor/MarkdownPreview";
 import { getQuestionNumberBgClasses } from "../utilities/levels";
 
 const QuestionCard = React.memo(({
@@ -92,14 +90,7 @@ const QuestionCard = React.memo(({
               </div>
 
                 <div className="flex-1 relative pl-1">
-                  <div className="prose prose-invert max-w-none text-slate-300 leading-relaxed">
-                    <ReactMarkdown 
-                      remarkPlugins={[remarkGfm]} 
-                      rehypePlugins={[rehypeRaw]}
-                    >
-                      {question.answer || ""}
-                    </ReactMarkdown>
-                  </div>
+                  <MarkdownPreview content={question.answer || ""} className="leading-relaxed" />
                 </div>
             </div>
           </div>
@@ -139,4 +130,3 @@ const QuestionCards = ({
 );
 
 export default React.memo(QuestionCards);
-

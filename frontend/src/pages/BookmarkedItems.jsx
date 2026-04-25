@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import Prism from "prismjs";
 
 import QuestionCards from "../components/QuestionCards";
 import {
@@ -16,11 +15,6 @@ import {
   QUESTION_FILTER_OPTIONS,
   sortQuestionsByUpvotes
 } from "../utilities/questions";
-
-import "prismjs/components/prism-ruby";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-markup";
 
 const BookmarkedItems = () => {
   const [courses, setCourses] = useState([]);
@@ -111,14 +105,6 @@ const BookmarkedItems = () => {
   useEffect(() => {
     loadBookmarksRef.current();
   }, []);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      Prism.highlightAll();
-    }, 300);
-    
-    return () => clearTimeout(timeoutId);
-  }, [courses, selectedTopicId, selectedLevel]);
 
   useEffect(() => {
     if (window.innerWidth >= 768) {

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import BaseModal from "./BaseModal";
 import { updateQuestionApi } from "../../apis/course_manager";
-import RichTextEditor from "../Editor/RichTextEditor";
+import MarkdownEditor from "../Editor/MarkdownEditor";
 import { LEVEL_OPTIONS } from "../../utilities/levels";
 
 const EditQuestionModal = ({
@@ -117,7 +117,7 @@ const EditQuestionModal = ({
           ))}
         </select>
 
-        <RichTextEditor
+        <MarkdownEditor
           value={answer}
           onChange={setAnswer}
         />

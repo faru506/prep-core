@@ -49,7 +49,7 @@ bundle exec rubocop -A  # Auto-fix offenses
 
 ## Stack
 
-- **Frontend**: React 19 + Vite + TailwindCSS v4 + TipTap + dnd-kit + Lucide-React + PrismJS + DOMPurify
+- **Frontend**: React 19 + Vite + TailwindCSS v4 + dnd-kit + Lucide-React + React Markdown
 - **Backend**: Rails 8.1.3 + Ruby 3.4.1 + MongoDB 7 (Mongoid)
 - **Auth**: JWT via Devise (routes under `/api/v1/users`)
 - **Testing**: RSpec (backend only)
@@ -104,12 +104,11 @@ When asked to populate courses, topics, and questions from an image or list:
 2.  **Plan Content**:
     - Create at least 10 questions per topic.
     - Distribute questions across `low`, `medium`, and `hard` levels.
-    - Craft rich answers in **HTML format** (compatible with TipTap editor), including:
-      - `<p>` for paragraphs.
-      - `<ul>` and `<li>` for lists.
-      - `<strong>` for emphasis.
-      - `<pre class="editor-code-block"><code>...</code></pre>` for all code examples.
-      - Refer to `backend/update_ruby_to_html.rb` for a complete example of correctly formatted rich content.
+    - Craft answers in **Markdown format**, including:
+      - short paragraphs for explanation
+      - `-` lists for key points
+      - `**bold**` for emphasis
+      - fenced code blocks such as ```` ```ruby ```` for all code examples
 3.  **Implement Seeding**:
     - Create a **single** temporary Ruby seed script (e.g., `backend/seed_<course>_<level>.rb`).
     - Use `find_or_create_by!` for `Course` and `Topic` to avoid duplicates.
@@ -143,6 +142,7 @@ When asked to populate courses, topics, and questions from an image or list:
 - `useMemo` and `useCallback` are avoided unless performance bottlenecks are identified.
 - Custom hooks should be implemented to encapsulate repetitive data fetching logic.
 - Shared presentational logic for question reading views should be centralized in reusable components/utilities instead of duplicated across `InterviewQA` and `Bookmarked Items`.
+- Admin question editing now uses a Markdown-only `Write`/`Preview` editor, and InterviewQA/Bookmarked Items must render answers through the same shared Markdown renderer so preview and read views stay visually identical.
 
 ## Performance Optimizations
 
@@ -152,19 +152,17 @@ When asked to populate courses, topics, and questions from an image or list:
   - Long CSS transitions (`transition-all duration-500`) causing visual artifacts
   - CPU-intensive ReactMarkdown parsing on every render
   - GPU-heavy backdrop blur effects slowing down rendering
-  - No debouncing on expensive operations (Prism highlighting, IntersectionObserver)
+  - No debouncing on expensive operations (IntersectionObserver)
 - **Solutions Implemented**:
   - Reduced CSS transition durations (300-500ms → 150-200ms)
   - Changed from `transition-all` to `transition-colors` to minimize repaints
   - Removed expensive backdrop blur effects (`backdrop-blur-xl`)
   - Added React.memo to QuestionCards component to prevent unnecessary re-renders
-  - Added debouncing to Prism.highlightAll() calls (300ms delay)
   - Optimized IntersectionObserver with debouncing and better thresholds
   - Added CSS optimizations with `optimize-scrolling` class for GPU acceleration
 - **Files Modified**:
   - `frontend/src/components/QuestionCards.jsx` - Performance optimizations
-  - `frontend/src/pages/InterviewQA.jsx` - Observer and Prism optimizations
-  - `frontend/src/pages/BookmarkedItems.jsx` - Prism optimization
+  - `frontend/src/pages/InterviewQA.jsx` - Observer optimizations
   - `frontend/src/index.css` - Scroll optimization CSS
 
 ### Best Practices for Smooth Scrolling:

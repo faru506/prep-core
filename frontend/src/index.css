@@ -51,59 +51,47 @@ code {
   font-size: 0.9rem;
 }
 
-.editor-surface {
-  min-height: 360px;
-  padding: 1.25rem 1.25rem 1.5rem;
-  color: #e2e8f0;
-  font-size: 0.98rem;
-  line-height: 1.75;
-  outline: none;
+.markdown-textarea {
+  resize: vertical;
+  line-height: 1.7;
 }
 
-.editor-surface p.is-editor-empty:first-child::before {
-  color: #64748b;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-
-.editor-surface p {
+.markdown-preview p {
   margin: 0 0 0.9rem;
 }
 
-.editor-surface h1,
-.editor-surface h2,
-.editor-surface h3 {
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
   color: #f8fafc;
   font-weight: 700;
   line-height: 1.2;
   margin: 1.35rem 0 0.8rem;
 }
 
-.editor-surface h1 {
+.markdown-preview h1 {
   font-size: 1.5rem;
 }
 
-.editor-surface h2 {
+.markdown-preview h2 {
   font-size: 1.25rem;
 }
 
-.editor-surface h3 {
+.markdown-preview h3 {
   font-size: 1.1rem;
 }
 
-.editor-surface ul,
-.editor-surface ol {
+.markdown-preview ul,
+.markdown-preview ol {
   margin: 0.9rem 0 1rem 1.3rem;
   padding: 0;
 }
 
-.editor-surface li {
+.markdown-preview li {
   margin: 0.35rem 0;
 }
 
-.editor-surface blockquote {
+.markdown-preview blockquote {
   margin: 1rem 0;
   border-left: 3px solid #6366f1;
   background: rgba(99, 102, 241, 0.08);
@@ -112,13 +100,13 @@ code {
   border-radius: 0.75rem;
 }
 
-.editor-surface hr {
+.markdown-preview hr {
   margin: 1.4rem 0;
   border: 0;
   border-top: 1px solid #334155;
 }
 
-.editor-surface code {
+.markdown-preview code {
   border: 1px solid rgba(100, 116, 139, 0.35);
   background: rgba(15, 23, 42, 0.9);
   padding: 0.15rem 0.4rem;
@@ -126,8 +114,7 @@ code {
   color: #c4b5fd;
 }
 
-.editor-surface pre,
-.editor-code-block,
+.markdown-preview pre,
 .prose pre {
   margin: 1rem 0;
   border: 1px solid rgba(71, 85, 105, 0.55);
@@ -140,8 +127,7 @@ code {
   word-break: break-word !important;
 }
 
-.editor-surface pre code,
-.editor-code-block code,
+.markdown-preview pre code,
 .prose pre code {
   border: 0;
   background: transparent;
