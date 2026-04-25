@@ -79,8 +79,8 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
       questions = questions.where(level: params[:level].to_s)
     end
 
-    page = (params[:page] || 1).to_i
-    per_page = (params[:per_page] || 100).to_i
+    page = [ (params[:page] || 1).to_i, 1 ].max
+    per_page = (params[:per_page] || 10).to_i.clamp(1, 50)
     offset = (page - 1) * per_page
 
     total_count = questions.count

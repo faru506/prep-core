@@ -126,6 +126,8 @@ When asked to populate courses, topics, and questions from an image or list:
 - `InterviewQA` reads bookmark/upvote state from the backend question payload; bookmark is user-specific and upvote uses a persisted per-user toggle plus question-level aggregate count.
 - `InterviewQA` and `Bookmarked Items` use a question dropdown with `low`, `medium`, `hard`, and `upvote`; `upvote` sorts by `upvote_count` descending, while level selections keep the default content order.
 - `InterviewQA` requests public questions with `per_page=10`, and its pagination/count display assumes 10 questions per page.
+- Auth responses should return a minimal safe user payload only; never serialize the full `User` record from Devise controllers.
+- Public question pagination must be bounded server-side to avoid untrusted `per_page` abuse.
 
 ## Session & Auth
 
@@ -198,3 +200,4 @@ When asked to populate courses, topics, and questions from an image or list:
 - After any code change, the model MUST run the relevant lint and test commands to verify the changes.
 - Whenever a task is assigned to an AI model, the model MUST first read AGENTS.md to gather codebase context and conventions.
 - Whenever changes are made to the codebase, the model MUST update AGENTS.md to reflect those changes.
+- Do not use `eval` for seed or import helpers; parse only restricted literal data formats.
