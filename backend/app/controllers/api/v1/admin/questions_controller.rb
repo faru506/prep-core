@@ -80,7 +80,7 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     end
 
     page = (params[:page] || 1).to_i
-    per_page = 10
+    per_page = (params[:per_page] || 100).to_i
     offset = (page - 1) * per_page
 
     total_count = questions.count
