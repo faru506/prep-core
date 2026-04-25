@@ -125,6 +125,7 @@ When asked to populate courses, topics, and questions from an image or list:
 - Redux is intentionally omitted as the current scale does not justify the boilerplate.
 - `InterviewQA` reads bookmark/upvote state from the backend question payload; bookmark is user-specific and upvote uses a persisted per-user toggle plus question-level aggregate count.
 - `InterviewQA` and `Bookmarked Items` use a question dropdown with `low`, `medium`, `hard`, and `upvote`; `upvote` sorts by `upvote_count` descending, while level selections keep the default content order.
+- `InterviewQA` requests public questions with `per_page=10`, and its pagination/count display assumes 10 questions per page.
 
 ## Session & Auth
 

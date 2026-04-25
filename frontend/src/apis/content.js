@@ -29,6 +29,7 @@ export const fetchQuestionsApi = async (topicId, filter, page = 1) => {
     params.append("level", filter);
   }
   params.append("page", page);
+  params.append("per_page", "10");
 
   return apiFetch(
     `${DOMAIN}/api/v1/topics/${topicId}/questions?${params.toString()}`,

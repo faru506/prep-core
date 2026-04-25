@@ -20,6 +20,8 @@ import {
   sortQuestionsByUpvotes
 } from "../utilities/questions";
 
+const QUESTIONS_PER_PAGE = 10;
+
 const InterviewQA = () => {
   const { courseSlug, topicSlug } = useParams();
   const navigate = useNavigate();
@@ -550,7 +552,7 @@ const InterviewQA = () => {
               pendingInteractions={pendingInteractions}
               onUpvoteToggle={handleUpvoteToggle}
               onBookmarkToggle={handleBookmarkToggle}
-              numberOffset={(currentPage - 1) * 10}
+              numberOffset={(currentPage - 1) * QUESTIONS_PER_PAGE}
               getQuestionDataId={(question) => question.topic_id}
               getQuestionRef={(question, element) => {
                 questionRefs.current[question.id] = element;
