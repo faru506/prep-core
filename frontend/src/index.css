@@ -127,7 +127,8 @@ code {
 }
 
 .editor-surface pre,
-.editor-code-block {
+.editor-code-block,
+.prose pre {
   margin: 1rem 0;
   border: 1px solid rgba(71, 85, 105, 0.55);
   background: linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(2, 6, 23, 1) 100%);
@@ -135,14 +136,18 @@ code {
   border-radius: 1rem;
   overflow-x: auto;
   box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
 }
 
 .editor-surface pre code,
-.editor-code-block code {
+.editor-code-block code,
+.prose pre code {
   border: 0;
   background: transparent;
   padding: 0;
   color: #e2e8f0;
+  white-space: pre-wrap !important;
 }
 
 .optimize-scrolling {

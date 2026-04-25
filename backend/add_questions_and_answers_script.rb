@@ -1,356 +1,379 @@
 # frozen_string_literal: true
+# rubocop:disable all
 
 # update_ruby_to_html.rb
 # This script ensures that the Ruby course, topics, and questions exist and have the correct HTML content.
 
 data = [
   {
-title: 'OOP Fundamentals',
+title: 'Ruby Basics',
 questions: [
 
 {
-  title: 'What is Object-Oriented Programming (OOP) and how is it implemented in Ruby?',
+  title: 'What are the basic data types available in Ruby?',
   level: 'low',
-  answer: '<p><strong>Object-Oriented Programming (OOP)</strong> is a programming paradigm based on objects that contain both data (attributes) and behavior (methods).</p>
-  <p>Ruby is a <strong>pure object-oriented language</strong>, meaning everything in Ruby is an object.</p>
-  <ul>
-    <li><strong>Class</strong>: Blueprint for creating objects</li>
-    <li><strong>Object</strong>: Instance of a class</li>
-    <li><strong>Methods</strong>: Define behavior</li>
-    <li><strong>Attributes</strong>: Store data</li>
-  </ul>
-  <pre class="editor-code-block"><code>
-class Car
-  def start
-    puts "Car started"
-  end
-end
+  answer: '<p>Ruby provides several built-in data types that are commonly used in applications.</p>
 
-car = Car.new
-car.start
-  </code></pre>
-  <p>Here, <strong>Car</strong> is a class and <strong>car</strong> is an object created from it.</p>'
+<p><strong>Common Ruby data types:</strong></p>
+<ul>
+<li><strong>Integer</strong> — whole numbers</li>
+<li><strong>Float</strong> — decimal numbers</li>
+<li><strong>String</strong> — sequence of characters</li>
+<li><strong>Array</strong> — ordered list of values</li>
+<li><strong>Hash</strong> — key-value pairs</li>
+<li><strong>Boolean</strong> — true or false</li>
+<li><strong>Nil</strong> — represents no value</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+age = 25                # Integer
+price = 99.99           # Float
+name = "Farooq"         # String
+marks = [80, 90, 100]   # Array
+user = {name: "Ali"}    # Hash
+is_active = true        # Boolean
+value = nil             # Nil
+</code></pre>'
 },
 
 {
-  title: 'What is a class and an object in Ruby? Provide an example.',
+  title: 'Explain the difference between puts, print, and p in Ruby.',
   level: 'low',
-  answer: '<p>A <strong>class</strong> is a blueprint used to create objects. An <strong>object</strong> is an instance of a class.</p>
-  <pre class="editor-code-block"><code>
-class User
-  def greet
-    puts "Hello User"
-  end
-end
+  answer: '<p>Ruby provides multiple ways to output data to the console.</p>
 
-user = User.new
-user.greet
-  </code></pre>
-  <ul>
-    <li><strong>User</strong> is the class</li>
-    <li><strong>user</strong> is the object</li>
-    <li><strong>greet</strong> is the method</li>
-  </ul>'
+<ul>
+<li><strong>puts</strong> — prints output with newline</li>
+<li><strong>print</strong> — prints without newline</li>
+<li><strong>p</strong> — prints object in debug-friendly format</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+puts "Hello"
+puts "World"
+
+print "Hello"
+print "World"
+
+p "Hello"
+</code></pre>
+
+<p><strong>Output:</strong></p>
+
+<pre class="editor-code-block"><code>
+Hello
+World
+HelloWorld
+"Hello"
+</code></pre>'
 },
 
 {
-  title: 'What is encapsulation in Ruby and how do you implement it?',
+  title: 'What is the difference between String and Symbol in Ruby?',
   level: 'low',
-  answer: '<p><strong>Encapsulation</strong> is the concept of restricting direct access to object data and exposing it through methods.</p>
-  <p>Ruby provides <strong>access modifiers</strong> like <strong>attr_reader</strong>, <strong>attr_writer</strong>, and <strong>attr_accessor</strong>.</p>
-  <pre class="editor-code-block"><code>
-class Person
-  attr_accessor :name
+  answer: '<p><strong>Strings</strong> and <strong>Symbols</strong> are both used to represent text, but they behave differently.</p>
 
-  def initialize(name)
-    @name = name
-  end
-end
+<ul>
+<li><strong>String</strong> — mutable (can be changed)</li>
+<li><strong>Symbol</strong> — immutable and memory-efficient</li>
+<li>Symbols are commonly used as <strong>hash keys</strong></li>
+</ul>
 
-person = Person.new("Farooq")
-puts person.name
-  </code></pre>
-  <p>Here, <strong>name</strong> is accessed through getter and setter methods.</p>'
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+str = "hello"
+str.upcase!
+
+sym = :hello
+
+puts str      # "HELLO"
+puts sym      # :hello
+</code></pre>'
 },
 
 {
-  title: 'Explain the difference between attr_reader, attr_writer, and attr_accessor.',
+  title: 'How do you define variables in Ruby? Explain naming conventions.',
   level: 'low',
-  answer: '<p>These methods create getter and setter methods automatically.</p>
-  <ul>
-    <li><strong>attr_reader</strong> → Getter only</li>
-    <li><strong>attr_writer</strong> → Setter only</li>
-    <li><strong>attr_accessor</strong> → Getter and Setter</li>
-  </ul>
-  <pre class="editor-code-block"><code>
-class Product
-  attr_reader :name
-  attr_writer :price
-  attr_accessor :stock
+  answer: '<p>Variables in Ruby are dynamically typed and do not require explicit type declarations.</p>
 
-  def initialize(name, price, stock)
-    @name = name
-    @price = price
-    @stock = stock
-  end
-end
-  </code></pre>'
+<p><strong>Naming conventions:</strong></p>
+<ul>
+<li>Must start with lowercase letter or underscore</li>
+<li>Use snake_case</li>
+<li>Cannot start with numbers</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+user_name = "Farooq"
+age = 24
+_is_valid = true
+</code></pre>'
 },
 
 {
-  title: 'What is the initialize method in Ruby and when is it called?',
+  title: 'Explain conditional statements in Ruby with examples.',
   level: 'low',
-  answer: '<p>The <strong>initialize</strong> method is a constructor that runs automatically when a new object is created.</p>
-  <pre class="editor-code-block"><code>
-class User
-  def initialize(name)
-    @name = name
-  end
+  answer: '<p>Conditional statements allow execution of code based on conditions.</p>
 
-  def display
-    puts @name
-  end
+<p><strong>Ruby supports:</strong></p>
+<ul>
+<li>if</li>
+<li>elsif</li>
+<li>else</li>
+<li>unless</li>
+<li>case</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+age = 18
+
+if age &gt;= 18
+  puts "Adult"
+else
+  puts "Minor"
 end
-
-user = User.new("Farooq")
-user.display
-  </code></pre>
-  <p>The <strong>initialize</strong> method sets the initial state of the object.</p>'
+</code></pre>'
 },
 
 {
-  title: 'What is inheritance in Ruby? Provide an example.',
+  title: 'Explain the difference between Array and Hash in Ruby.',
   level: 'medium',
-  answer: '<p><strong>Inheritance</strong> allows one class to inherit behavior from another class.</p>
-  <pre class="editor-code-block"><code>
-class Animal
-  def speak
-    puts "Animal makes sound"
-  end
-end
+  answer: '<p><strong>Array</strong> and <strong>Hash</strong> are collection data structures in Ruby.</p>
 
-class Dog < Animal
-end
+<ul>
+<li><strong>Array</strong> stores ordered elements accessed by index</li>
+<li><strong>Hash</strong> stores key-value pairs accessed by keys</li>
+</ul>
 
-dog = Dog.new
-dog.speak
-  </code></pre>
-  <p><strong>Dog</strong> inherits the <strong>speak</strong> method from <strong>Animal</strong>.</p>'
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+# Array
+fruits = ["apple", "banana"]
+puts fruits[0]
+
+# Hash
+user = {name: "Ali", age: 25}
+puts user[:name]
+</code></pre>'
 },
 
 {
-  title: 'What is method overriding in Ruby? Show an example.',
+  title: 'What are Ruby blocks? Explain with example.',
   level: 'medium',
-  answer: '<p><strong>Method overriding</strong> occurs when a subclass provides its own implementation of a method defined in its parent class.</p>
-  <pre class="editor-code-block"><code>
-class Animal
-  def speak
-    puts "Animal sound"
-  end
-end
+  answer: '<p>A <strong>block</strong> is a chunk of code passed to methods.</p>
 
-class Dog < Animal
-  def speak
-    puts "Dog barks"
-  end
-end
+<p>Blocks are commonly used with iterators.</p>
 
-dog = Dog.new
-dog.speak
-  </code></pre>
-  <p>The subclass method replaces the parent method.</p>'
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+numbers = [1, 2, 3]
+
+numbers.each do |num|
+  puts num * 2
+end
+</code></pre>
+
+<p>Here, the code inside <strong>do...end</strong> is the block.</p>'
 },
 
 {
-  title: 'What is polymorphism in Ruby? Provide an example.',
+  title: 'Explain how loops work in Ruby. Give examples of different loop types.',
   level: 'medium',
-  answer: '<p><strong>Polymorphism</strong> allows different classes to respond to the same method name in different ways.</p>
-  <pre class="editor-code-block"><code>
-class Dog
-  def sound
-    puts "Bark"
-  end
-end
+  answer: '<p>Loops allow repeated execution of code.</p>
 
-class Cat
-  def sound
-    puts "Meow"
-  end
-end
+<p><strong>Common Ruby loops:</strong></p>
 
-animals = [Dog.new, Cat.new]
+<ul>
+<li>while</li>
+<li>until</li>
+<li>for</li>
+<li>each</li>
+</ul>
 
-animals.each do |animal|
-  animal.sound
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+i = 1
+
+while i &lt;= 3
+  puts i
+  i += 1
 end
-  </code></pre>
-  <p>Each object responds differently to the same method.</p>'
+</code></pre>'
 },
 
 {
-  title: 'Explain the difference between instance methods and class methods.',
+  title: 'What is the difference between ==, eql?, and equal? in Ruby?',
   level: 'medium',
-  answer: '<p><strong>Instance methods</strong> belong to objects, while <strong>class methods</strong> belong to the class itself.</p>
-  <pre class="editor-code-block"><code>
-class MathHelper
-  def instance_method
-    puts "Instance method"
-  end
+  answer: '<p>Ruby provides multiple equality methods.</p>
 
-  def self.class_method
-    puts "Class method"
-  end
-end
+<ul>
+<li><strong>==</strong> compares values</li>
+<li><strong>eql?</strong> compares value and type</li>
+<li><strong>equal?</strong> checks object identity</li>
+</ul>
 
-obj = MathHelper.new
-obj.instance_method
+<p><strong>Example:</strong></p>
 
-MathHelper.class_method
-  </code></pre>'
+<pre class="editor-code-block"><code>
+a = "hello"
+b = "hello"
+
+puts a == b        # true
+puts a.eql?(b)     # true
+puts a.equal?(b)   # false
+</code></pre>'
 },
 
 {
-  title: 'What is the difference between private, protected, and public methods in Ruby?',
+  title: 'Explain how methods are defined in Ruby and how arguments work.',
   level: 'medium',
-  answer: '<p>Ruby provides access control using method visibility.</p>
-  <ul>
-    <li><strong>public</strong> → Accessible anywhere</li>
-    <li><strong>private</strong> → Only within same object</li>
-    <li><strong>protected</strong> → Accessible within same class hierarchy</li>
-  </ul>
-  <pre class="editor-code-block"><code>
-class Account
-  def initialize(balance)
-    @balance = balance
-  end
+  answer: '<p>Methods in Ruby are defined using the <strong>def</strong> keyword.</p>
 
-  def withdraw(amount)
-    deduct(amount)
-  end
+<p>Ruby supports:</p>
 
-  private
+<ul>
+<li>Default arguments</li>
+<li>Keyword arguments</li>
+<li>Variable arguments</li>
+</ul>
 
-  def deduct(amount)
-    @balance -= amount
-  end
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+def greet(name = "Guest")
+  puts "Hello #{name}"
 end
-  </code></pre>'
+
+greet("Farooq")
+greet
+</code></pre>'
 },
 
 {
-  title: 'What is the difference between composition and inheritance? When would you use composition?',
+  title: 'Explain the difference between nil and false in Ruby.',
   level: 'medium',
-  answer: '<p><strong>Inheritance</strong> represents an "is-a" relationship, while <strong>composition</strong> represents a "has-a" relationship.</p>
-  <pre class="editor-code-block"><code>
-class Engine
-  def start
-    puts "Engine started"
-  end
-end
+  answer: '<p>In Ruby, both <strong>nil</strong> and <strong>false</strong> are falsy values, but they are different.</p>
 
-class Car
-  def initialize
-    @engine = Engine.new
-  end
+<ul>
+<li><strong>nil</strong> represents absence of value</li>
+<li><strong>false</strong> represents boolean false</li>
+</ul>
 
-  def start
-    @engine.start
-  end
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+value = nil
+
+if value
+  puts "True"
+else
+  puts "Falsy"
 end
-  </code></pre>
-  <p>Use <strong>composition</strong> when you want flexible and reusable components instead of strict hierarchy.</p>'
+</code></pre>
+
+<p>Output:</p>
+
+<pre class="editor-code-block"><code>
+Falsy
+</code></pre>'
 },
 
 {
-  title: 'What will be the output of the following Ruby code and why?',
+  title: 'Predict the output of the following Ruby code and explain why.',
   level: 'hard',
-  answer: '<pre class="editor-code-block"><code>
-class Parent
-  def greet
-    puts "Hello from Parent"
-  end
-end
+  answer: '<p>This question tests understanding of Ruby object references.</p>
 
-class Child < Parent
-  def greet
-    super
-    puts "Hello from Child"
-  end
-end
+<p><strong>Code:</strong></p>
 
-Child.new.greet
-  </code></pre>
-  <p><strong>Output:</strong></p>
-  <pre class="editor-code-block"><code>
-Hello from Parent
-Hello from Child
-  </code></pre>
-  <p><strong>Explanation:</strong></p>
-  <ul>
-    <li><strong>super</strong> calls the parent class method.</li>
-    <li>After parent execution, child method continues.</li>
-  </ul>'
+<pre class="editor-code-block"><code>
+arr1 = [1, 2, 3]
+arr2 = arr1
+
+arr2 &lt;&lt; 4
+
+puts arr1.inspect
+</code></pre>
+
+<p><strong>Output:</strong></p>
+
+<pre class="editor-code-block"><code>
+[1, 2, 3, 4]
+</code></pre>
+
+<p><strong>Explanation:</strong></p>
+
+<ul>
+<li>arr1 and arr2 reference the same object</li>
+<li>Appending to arr2 modifies arr1</li>
+</ul>'
 },
 
 {
-  title: 'Explain how Ruby handles multiple inheritance and what modules provide.',
+  title: 'What is the difference between dup and clone in Ruby?',
   level: 'hard',
-  answer: '<p>Ruby does not support multiple inheritance using classes, but supports it using <strong>modules</strong>.</p>
-  <pre class="editor-code-block"><code>
-module Flyable
-  def fly
-    puts "Flying"
-  end
-end
+  answer: '<p>Both <strong>dup</strong> and <strong>clone</strong> create copies of objects.</p>
 
-module Swimmable
-  def swim
-    puts "Swimming"
-  end
-end
+<ul>
+<li><strong>dup</strong> copies object without frozen state</li>
+<li><strong>clone</strong> copies object including frozen state</li>
+</ul>
 
-class Duck
-  include Flyable
-  include Swimmable
-end
+<p><strong>Example:</strong></p>
 
-duck = Duck.new
-duck.fly
-duck.swim
-  </code></pre>
-  <p>Modules enable sharing reusable functionality across classes.</p>'
+<pre class="editor-code-block"><code>
+str = "hello".freeze
+
+dup_str = str.dup
+clone_str = str.clone
+
+puts dup_str.frozen?    # false
+puts clone_str.frozen?  # true
+</code></pre>'
 },
 
 {
-  title: 'How does method lookup work in Ruby when using inheritance and modules?',
+  title: 'Explain how Ruby handles mutable objects and demonstrate a common bug caused by mutability.',
   level: 'hard',
-  answer: '<p>Ruby follows a <strong>method lookup chain</strong> to find methods.</p>
-  <ul>
-    <li>Class itself</li>
-    <li>Included modules</li>
-    <li>Superclass</li>
-    <li>Superclass modules</li>
-    <li>Object class</li>
-    <li>Kernel</li>
-    <li>BasicObject</li>
-  </ul>
-  <pre class="editor-code-block"><code>
-module A
-  def greet
-    puts "Hello from A"
-  end
+  answer: '<p>Ruby objects like arrays and hashes are mutable, meaning their contents can change.</p>
+
+<p>A common bug occurs when the same object reference is reused unintentionally.</p>
+
+<p><strong>Example:</strong></p>
+
+<pre class="editor-code-block"><code>
+def add_item(list = [])
+  list &lt;&lt; "item"
+  list
 end
 
-class Parent
-  include A
-end
+puts add_item.inspect
+puts add_item.inspect
+</code></pre>
 
-class Child < Parent
-end
+<p><strong>Output:</strong></p>
 
-Child.new.greet
-  </code></pre>
-  <p>Ruby finds <strong>greet</strong> in module A during lookup.</p>'
+<pre class="editor-code-block"><code>
+["item"]
+["item", "item"]
+</code></pre>
+
+<p><strong>Explanation:</strong></p>
+
+<ul>
+<li>Default arguments are evaluated once</li>
+<li>The same array object is reused</li>
+</ul>'
 }
 
 ]
@@ -378,3 +401,4 @@ data.each do |topic_data|
 end
 
 puts 'Successfully updated/seeded Ruby course content to HTML!'
+# rubocop:enable all
