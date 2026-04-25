@@ -5,141 +5,355 @@
 
 data = [
   {
-  title: 'Ruby Basics',
-  questions: [
+title: 'OOP Fundamentals',
+questions: [
 
-    {
-      title: 'Is everything in Ruby an object?',
-      level: 'low',
-      answer: '<p>Yes, everything in Ruby is an object, including numbers, booleans, and nil.</p><pre class="editor-code-block"><code>5.class      # Integer
-true.class   # TrueClass
-nil.class    # NilClass</code></pre>'
-    },
-
-    {
-      title: 'What are truthy and falsy values in Ruby?',
-      level: 'medium',
-      answer: '<p>Only <code>false</code> and <code>nil</code> are falsy in Ruby. Everything else is truthy.</p><pre class="editor-code-block"><code>if 0
-  puts "Runs"  # 0 is truthy
-end</code></pre>'
-    },
-
-    {
-      title: 'How do you check the type of a variable in Ruby?',
-      level: 'low',
-      answer: '<p>You can use the <code>.class</code> method to check the type of a variable.</p><pre class="editor-code-block"><code>name = "Farooq"
-puts name.class  # String</code></pre>'
-    },
-
-    {
-      title: 'What is multiple assignment in Ruby?',
-      level: 'medium',
-      answer: '<p>Multiple assignment allows assigning multiple variables at once.</p><pre class="editor-code-block"><code>a, b = 1, 2
-
-# Swapping variables
-a, b = b, a</code></pre>'
-    },
-
-    {
-      title: 'Explain the difference between == and equal? in Ruby.',
-      level: 'medium',
-      answer: '<p><code>==</code> checks value equality, while <code>equal?</code> checks object identity.</p><pre class="editor-code-block"><code>a = "hi"
-b = "hi"
-
-a == b        # true
-a.equal?(b)   # false</code></pre>'
-    },
-
-    {
-      title: 'How do you convert a string to integer in Ruby?',
-      level: 'low',
-      answer: '<p>You can use <code>to_i</code> method to convert a string into an integer.</p><pre class="editor-code-block"><code>num = "10"
-num.to_i   # 10</code></pre>'
-    },
-
-    {
-      title: 'How do you convert an integer to string in Ruby?',
-      level: 'low',
-      answer: '<p>You can use <code>to_s</code> method to convert an integer into a string.</p><pre class="editor-code-block"><code>num = 10
-num.to_s   # "10"</code></pre>'
-    },
-
-    {
-      title: 'What is the difference between nil and empty? in Ruby?',
-      level: 'medium',
-      answer: '<p><code>nil</code> represents absence of value, while <code>empty?</code> checks if collection has no elements.</p><pre class="editor-code-block"><code>name = nil
-puts name.nil?   # true
-
-arr = []
-puts arr.empty?  # true</code></pre>'
-    },
-
-    {
-      title: 'How do you define a method in Ruby?',
-      level: 'low',
-      answer: '<p>Methods are defined using the <code>def</code> keyword.</p><pre class="editor-code-block"><code>def greet
-  puts "Hello"
+{
+  title: 'What is Object-Oriented Programming (OOP) and how is it implemented in Ruby?',
+  level: 'low',
+  answer: '<p><strong>Object-Oriented Programming (OOP)</strong> is a programming paradigm based on objects that contain both data (attributes) and behavior (methods).</p>
+  <p>Ruby is a <strong>pure object-oriented language</strong>, meaning everything in Ruby is an object.</p>
+  <ul>
+    <li><strong>Class</strong>: Blueprint for creating objects</li>
+    <li><strong>Object</strong>: Instance of a class</li>
+    <li><strong>Methods</strong>: Define behavior</li>
+    <li><strong>Attributes</strong>: Store data</li>
+  </ul>
+  <pre class="editor-code-block"><code>
+class Car
+  def start
+    puts "Car started"
+  end
 end
 
-greet</code></pre>'
-    },
+car = Car.new
+car.start
+  </code></pre>
+  <p>Here, <strong>Car</strong> is a class and <strong>car</strong> is an object created from it.</p>'
+},
 
-    {
-      title: 'How do you pass arguments to a method?',
-      level: 'low',
-      answer: '<p>Arguments can be passed inside parentheses after method name.</p><pre class="editor-code-block"><code>def greet(name)
-  puts "Hello #{name}"
+{
+  title: 'What is a class and an object in Ruby? Provide an example.',
+  level: 'low',
+  answer: '<p>A <strong>class</strong> is a blueprint used to create objects. An <strong>object</strong> is an instance of a class.</p>
+  <pre class="editor-code-block"><code>
+class User
+  def greet
+    puts "Hello User"
+  end
 end
 
-greet("Farooq")</code></pre>'
-    },
+user = User.new
+user.greet
+  </code></pre>
+  <ul>
+    <li><strong>User</strong> is the class</li>
+    <li><strong>user</strong> is the object</li>
+    <li><strong>greet</strong> is the method</li>
+  </ul>'
+},
 
-    {
-      title: 'What are default arguments in Ruby methods?',
-      level: 'medium',
-      answer: '<p>Default arguments allow assigning default values to parameters.</p><pre class="editor-code-block"><code>def greet(name = "Guest")
-  puts "Hello #{name}"
+{
+  title: 'What is encapsulation in Ruby and how do you implement it?',
+  level: 'low',
+  answer: '<p><strong>Encapsulation</strong> is the concept of restricting direct access to object data and exposing it through methods.</p>
+  <p>Ruby provides <strong>access modifiers</strong> like <strong>attr_reader</strong>, <strong>attr_writer</strong>, and <strong>attr_accessor</strong>.</p>
+  <pre class="editor-code-block"><code>
+class Person
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
 end
 
-greet       # Hello Guest
-greet("Farooq")</code></pre>'
-    },
+person = Person.new("Farooq")
+puts person.name
+  </code></pre>
+  <p>Here, <strong>name</strong> is accessed through getter and setter methods.</p>'
+},
 
-    {
-      title: 'What is method return behavior in Ruby?',
-      level: 'medium',
-      answer: '<p>Ruby methods return the last evaluated expression automatically.</p><pre class="editor-code-block"><code>def add(a, b)
-  a + b
+{
+  title: 'Explain the difference between attr_reader, attr_writer, and attr_accessor.',
+  level: 'low',
+  answer: '<p>These methods create getter and setter methods automatically.</p>
+  <ul>
+    <li><strong>attr_reader</strong> → Getter only</li>
+    <li><strong>attr_writer</strong> → Setter only</li>
+    <li><strong>attr_accessor</strong> → Getter and Setter</li>
+  </ul>
+  <pre class="editor-code-block"><code>
+class Product
+  attr_reader :name
+  attr_writer :price
+  attr_accessor :stock
+
+  def initialize(name, price, stock)
+    @name = name
+    @price = price
+    @stock = stock
+  end
+end
+  </code></pre>'
+},
+
+{
+  title: 'What is the initialize method in Ruby and when is it called?',
+  level: 'low',
+  answer: '<p>The <strong>initialize</strong> method is a constructor that runs automatically when a new object is created.</p>
+  <pre class="editor-code-block"><code>
+class User
+  def initialize(name)
+    @name = name
+  end
+
+  def display
+    puts @name
+  end
 end
 
-puts add(2, 3)  # 5</code></pre>'
-    },
+user = User.new("Farooq")
+user.display
+  </code></pre>
+  <p>The <strong>initialize</strong> method sets the initial state of the object.</p>'
+},
 
-    {
-      title: 'How does Ruby handle operator precedence?',
-      level: 'medium',
-      answer: '<p>Ruby follows mathematical precedence rules: parentheses first, then multiplication/division, then addition/subtraction.</p><pre class="editor-code-block"><code>result = 2 + 3 * 4
-puts result   # 14</code></pre>'
-    },
+{
+  title: 'What is inheritance in Ruby? Provide an example.',
+  level: 'medium',
+  answer: '<p><strong>Inheritance</strong> allows one class to inherit behavior from another class.</p>
+  <pre class="editor-code-block"><code>
+class Animal
+  def speak
+    puts "Animal makes sound"
+  end
+end
 
-    {
-      title: 'What is the ternary operator in Ruby?',
-      level: 'medium',
-      answer: '<p>The ternary operator provides a shorthand conditional expression.</p><pre class="editor-code-block"><code>age = 18
+class Dog < Animal
+end
 
-status = age >= 18 ? "Adult" : "Minor"
-puts status</code></pre>'
-    },
+dog = Dog.new
+dog.speak
+  </code></pre>
+  <p><strong>Dog</strong> inherits the <strong>speak</strong> method from <strong>Animal</strong>.</p>'
+},
 
-    {
-      title: 'What happens if you use an undefined variable in Ruby?',
-      level: 'hard',
-      answer: '<p>Using an undefined variable raises a <code>NameError</code>.</p><pre class="editor-code-block"><code>puts username
+{
+  title: 'What is method overriding in Ruby? Show an example.',
+  level: 'medium',
+  answer: '<p><strong>Method overriding</strong> occurs when a subclass provides its own implementation of a method defined in its parent class.</p>
+  <pre class="editor-code-block"><code>
+class Animal
+  def speak
+    puts "Animal sound"
+  end
+end
 
-# NameError: undefined local variable</code></pre>'
-    }
+class Dog < Animal
+  def speak
+    puts "Dog barks"
+  end
+end
 
-  ]
+dog = Dog.new
+dog.speak
+  </code></pre>
+  <p>The subclass method replaces the parent method.</p>'
+},
+
+{
+  title: 'What is polymorphism in Ruby? Provide an example.',
+  level: 'medium',
+  answer: '<p><strong>Polymorphism</strong> allows different classes to respond to the same method name in different ways.</p>
+  <pre class="editor-code-block"><code>
+class Dog
+  def sound
+    puts "Bark"
+  end
+end
+
+class Cat
+  def sound
+    puts "Meow"
+  end
+end
+
+animals = [Dog.new, Cat.new]
+
+animals.each do |animal|
+  animal.sound
+end
+  </code></pre>
+  <p>Each object responds differently to the same method.</p>'
+},
+
+{
+  title: 'Explain the difference between instance methods and class methods.',
+  level: 'medium',
+  answer: '<p><strong>Instance methods</strong> belong to objects, while <strong>class methods</strong> belong to the class itself.</p>
+  <pre class="editor-code-block"><code>
+class MathHelper
+  def instance_method
+    puts "Instance method"
+  end
+
+  def self.class_method
+    puts "Class method"
+  end
+end
+
+obj = MathHelper.new
+obj.instance_method
+
+MathHelper.class_method
+  </code></pre>'
+},
+
+{
+  title: 'What is the difference between private, protected, and public methods in Ruby?',
+  level: 'medium',
+  answer: '<p>Ruby provides access control using method visibility.</p>
+  <ul>
+    <li><strong>public</strong> → Accessible anywhere</li>
+    <li><strong>private</strong> → Only within same object</li>
+    <li><strong>protected</strong> → Accessible within same class hierarchy</li>
+  </ul>
+  <pre class="editor-code-block"><code>
+class Account
+  def initialize(balance)
+    @balance = balance
+  end
+
+  def withdraw(amount)
+    deduct(amount)
+  end
+
+  private
+
+  def deduct(amount)
+    @balance -= amount
+  end
+end
+  </code></pre>'
+},
+
+{
+  title: 'What is the difference between composition and inheritance? When would you use composition?',
+  level: 'medium',
+  answer: '<p><strong>Inheritance</strong> represents an "is-a" relationship, while <strong>composition</strong> represents a "has-a" relationship.</p>
+  <pre class="editor-code-block"><code>
+class Engine
+  def start
+    puts "Engine started"
+  end
+end
+
+class Car
+  def initialize
+    @engine = Engine.new
+  end
+
+  def start
+    @engine.start
+  end
+end
+  </code></pre>
+  <p>Use <strong>composition</strong> when you want flexible and reusable components instead of strict hierarchy.</p>'
+},
+
+{
+  title: 'What will be the output of the following Ruby code and why?',
+  level: 'hard',
+  answer: '<pre class="editor-code-block"><code>
+class Parent
+  def greet
+    puts "Hello from Parent"
+  end
+end
+
+class Child < Parent
+  def greet
+    super
+    puts "Hello from Child"
+  end
+end
+
+Child.new.greet
+  </code></pre>
+  <p><strong>Output:</strong></p>
+  <pre class="editor-code-block"><code>
+Hello from Parent
+Hello from Child
+  </code></pre>
+  <p><strong>Explanation:</strong></p>
+  <ul>
+    <li><strong>super</strong> calls the parent class method.</li>
+    <li>After parent execution, child method continues.</li>
+  </ul>'
+},
+
+{
+  title: 'Explain how Ruby handles multiple inheritance and what modules provide.',
+  level: 'hard',
+  answer: '<p>Ruby does not support multiple inheritance using classes, but supports it using <strong>modules</strong>.</p>
+  <pre class="editor-code-block"><code>
+module Flyable
+  def fly
+    puts "Flying"
+  end
+end
+
+module Swimmable
+  def swim
+    puts "Swimming"
+  end
+end
+
+class Duck
+  include Flyable
+  include Swimmable
+end
+
+duck = Duck.new
+duck.fly
+duck.swim
+  </code></pre>
+  <p>Modules enable sharing reusable functionality across classes.</p>'
+},
+
+{
+  title: 'How does method lookup work in Ruby when using inheritance and modules?',
+  level: 'hard',
+  answer: '<p>Ruby follows a <strong>method lookup chain</strong> to find methods.</p>
+  <ul>
+    <li>Class itself</li>
+    <li>Included modules</li>
+    <li>Superclass</li>
+    <li>Superclass modules</li>
+    <li>Object class</li>
+    <li>Kernel</li>
+    <li>BasicObject</li>
+  </ul>
+  <pre class="editor-code-block"><code>
+module A
+  def greet
+    puts "Hello from A"
+  end
+end
+
+class Parent
+  include A
+end
+
+class Child < Parent
+end
+
+Child.new.greet
+  </code></pre>
+  <p>Ruby finds <strong>greet</strong> in module A during lookup.</p>'
+}
+
+]
 }
 ]
 
@@ -152,9 +366,9 @@ data.each do |topic_data|
   end
   puts "  Topic: #{topic.title} (ID: #{topic.id})"
 
-  topic_data[:questions].each do |q_data|
+  topic_data[:questions].each_with_index do |q_data, index|
     question = Question.find_or_create_by!(title: q_data[:title], topic: topic)
-    question.update!(level: q_data[:level])
+    question.update!(level: q_data[:level], position: index)
 
     answer = question.answer || question.create_answer
     answer.update!(content: q_data[:answer])
