@@ -1,90 +1,78 @@
 COMPOSE_FILE=docker-compose.dev.yml
+DC = docker compose -f $(COMPOSE_FILE)
+EXEC_BACKEND = $(DC) exec backend
+EXEC_FRONTEND = $(DC) exec frontend
 
-# Start containers
-start:
-	docker compose -f $(COMPOSE_FILE) up -d
+.PHONY: help start stop restart logs logs-backend logs-frontend rails migrate seed \
+       questions-and-answers bash frontend build rebuild clean reset-db ps \
+       npm-install npm-add lint-frontend lint-backend lint
 
-# Stop containers (SAFE — keeps DB)
-stop:
-	docker compose -f $(COMPOSE_FILE) down
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-# Restart containers (SAFE)
-restart:
-	docker compose -f $(COMPOSE_FILE) restart
+start: ## Start all containers
+	$(DC) up -d
 
-# View logs (all services)
-logs:
-	docker compose -f $(COMPOSE_FILE) logs -f
+stop: ## Stop containers (SAFE — keeps DB)
+	$(DC) down
 
-# View logs for Rails only
-logs-backend:
-	docker compose -f $(COMPOSE_FILE) logs -f backend
+restart: ## Restart containers (SAFE)
+	$(DC) restart
 
-# View logs for React only
-logs-frontend:
-	docker compose -f $(COMPOSE_FILE) logs -f frontend
+logs: ## View logs (all services)
+	$(DC) logs -f
 
-# Open Rails console
-rails:
-	docker compose -f $(COMPOSE_FILE) exec backend rails console
+logs-backend: ## View logs for Rails only
+	$(DC) logs -f backend
 
-# Run Rails migrations
-migrate:
-	docker compose -f $(COMPOSE_FILE) exec backend rails db:migrate
+logs-frontend: ## View logs for React only
+	$(DC) logs -f frontend
 
-# Seed database
-seed:
-	docker compose -f $(COMPOSE_FILE) exec backend rails db:seed
+rails: ## Open Rails console
+	$(EXEC_BACKEND) rails console
 
-# Add Questions and Answers
-questions-and-answers:
-	docker compose -f $(COMPOSE_FILE) exec backend bundle exec rails runner add_questions_and_answers_script.rb
+migrate: ## Run Rails migrations
+	$(EXEC_BACKEND) rails db:migrate
 
-# Open bash inside Rails container
-bash:
-	docker compose -f $(COMPOSE_FILE) exec backend bash
+seed: ## Seed database
+	$(EXEC_BACKEND) rails db:seed
 
-# Open bash inside frontend container
-frontend:
-	docker compose -f $(COMPOSE_FILE) exec frontend sh
+questions-and-answers: ## Add Questions and Answers
+	$(EXEC_BACKEND) bundle exec rails runner add_questions_and_answers_script.rb
 
-# Build containers (SAFE)
-build:
-	docker compose -f $(COMPOSE_FILE) build
+bash: ## Open bash inside Rails container
+	$(EXEC_BACKEND) bash
 
-# Rebuild containers (SAFE — keeps DB)
-rebuild:
-	docker compose -f $(COMPOSE_FILE) build --no-cache
-	docker compose -f $(COMPOSE_FILE) up -d
+frontend: ## Open shell inside frontend container
+	$(EXEC_FRONTEND) sh
 
-# Remove containers ONLY (SAFE — keeps DB)
-clean:
-	docker compose -f $(COMPOSE_FILE) down
+build: ## Build containers (SAFE)
+	$(DC) build
 
-# ⚠️ Dangerous — Deletes Database
-reset-db:
-	docker compose -f $(COMPOSE_FILE) down -v
-	docker compose -f $(COMPOSE_FILE) up -d
+rebuild: ## Rebuild containers (SAFE — keeps DB)
+	$(DC) build --no-cache
+	$(DC) up -d
 
-# Show running containers
-ps:
-	docker compose -f $(COMPOSE_FILE) ps
+clean: ## Remove containers ONLY (SAFE — keeps DB)
+	$(DC) down
 
-# Install frontend packages inside container
-npm-install:
-	docker compose -f $(COMPOSE_FILE) exec frontend npm install
+reset-db: ## ⚠️ Dangerous — Deletes Database
+	$(DC) down -v
+	$(DC) up -d
 
-# Install specific npm package
-npm-add:
-	docker compose -f $(COMPOSE_FILE) exec frontend npm install $(pkg)
+ps: ## Show running containers
+	$(DC) ps
 
-# Run frontend lint
-lint-frontend:
-	cd frontend && npm run lint
+npm-install: ## Install frontend packages inside container
+	$(EXEC_FRONTEND) npm install
 
-# Run backend rubocop
-lint-backend:
-	docker compose -f $(COMPOSE_FILE) exec backend bundle exec rubocop
+npm-add: ## Install specific npm package (usage: make npm-add pkg=name)
+	$(EXEC_FRONTEND) npm install $(pkg)
 
-# Run both linters
-lint: lint-frontend lint-backend
+lint-frontend: ## Run frontend lint inside container
+	$(EXEC_FRONTEND) npm run lint
+
+lint-backend: ## Run backend rubocop
+	$(EXEC_BACKEND) bundle exec rubocop
+
+lint: lint-frontend lint-backend ## Run both linters
