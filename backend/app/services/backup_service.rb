@@ -19,9 +19,9 @@ class BackupService
 
         uri = ENV["MONGODB_URI"]
         raise "MONGODB_URI not set" if uri.blank?
-        raise "Invalid URI" unless uri.to_s.start_with?("mongodb://", "mongodb+srv://")
+        raise "Invalid URI" unless uri.to_s.match?(%r{\Amongodb(\+srv)?://[^\s]+\z})
 
-        cmd = [ "mongodump", "--uri", uri, "--gzip", "--archive", filepath.to_s ]
+        cmd = [ "mongodump", "--uri", uri.to_s, "--gzip", "--archive", filepath.to_s ]
         stdout, stderr, status = Open3.capture3(*cmd)
 
         unless status.success?
