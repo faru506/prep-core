@@ -21,3 +21,16 @@ backend/.bundle
 # Vite
 frontend/node_modules
 frontend/dist
+
+# Local agent framework (kept out of GitHub)
+AGENTS.md
+.agent/
+opencode.jsonc
+
+# Internal reports and scratch notes
+DEEP_REVIEW_REPORT.md
+prompt.md
+project-related-images/
+
+# Local credentials
+updated_creds.json

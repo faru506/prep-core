@@ -97,7 +97,6 @@ PrepCore currently provides two main experiences:
 ├── frontend/               # React app
 ├── docker-compose.dev.yml  # Local dev stack
 ├── Makefile                # Common development commands
-├── AGENTS.md               # Codebase conventions for AI/dev workflows
 └── README.md               # Main project documentation
 ```
 
@@ -548,7 +547,6 @@ make lint
 
 - [Makefile](./Makefile)
 - [docker-compose.dev.yml](./docker-compose.dev.yml)
-- [AGENTS.md](./AGENTS.md)
 
 ### Backend
 
@@ -571,7 +569,6 @@ make lint
 
 ## Contribution Notes
 
-- Follow conventions in [AGENTS.md](./AGENTS.md).
 - Prefer `rg` for searching.
 - Use `apply_patch` for manual code edits.
 - Run relevant lint commands before finalizing changes.
