@@ -1,11 +1,12 @@
 import { Navigate } from "react-router-dom";
-import { getRole } from "../utilities/storage";
+import { getToken, getRole } from "../utilities/storage";
 
 
 const AdminRoute = ({ children }) => {
+  const token = getToken();
   const role = getRole();
 
-  if (!role) {
+  if (!token) {
     return (
       <Navigate to="/login" replace />
     );

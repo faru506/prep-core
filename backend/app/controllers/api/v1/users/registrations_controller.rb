@@ -11,7 +11,7 @@ class Api::V1::Users::RegistrationsController < Devise::RegistrationsController
       render json:
         { message: "Signed up sucessfully.",
           data: user_payload(resource)
-        }, status: :ok
+        }, status: :created
     elsif request.method == "DELETE"
       render json:
         { message: "Account deleted successfully."

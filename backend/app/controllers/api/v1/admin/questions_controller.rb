@@ -128,21 +128,23 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     }
   end
 
-  private
-
-  def sort_order
-    return { upvote_count: :desc, position: :asc } if params[:sort].to_s == "upvotes"
-
-    { position: :asc }
-  end
-
   def reorder
-    topic = Topic.find(params[:topic_id])
+    topic = Topic.find_by(id: params[:topic_id])
+    return render json: { error: "Topic not found" }, status: :not_found unless topic
+
     questions = topic.questions
     params[:question_ids].each_with_index do |id, index|
       questions.find(id).update(position: index + 1)
     end
 
     head :ok
+  end
+
+  private
+
+  def sort_order
+    return { upvote_count: :desc, position: :asc } if params[:sort].to_s == "upvotes"
+
+    { position: :asc }
   end
 end
