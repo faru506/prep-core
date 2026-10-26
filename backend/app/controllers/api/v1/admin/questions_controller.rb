@@ -129,12 +129,18 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
   end
 
   def reorder
-    topic = Topic.find_by(id: params[:topic_id])
+    topic = Topic.where(id: params[:topic_id]).first
     return render json: { error: "Topic not found" }, status: :not_found unless topic
 
+    question_ids = Array(params[:question_ids])
+    return render json: { error: "question_ids must be an array" }, status: :bad_request if question_ids.empty? && params.key?(:question_ids) && !params[:question_ids].is_a?(Array)
+    return render json: { error: "question_ids required" }, status: :bad_request if question_ids.empty?
+
     questions = topic.questions
-    params[:question_ids].each_with_index do |id, index|
-      questions.find(id).update(position: index + 1)
+    question_ids.each_with_index do |id, index|
+      question = questions.where(id: id).first
+      next unless question
+      question.update(position: index + 1)
     end
 
     head :ok

@@ -221,25 +221,23 @@ Optional if you want to run things outside Docker:
 
 ## Environment Variables
 
-The backend expects a JWT secret:
+Required (minimum for local dev):
 
 ```env
-JWT_SECRET=your-secret-value
+# backend/.env
+RAILS_ENV=development
+SECRET_KEY_BASE=replace-with-long-random-secret
+JWT_SECRET=replace-with-long-random-secret
+MONGODB_URI=mongodb://mongodb:27017/prep_core_development  # or mongodb://localhost:27017/... if running outside Docker
+ALLOWED_ORIGINS=http://localhost:5173
+FRONTEND_URL=http://localhost:5173
 ```
 
-If you use `dotenv-rails`, create:
-
-```text
-backend/.env
-```
-
-with:
-
-```env
-JWT_SECRET=replace-this-with-a-long-random-secret
-```
-
-Without this value, login/session JWT behavior can break.
+Notes:
+- `dotenv-rails` is only loaded in development/test. In production you must set environment variables directly.
+- `backend/.env` is gitignored. Never commit secrets.
+- If `JWT_SECRET` is missing, Devise JWT initialization will fail fast.
+- See `backend/config/mongoid.yml` for environment-specific MongoDB URI fallbacks.
 
 ## Start The Project
 
@@ -429,17 +427,18 @@ This runs:
 
 ### Tests
 
-Backend test framework is present:
+Backend tests (Minitest):
 
 ```bash
 cd backend
-bundle exec rspec
+bundle exec rails test
 ```
 
-Current note:
+Notes:
 
-- the test setup exists
-- the repository may not yet contain meaningful backend specs beyond the scaffold baseline
+- The CI `Rails Backend Tests` job runs `bundle exec rails test` with MongoDB; the repository currently has no `test/` directory and no specs, so the job reports `0 runs, 0 assertions`.
+- RSpec is installed but there are currently no RSpec examples in `backend/spec/`.
+- No frontend test runner or CI lint step is configured at present.
 
 ## Known Gaps / Current Limitations
 

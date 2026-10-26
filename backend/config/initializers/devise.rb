@@ -315,7 +315,7 @@ Devise.setup do |config|
   # config.sign_in_after_change_password = true
 
   config.jwt do |jwt|
-    jwt.secret = ENV["JWT_SECRET"]
+    jwt.secret = ENV.fetch("JWT_SECRET")
     jwt.dispatch_requests = [
       [ "POST", %r{^/api/v1/users/sign_in$} ]
     ]
