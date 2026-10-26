@@ -18,6 +18,14 @@ Rails.application.routes.draw do
         post "courses/reorder", to: "courses#reorder"
         post "topics/reorder", to: "topics#reorder"
         post "questions/reorder", to: "questions#reorder"
+        resources :backups, only: [ :index, :create, :destroy ] do
+          collection do
+            post :restore
+          end
+          member do
+            get :download
+          end
+        end
       end
 
       resources :courses, only: [ :index ], controller: "admin/courses" do

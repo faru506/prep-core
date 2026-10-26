@@ -11,6 +11,7 @@ import InterviewQA from "./pages/InterviewQA";
 import BookmarkedItems from "./pages/BookmarkedItems";
 import Users from "./pages/Users";
 import CourseManager from "./pages/CourseManager"
+import Backups from "./pages/Backups"
 import { getToken } from "./utilities/storage";
 
 const router = createBrowserRouter([
@@ -89,6 +90,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <CourseManager />
+          </AdminRoute>
+        )
+      },
+      {
+        path: "backups",
+        element: (
+          <AdminRoute>
+            <Backups />
           </AdminRoute>
         )
       }

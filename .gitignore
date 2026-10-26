@@ -34,3 +34,9 @@ project-related-images/
 
 # Local credentials
 updated_creds.json
+
+# Backups
+backend/storage/backups/*
+!backend/storage/backups/.keep
+storage/backups/*
+!storage/backups/.keep

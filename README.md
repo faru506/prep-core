@@ -576,3 +576,5 @@ make lint
 ## License / Ownership
 
 No license file is currently present in the repository. Add one if this project is intended for open-source distribution.
+
+**Backups:** Daily at 2 AM via host cron. Admin UI at `/backups` or CLI: `docker compose -f docker-compose.dev.yml exec backend bundle exec rake backup:{create,list,restore[filename.gz],prune}`. Keep up to 30 by default (`BACKUP_RETENTION_COUNT`). All backups stored locally in `storage/backups/`. Add to crontab: `0 2 * * * cd /path/to/prep-core && docker compose -f docker-compose.dev.yml exec -T backend bundle exec rake backup:create >> /tmp/prepcore-backup.log 2>&1`
