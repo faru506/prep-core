@@ -15,11 +15,12 @@ class Api::V1::Admin::BackupsController < Api::V1::Admin::AdminController
 
   def download
     filename = params[:id]
-    raise "Invalid filename" if filename.to_s.include?("..") || filename.to_s.include?("/")
+    raise "Invalid filename" if filename.to_s.blank? || filename.to_s.include?("..") || filename.to_s.include?("/") || filename.to_s.include?("\\")
+    raise "Invalid filename" unless filename.to_s.match?(/\A[a-zA-Z0-9._-]+\.gz\z/)
     filepath = Rails.root.join("storage", "backups", filename)
     raise "Backup not found" unless File.exist?(filepath)
 
-    send_file filepath, type: "application/gzip", disposition: "attachment", filename: filename
+    send_file filepath.to_s, type: "application/gzip", disposition: "attachment", filename: filename
   rescue => e
     render json: { error: e.message }, status: :not_found
   end

@@ -38,8 +38,9 @@ class RestoreService
 
         uri = ENV["MONGODB_URI"]
         raise "MONGODB_URI not set" if uri.blank?
+        raise "Invalid URI" unless uri.to_s.start_with?("mongodb://", "mongodb+srv://")
 
-        cmd = [ "mongorestore", "--uri=#{uri}", "--gzip", "--archive=#{filepath}", "--drop" ]
+        cmd = [ "mongorestore", "--uri", uri, "--gzip", "--archive", filepath.to_s, "--drop" ]
         stdout, stderr, status = Open3.capture3(*cmd)
 
         unless status.success?
