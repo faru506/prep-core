@@ -52,8 +52,30 @@ const Backups = () => {
     }
   };
 
-  const handleDownload = (filename) => {
-    window.open(`http://localhost:3000/api/v1/admin/backups/${filename}/download`, "_blank");
+  const handleDownload = async (filename) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:3000/api/v1/admin/backups/${filename}/download`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      setMessage({ type: "error", text: "Download failed" });
+    }
   };
 
   const handleDelete = async (filename) => {

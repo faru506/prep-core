@@ -17,9 +17,25 @@ export const createBackup = () =>
     headers: authHeaders()
   });
 
-export const downloadBackup = (filename) => {
+export const downloadBackup = async (filename) => {
   const token = getToken();
-  window.open(`${DOMAIN}/api/v1/admin/backups/${filename}/download?token=${token}`, "_blank");
+  const response = await fetch(`${DOMAIN}/api/v1/admin/backups/${filename}/download`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error("Download failed");
+  }
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
 };
 
 export const deleteBackup = (filename) =>
