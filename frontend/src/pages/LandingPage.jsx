@@ -16,8 +16,8 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
       </svg>
     ),
-    title: "Programming Practice",
-    description: "Master coding challenges and improve your problem-solving skills with our structured learning paths."
+    title: "Difficulty Levels",
+    description: "Filter questions by low, medium, and hard difficulty to focus on what you need most."
   },
   {
     icon: (
@@ -25,8 +25,8 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ),
-    title: "Track Progress",
-    description: "Stay organized and monitor your growth as you prepare for your next big career move."
+    title: "Bookmarks & Upvotes",
+    description: "Save questions to revisit later and upvote the ones the community finds most useful."
   }
 ];
 
@@ -74,7 +74,7 @@ const LandingPage = () => {
             
             <p className="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
               The all-in-one platform designed to help developers ace their interviews. 
-              Access curated Q&As, practice coding challenges, and track your progress across 
+              Access curated Q&As, filter by difficulty, and bookmark questions across 
               Ruby, Rails, React, and System Design.
             </p>
             

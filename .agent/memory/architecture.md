@@ -85,7 +85,7 @@ Editing controllers, adding endpoints, or debugging 401/403 responses.
 `frontend/src/Router.jsx` uses `createBrowserRouter`:
 
 - Public: `/login`, `/register` (both wrapped in `PublicRoute`).
-- Layout `Root`: `/` (Home), `/interview_qa`, `/interview_qa/:courseSlug/:topicSlug?`, `/programs`, `/contests`.
+- Layout `Root`: `/` (Home), `/interview_qa`, `/interview_qa/:courseSlug/:topicSlug?`. `pages/Programs.jsx` and `pages/Contests.jsx` are static placeholders kept on disk but intentionally unrouted and unlinked (hidden 2026-11-20) until real backends exist.
 - Auth-guarded: `/bookmarks` (`ProtectedRoute`).
 - Admin-guarded: `/users`, `/course_manager`, `/backups` (all `AdminRoute`).
 - Fallback `*`: redirects to `/` when `getToken()` exists, otherwise `/login`.

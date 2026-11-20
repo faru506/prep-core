@@ -82,8 +82,6 @@ const Navbar = () => {
   const navItems = [
     { name: "Interview Q&A", path: "/interview_qa" },
     { name: "Bookmarked Items", path: "/bookmarks" },
-    { name: "Programs", path: "/programs" },
-    { name: "Contests", path: "/contests" },
     ...(role === "admin"
       ? [{ name: "Users", path: "/users" },
          { name: "Course Manager", path: "/course_manager" },

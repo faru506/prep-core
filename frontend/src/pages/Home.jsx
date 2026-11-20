@@ -16,8 +16,8 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
       </svg>
     ),
-    title: "Programming Practice",
-    description: "Solve coding challenges and improve your problem-solving skills."
+    title: "Difficulty Levels",
+    description: "Filter questions by low, medium, and hard difficulty to focus on what you need most."
   },
   {
     icon: (
@@ -25,8 +25,8 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ),
-    title: "Track Progress",
-    description: "Monitor your performance and identify areas for improvement."
+    title: "Bookmarks & Upvotes",
+    description: "Save questions to revisit later and upvote the ones the community finds most useful."
   }
 ];
 
@@ -51,7 +51,7 @@ const Home = () => {
             
             <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10">
               Your comprehensive platform for interview preparation. 
-              Practice with real questions, master coding challenges, and land your dream job.
+              Practice with real interview questions and land your dream job.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -66,10 +66,10 @@ const Home = () => {
               </Link>
               
               <Link 
-                to="/programs" 
+                to="/bookmarks" 
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all duration-200 hover:scale-105"
               >
-                Explore Programs
+                View Bookmarks
               </Link>
             </div>
           </div>
@@ -109,7 +109,7 @@ const Home = () => {
               Ready to Start Your Journey?
             </h2>
             <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-              Join thousands of developers who have improved their interview skills with PrepCore.
+              Start improving your interview skills with PrepCore today.
             </p>
             <Link 
               to="/interview_qa" 

@@ -5,8 +5,6 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import AdminRoute from "./routes/AdminRoute";
 import Home from "./pages/Home";
-import Programs from "./pages/Programs";
-import Contests from "./pages/Contests";
 import InterviewQA from "./pages/InterviewQA";
 import BookmarkedItems from "./pages/BookmarkedItems";
 import Users from "./pages/Users";
@@ -66,15 +64,6 @@ const router = createBrowserRouter([
         )
       },
 
-      {
-        path: "programs",
-        element: <Programs />
-      },
-
-      {
-        path: "contests",
-        element: <Contests />
-      },
 
       {
         path: "users",
