@@ -192,7 +192,7 @@ Debugging a red security job that shows no Brakeman warnings, or regenerating `b
 
 `bin/bundler-audit` originally reported advisories across Rails/ActiveStorage, Puma, Nokogiri, Devise, jwt, mongo, loofah, concurrent-ruby, and others. They were cleared with a targeted `bundle update --conservative` and by moving the Gemfile constraint to `puma ~> 7.2`. Current result: `No vulnerabilities found`. Notable versions: Rails 8.1.4, Puma 7.2.1, json 3.1.0, jwt 3.3.0. The placeholder `CVE-THAT-DOES-NOT-APPLY` was removed from `backend/config/bundler-audit.yml` (now `ignore: []`).
 
-Advisories will reappear as the lockfile ages, so re-run `bin/bundler-audit` periodically rather than assuming the tree stays clean.
+Advisories will reappear as the lockfile ages, so re-run `bin/bundler-audit` periodically rather than assuming the tree stays clean. This happened again by 2026-11-20 and was fixed the same way (`bundle update --conservative <gems>`); `mongoid` was held to the 9.0 line with `bundle update mongoid --patch --conservative` because a plain conservative update jumps to 9.1.x.
 
 **Use When**
 
