@@ -94,6 +94,8 @@ Configuring a new environment, debugging CORS preflight failures, or changing po
 
 There is no frontend lint job and no automated test job. See `testing.md` for why `backend_test` has no suite to run (the job log shows `0 runs, 0 assertions`). The frontend job uses `node-version: 20` and `npm install` even though `frontend/package-lock.json` is tracked; `npm run lint` is never run in CI. As of 2026-10-26 all four jobs pass; `backend/bin/brakeman` no longer passes `--ensure-latest`, and `bin/bundler-audit` is clean (placeholder ignore removed). The README was updated to reflect Minitest (`rails test`) and required env vars.
 
+`backend/config/brakeman.ignore` now contains three reviewed false positives from the backup feature: two `Open3.capture3` command-injection warnings (backup and restore) and one `send_file` warning after strict filename validation/containment. Brakeman still reports "Ignored Warnings: 3" and exits 0; do not remove the entries without re-verifying the validation paths.
+
 **Use When**
 
 Checking what must pass before a PR, or adding a new CI step.
@@ -101,6 +103,35 @@ Checking what must pass before a PR, or adding a new CI step.
 **Source**
 
 - `.github/workflows/ci.yml`
+
+**Last Verified**
+
+2026-10-26
+
+## Local database backups
+
+**Knowledge**
+
+- Backups use `mongodump`/`mongorestore` gzip archives (not JSON export) to preserve BSON types, ObjectIds, embedded answers, indexes, and denormalized counters.
+- Archives live in `backend/storage/backups/` on the host, visible in the container at `/app/storage/backups` through the `./backend:/app` bind mount. They therefore survive container rebuilds and `make reset-db` (which deletes only the Mongo volume). The directory is gitignored and is never under `public/`.
+- Metadata (`filename`, size, created_at, created_by) is stored in `backups.json`; `BackupService.prune!` removes the oldest entries beyond `BACKUP_RETENTION_COUNT` (default 30).
+- `backend/Dockerfile` installs the **arm64** `mongodb-database-tools` tarball from `fastdl.mongodb.org` into `/usr/local/bin`. Rebuild the backend image after Dockerfile changes (`make rebuild` or `docker compose build backend`).
+- Daily creation is host-scheduled, because the app has no worker/queue. On this Mac a launchd agent (`~/Library/LaunchAgents/com.prepcore.backup.plist`) runs at 02:00 and invokes `/usr/local/bin/docker compose ... rake backup:create`; logs go to `/tmp/prepcore-backup.log`. Linux equivalents use cron.
+- Restores are admin-only, require `confirmation=RESTORE`, take the `.backup.lock`, and create a pre-restore snapshot first. Production restores are blocked unless `ALLOW_RESTORE_IN_PROD=true`.
+- Backups contain `encrypted_password`, `jti`, and reset tokens; treat archives as secrets.
+
+**Use When**
+
+Changing backup tooling, Docker images/volumes, retention, restore behavior, or the daily schedule.
+
+**Source**
+
+- `backend/Dockerfile`
+- `docker-compose.dev.yml`
+- `backend/app/services/backup_service.rb`
+- `backend/app/services/restore_service.rb`
+- `backend/lib/tasks/backup.rake`
+- `README.md`
 
 **Last Verified**
 

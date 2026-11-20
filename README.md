@@ -566,6 +566,61 @@ make lint
 - [frontend/src/pages/Users.jsx](./frontend/src/pages/Users.jsx)
 - [frontend/src/components/Navbar.jsx](./frontend/src/components/Navbar.jsx)
 
+## Backups
+
+Backups are local-only and run daily at **2:00 AM**. They are stored in `backend/storage/backups/` on the host (visible in the container at `/app/storage/backups`) and are never served from `public/`. Because they live in the bind-mounted `backend/` directory, they survive container rebuilds and `make reset-db`.
+
+### Admin UI
+
+Admins can list, create, download, delete, and restore backups at `/backups`. Restoring requires typing `RESTORE`, and a pre-restore snapshot is created automatically. Restores are blocked in production unless `ALLOW_RESTORE_IN_PROD=true` is set.
+
+### CLI
+
+```bash
+docker compose -f docker-compose.dev.yml exec backend bundle exec rake backup:create
+docker compose -f docker-compose.dev.yml exec backend bundle exec rake backup:list
+docker compose -f docker-compose.dev.yml exec backend bundle exec rake "backup:restore[backup_YYYY-MM-DD_HH-MM-SS.gz]"
+docker compose -f docker-compose.dev.yml exec backend bundle exec rake backup:prune
+```
+
+Retention defaults to 30 archives; set `BACKUP_RETENTION_COUNT` to change it.
+
+### Daily schedule (macOS)
+
+Install a launchd agent at `~/Library/LaunchAgents/com.prepcore.backup.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.prepcore.backup</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>cd /path/to/prep-core &amp;&amp; /usr/local/bin/docker compose -f docker-compose.dev.yml exec -T backend bundle exec rake backup:create &gt;&gt; /tmp/prepcore-backup.log 2&gt;&amp;1</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+</dict>
+</plist>
+```
+
+Load it with `launchctl load ~/Library/LaunchAgents/com.prepcore.backup.plist`. Logs are written to `/tmp/prepcore-backup.log`.
+
+On Linux hosts, use cron instead:
+
+```bash
+0 2 * * * cd /path/to/prep-core && docker compose -f docker-compose.dev.yml exec -T backend bundle exec rake backup:create >> /tmp/prepcore-backup.log 2>&1
+```
+
 ## Contribution Notes
 
 - Prefer `rg` for searching.
@@ -576,5 +631,3 @@ make lint
 ## License / Ownership
 
 No license file is currently present in the repository. Add one if this project is intended for open-source distribution.
-
-**Backups:** Daily at 2 AM via host cron. Admin UI at `/backups` or CLI: `docker compose -f docker-compose.dev.yml exec backend bundle exec rake backup:{create,list,restore[filename.gz],prune}`. Keep up to 30 by default (`BACKUP_RETENTION_COUNT`). All backups stored locally in `storage/backups/`. Add to crontab: `0 2 * * * cd /path/to/prep-core && docker compose -f docker-compose.dev.yml exec -T backend bundle exec rake backup:create >> /tmp/prepcore-backup.log 2>&1`

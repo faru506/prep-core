@@ -272,6 +272,87 @@ Adding profile/settings updates or testing the Devise registration endpoints.
 
 2026-10-26
 
+## Restore pre-snapshot must not re-acquire the backup lock
+
+**Knowledge**
+
+`RestoreService.restore_archive` acquires `BackupLock` and then creates a pre-restore snapshot. The first implementation called `BackupService.create_backup`, which attempted a second `flock` in the same process and raised `Another backup or restore operation is already in progress`. `BackupService.create_backup` now accepts `lock: false` for callers that already hold the lock; the outer `ensure` releases it.
+
+Related: do not call `BackupLock.release` from controller `ensure` blocks. It would release/close a lock owned by another request if the action never acquired it.
+
+**Use When**
+
+Changing `RestoreService`, `BackupService`, or any code that nests backup operations.
+
+**Source**
+
+- `backend/app/services/backup_service.rb#create_backup`
+- `backend/app/services/restore_service.rb#restore_archive`
+- `backend/app/services/backup_lock.rb`
+
+**Last Verified**
+
+2026-10-26
+
+## Rails dynamic route segments exclude dots
+
+**Knowledge**
+
+A member route such as `GET /api/v1/admin/backups/:id/download` does not match `backup_2026-10-26_14-38-23.gz` by default because `:id` excludes dots. The request returns a routing 404. Add `constraints: { id: /[^\/]+/ }` to the `resources` declaration (or the member route) so `.gz` filenames match.
+
+**Use When**
+
+Adding routes whose identifier contains a dot (filenames, versioned slugs, emails).
+
+**Source**
+
+- `backend/config/routes.rb`
+- `backend/app/controllers/api/v1/admin/backups_controller.rb#download`
+
+**Last Verified**
+
+2026-10-26
+
+## MongoDB tools must match the container architecture
+
+**Knowledge**
+
+On Apple Silicon the backend container is `aarch64`. Installing the Debian `mongodb-database-tools` package or the x86_64 tarball produces binaries that fail under Rosetta with `rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2`. The Dockerfile downloads `mongodb-database-tools-ubuntu2204-arm64-100.9.4.tgz` from `fastdl.mongodb.org` and copies its `bin/*` into `/usr/local/bin`. Verify with `docker exec rails_backend file /usr/local/bin/mongodump` (should report `ARM aarch64`) and `mongodump --version`.
+
+**Use When**
+
+Rebuilding the backend image, adding MongoDB CLI tools, or debugging `mongodump`/`mongorestore` failures.
+
+**Source**
+
+- `backend/Dockerfile`
+- `BackupService#create_backup`
+- `RestoreService#restore_archive`
+
+**Last Verified**
+
+2026-10-26
+
+## Backup service warnings are Brakeman false positives
+
+**Knowledge**
+
+Brakeman reports `Command Injection` (Open3) for both backup and restore, plus `File Access` (send_file). All are reviewed false positives: `Open3.capture3` receives an argument array (no shell), and download filenames are validated against `\A[a-zA-Z0-9._-]+\.gz\z` and confined to `storage/backups`. They are recorded in `backend/config/brakeman.ignore` with notes; the scan exits 0 with `Ignored Warnings: 3`. If the validation or command construction changes, re-review the entries instead of assuming they are still safe.
+
+**Use When**
+
+The security CI job fails or the backup controller/service is refactored.
+
+**Source**
+
+- `backend/config/brakeman.ignore`
+- `backend/app/services/backup_service.rb#create_backup`
+- `backend/app/controllers/api/v1/admin/backups_controller.rb#download`
+
+**Last Verified**
+
+2026-10-26
+
 ## Admin reorder is not fully validated or atomic
 
 **Knowledge**

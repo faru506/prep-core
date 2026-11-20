@@ -9,7 +9,6 @@ services:
 
     volumes:
       - ./backend:/app
-      - backups_data:/app/storage/backups
 
     depends_on:
       - mongodb
@@ -41,4 +40,3 @@ services:
 
 volumes:
   mongo_data:
-  backups_data:

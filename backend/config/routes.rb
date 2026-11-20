@@ -18,7 +18,7 @@ Rails.application.routes.draw do
         post "courses/reorder", to: "courses#reorder"
         post "topics/reorder", to: "topics#reorder"
         post "questions/reorder", to: "questions#reorder"
-        resources :backups, only: [ :index, :create, :destroy ] do
+        resources :backups, only: [ :index, :create, :destroy ], constraints: { id: /[^\/]+/ } do
           collection do
             post :restore
           end

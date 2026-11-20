@@ -7,21 +7,18 @@ class BackupService
   BACKUP_DIR = Rails.root.join("storage", "backups")
   METADATA_FILE = BACKUP_DIR.join("backups.json")
   DEFAULT_RETENTION_COUNT = 30
+  FILENAME_PATTERN = /\A[a-zA-Z0-9._-]+\.gz\z/
 
   class << self
-    def create_backup(created_by: nil)
+    def create_backup(created_by: nil, lock: true)
       FileUtils.mkdir_p(BACKUP_DIR)
-      BackupLock.acquire
+      BackupLock.acquire if lock
       begin
         timestamp = Time.now.strftime("%Y-%m-%d_%H-%M-%S")
         filename = "backup_#{timestamp}.gz"
         filepath = BACKUP_DIR.join(filename)
 
-        uri = ENV["MONGODB_URI"]
-        raise "MONGODB_URI not set" if uri.blank?
-        raise "Invalid URI" unless uri.to_s.match?(%r{\Amongodb(\+srv)?://[^\s]+\z})
-
-        cmd = [ "mongodump", "--uri", uri.to_s, "--gzip", "--archive", filepath.to_s ]
+        cmd = [ "mongodump", "--uri=#{mongodb_uri}", "--gzip", "--archive=#{filepath}" ]
         stdout, stderr, status = Open3.capture3(*cmd)
 
         unless status.success?
@@ -40,11 +37,11 @@ class BackupService
         }
         metadata.unshift(entry)
         save_metadata(metadata)
-        prune!
+        prune!(lock: false)
 
         entry
       ensure
-        BackupLock.release
+        BackupLock.release if lock
       end
     end
 
@@ -52,20 +49,39 @@ class BackupService
       load_metadata.select { |b| File.exist?(BACKUP_DIR.join(b["filename"])) }
     end
 
-    def delete_backup(filename)
-      raise "Invalid filename" if filename.include?("..") || filename.include?("/")
-      filepath = BACKUP_DIR.join(filename)
-      raise "Backup not found" unless File.exist?(filepath)
+    def delete_backup(filename, lock: true)
+      filepath = filepath_for(filename)
+      BackupLock.acquire if lock
 
       FileUtils.rm_f(filepath)
       metadata = load_metadata.reject { |b| b["filename"] == filename }
       save_metadata(metadata)
       true
+    ensure
+      BackupLock.release if lock
     end
 
-    def prune!
-      retention = ENV.fetch("BACKUP_RETENTION_COUNT", DEFAULT_RETENTION_COUNT).to_i
-      metadata = load_metadata
+    def filepath_for(filename)
+      name = filename.to_s
+      raise "Invalid filename" if name.blank? || name.include?("..") || name.include?("/") || name.include?("\\")
+      raise "Invalid filename" unless name.match?(FILENAME_PATTERN)
+
+      filepath = BACKUP_DIR.join(name)
+      raise "Backup not found" unless File.exist?(filepath)
+      filepath
+    end
+
+    def mongodb_uri
+      uri = Mongoid::Config.clients[:default][:uri].to_s
+      raise "MongoDB URI not configured" if uri.blank?
+      raise "Invalid MongoDB URI" unless uri.match?(%r{\Amongodb(\+srv)?://[^\s]+\z})
+      uri
+    end
+
+    def prune!(lock: true)
+      BackupLock.acquire if lock
+      retention = [ ENV.fetch("BACKUP_RETENTION_COUNT", DEFAULT_RETENTION_COUNT).to_i, 1 ].max
+      metadata = load_metadata.select { |b| File.exist?(BACKUP_DIR.join(b["filename"])) }
       return if metadata.size <= retention
 
       to_delete = metadata.drop(retention)
@@ -74,6 +90,8 @@ class BackupService
         FileUtils.rm_f(filepath)
       end
       save_metadata(metadata.first(retention))
+    ensure
+      BackupLock.release if lock
     end
 
     private

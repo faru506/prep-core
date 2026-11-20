@@ -6,9 +6,7 @@ class RestoreService
 
   class << self
     def restore_from_file(filename, created_by: nil)
-      raise "Invalid filename" if filename.include?("..") || filename.include?("/")
-      filepath = BACKUP_DIR.join(filename)
-      raise "Backup file not found" unless File.exist?(filepath)
+      filepath = BackupService.filepath_for(filename)
       restore_archive(filepath, created_by: created_by)
     end
 
@@ -18,9 +16,9 @@ class RestoreService
 
       FileUtils.mkdir_p(BACKUP_DIR)
       timestamp = Time.now.strftime("%Y-%m-%d_%H-%M-%S")
-      filename = "upload_#{timestamp}_#{File.basename(uploaded_file.original_filename)}"
+      filename = "upload_#{timestamp}.gz"
       filepath = BACKUP_DIR.join(filename)
-      File.binwrite(filepath, uploaded_file.read)
+      FileUtils.cp(uploaded_file.tempfile.path, filepath)
       begin
         restore_archive(filepath, created_by: created_by)
       ensure
@@ -33,14 +31,12 @@ class RestoreService
     def restore_archive(filepath, created_by: nil)
       BackupLock.acquire
       begin
-        pre_restore = BackupService.create_backup(created_by: "pre-restore-#{created_by}")
+        pre_restore = BackupService.create_backup(created_by: "pre-restore-#{created_by}", lock: false)
         Rails.logger.info "Created pre-restore backup: #{pre_restore['filename']}"
 
-        uri = ENV["MONGODB_URI"]
-        raise "MONGODB_URI not set" if uri.blank?
-        raise "Invalid URI" unless uri.to_s.match?(%r{\Amongodb(\+srv)?://[^\s]+\z})
+        uri = BackupService.mongodb_uri
 
-        cmd = [ "mongorestore", "--uri", uri.to_s, "--gzip", "--archive", filepath.to_s, "--drop" ]
+        cmd = [ "mongorestore", "--uri=#{uri}", "--gzip", "--archive=#{filepath}", "--drop" ]
         stdout, stderr, status = Open3.capture3(*cmd)
 
         unless status.success?

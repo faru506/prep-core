@@ -1,0 +1,73 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "85d6b213b254aa79edcd84ad2798f3a31e6470664042e3fd59e9e3bd7a51d36a",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/backup_service.rb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture3(\"mongodump\", \"--uri=#{mongodb_uri}\", \"--gzip\", \"--archive=#{BACKUP_DIR.join(\"backup_#{Time.now.strftime(\"%Y-%m-%d_%H-%M-%S\")}.gz\")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BackupService",
+        "method": "self.create_backup"
+      },
+      "user_input": "mongodb_uri",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "mongodump/mongorestore are invoked with Open3.capture3 using argument arrays (no shell). The URI comes from validated Mongoid config; archive paths are generated internally or validated by filepath_for."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8a30f4345d547b77929ff166e1c44a6fe3989c870edf144cf2a6c05e60bafda5",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/restore_service.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture3(\"mongorestore\", \"--uri=#{BackupService.mongodb_uri}\", \"--gzip\", \"--archive=#{filepath}\", \"--drop\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RestoreService",
+        "method": "self.restore_archive"
+      },
+      "user_input": "BackupService.mongodb_uri",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "mongodump/mongorestore are invoked with Open3.capture3 using argument arrays (no shell). The URI comes from validated Mongoid config; archive paths are generated internally or validated by filepath_for."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "5aa86ed74e1dfb21bf6cf2b95209dd6fa125c462c372e769f47ffc9a61a7a6f0",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/v1/admin/backups_controller.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(BackupService.filepath_for(params[:id]).to_s, :type => \"application/gzip\", :disposition => \"attachment\", :filename => File.basename(BackupService.filepath_for(params[:id])), :x_sendfile => false)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::V1::Admin::BackupsController",
+        "method": "download"
+      },
+      "user_input": "params[:id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "The filename is validated against a strict .gz pattern and resolved by BackupService.filepath_for, which confines it to storage/backups. No user-controlled path is used."
+    }
+  ]
+}

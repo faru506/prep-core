@@ -23,3 +23,4 @@ Current topics:
 - Docker workflow, environment variables, and CI jobs are documented in `operations.md`.
 - Verified audit findings and recurring traps are documented in `pitfalls.md` and `decisions.md`.
 - Recent hardenings: Mongoid safe lookups, Devise registration update handling, JWT_SECRET fail-fast, admin reorder validation.
+- Local mongodump backups, the admin `/backups` page, host scheduling, and restore safety are documented in `operations.md`, `apis.md`, `background-jobs.md`, `decisions.md`, and `pitfalls.md`.

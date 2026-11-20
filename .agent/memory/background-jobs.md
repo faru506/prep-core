@@ -8,6 +8,8 @@ The repository ships ActiveJob but uses no queue backend. `app/jobs/` contains o
 
 Consequences: all work (including seeding via `rails runner`) executes inside the request/process that triggers it, and there is no retry/backoff infrastructure. Adding a background job requires both a queue adapter and a worker process, which the Docker stack does not provide today.
 
+The daily database backup is therefore scheduled outside Rails: a macOS launchd agent (`~/Library/LaunchAgents/com.prepcore.backup.plist`) runs `docker compose exec -T backend bundle exec rake backup:create` at 02:00; Linux hosts use cron. The rake task runs synchronously and uses a file lock to prevent concurrent backup/restore operations. Restores also run synchronously in the request cycle.
+
 **Use When**
 
 Considering asynchronous work, diagnosing timeouts on heavy endpoints, or being asked to add a job/worker.

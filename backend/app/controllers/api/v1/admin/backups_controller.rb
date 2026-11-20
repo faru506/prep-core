@@ -14,13 +14,12 @@ class Api::V1::Admin::BackupsController < Api::V1::Admin::AdminController
   end
 
   def download
-    filename = params[:id].to_s
-    raise "Invalid filename" if filename.blank? || filename.include?("..") || filename.include?("/") || filename.include?("\\")
-    raise "Invalid filename" unless filename.match?(/\A[a-zA-Z0-9._-]+\.gz\z/)
-    filepath = Rails.root.join("storage", "backups").join(filename)
-    raise "Backup not found" unless File.exist?(filepath.to_s)
-
-    send_file filepath.to_s, type: "application/gzip", disposition: "attachment", filename: filename, x_sendfile: false
+    filepath = BackupService.filepath_for(params[:id])
+    send_file filepath.to_s,
+              type: "application/gzip",
+              disposition: "attachment",
+              filename: File.basename(filepath),
+              x_sendfile: false
   rescue => e
     render json: { error: e.message }, status: :not_found
   end
@@ -55,8 +54,6 @@ class Api::V1::Admin::BackupsController < Api::V1::Admin::AdminController
     render json: { message: "Database restored successfully", pre_restore: result[:pre_restore] }
   rescue => e
     render json: { error: e.message }, status: :unprocessable_entity
-  ensure
-    BackupLock.release
   end
 
   private

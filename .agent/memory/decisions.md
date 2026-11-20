@@ -127,6 +127,33 @@ Writing clients or tests against the registration endpoint.
 
 2026-10-26
 
+## Local-only backups via mongodump with host scheduling
+
+**Knowledge**
+
+- **Decision**: Back up the full MongoDB database with `mongodump` gzip archives and restore with `mongorestore --drop`. Archives stay on the local machine in `backend/storage/backups/` (host bind mount, not a Docker volume); there is no cloud/offsite copy. Daily creation is scheduled on the host (macOS launchd at 02:00; cron on Linux) rather than through ActiveJob.
+- **Rationale**: BSON archives preserve ObjectIds, embedded answers, indexes, and denormalized counters that a JSON export would lose or complicate. The app has no worker/queue, so host scheduling avoids introducing Sidekiq/Redis for one task. Local storage matches the explicit requirement.
+- **Safety**: A file lock serializes backup/restore; restores require `confirmation=RESTORE`, create a pre-restore snapshot, and are blocked in production unless `ALLOW_RESTORE_IN_PROD=true`. Restore is destructive (`--drop`) and MongoDB standalone has no multi-document transaction.
+- **Trade-off**: Local-only archives are lost with the machine/disk; retention (`BACKUP_RETENTION_COUNT`, default 30) bounds disk use. Archives contain password hashes and tokens, so they are treated as secrets.
+
+**Use When**
+
+Changing backup storage, scheduling, restore safety, or considering offsite/cloud backups.
+
+**Source**
+
+- `backend/app/services/backup_service.rb`
+- `backend/app/services/restore_service.rb`
+- `backend/app/services/backup_lock.rb`
+- `backend/lib/tasks/backup.rake`
+- `backend/Dockerfile`
+- `docker-compose.dev.yml`
+- `~/Library/LaunchAgents/com.prepcore.backup.plist`
+
+**Last Verified**
+
+2026-10-26
+
 ## Dependency upgrades performed to clear advisories
 
 **Knowledge**

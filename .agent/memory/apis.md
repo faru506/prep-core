@@ -94,8 +94,11 @@ All `/api/v1/admin/*` routes require an admin JWT (non-admin → `403 { error: "
 | Courses | `GET/POST /admin/courses`, `PATCH/DELETE /admin/courses/:id`, `POST /admin/courses/reorder` | `200` / `200` / `200` / `204` / `200` |
 | Topics | `GET/POST /admin/topics`, `PATCH/DELETE /admin/topics/:id`, `POST /admin/topics/reorder` | `200` / `200` / `200` / `204` / `200` |
 | Questions | `GET /admin/topics/:topic_id/questions`, `POST /admin/questions`, `PATCH/DELETE /admin/questions/:id`, `POST /admin/questions/reorder` | `200` / `200` / `200` / `204` / `200` |
+| Backups | `GET/POST /admin/backups`, `DELETE /admin/backups/:id`, `GET /admin/backups/:id/download`, `POST /admin/backups/restore` | `200` / `201` / `200` / `200` (gzip) / `200` |
 
 Create/update params are read directly from `params` (top-level keys such as `title`, `slug`, `level`, `answer`, `role`), not nested under a resource key. Reorder bodies: `{ course_ids }`, `{ topic_ids }`, or `{ question_ids, topic_id }` — each array must contain the complete ordered set, and positions are rewritten as `index + 1`.
+
+Backups are admin-only. `POST /admin/backups/restore` accepts either `filename` (existing archive) or multipart `file` (`.gz`) plus `confirmation=RESTORE`; missing confirmation → `422`, production without `ALLOW_RESTORE_IN_PROD=true` → `403`, concurrent operation → `409`. Download requires the `Authorization` header (a plain `window.open` will get `401`).
 
 Custom errors use `{ error: "..." }`; Devise's unauthenticated response is plain text `"You need to sign in or sign up before continuing."`.
 
