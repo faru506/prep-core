@@ -81,7 +81,7 @@ PrepCore currently provides two main experiences:
 - Devise
 - devise-jwt
 - Pundit
-- RSpec scaffolded for backend testing
+- RSpec request specs for auth, admin access, questions, bookmarks, and upvotes
 
 ### Infrastructure / Dev Environment
 
@@ -427,17 +427,16 @@ This runs:
 
 ### Tests
 
-Backend tests (Minitest):
+Backend tests (RSpec request specs in `backend/spec/requests/`):
 
 ```bash
-cd backend
-bundle exec rails test
+make test-backend
 ```
 
 Notes:
 
-- The CI `Rails Backend Tests` job runs `bundle exec rails test` with MongoDB; the repository currently has no `test/` directory and no specs, so the job reports `0 runs, 0 assertions`.
-- RSpec is installed but there are currently no RSpec examples in `backend/spec/`.
+- `make test-backend` runs RSpec in the backend container against the separate `prep_core_test` database. `spec/rails_helper.rb` purges the database before every example and aborts unless the database name ends in `_test`.
+- The CI `Rails Backend Tests` job runs `bundle exec rspec` against a `mongo:7` service.
 - No frontend test runner or CI lint step is configured at present.
 
 ## Known Gaps / Current Limitations

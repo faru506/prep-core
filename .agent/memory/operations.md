@@ -87,12 +87,12 @@ Configuring a new environment, debugging CORS preflight failures, or changing po
 
 `.github/workflows/ci.yml` runs on pushes to `main` and on pull requests, with four jobs:
 
-1. `backend_test` — starts a `mongo:7` service and runs `bundle exec rails test`.
+1. `backend_test` — starts a `mongo:7` service and runs `bundle exec rspec` (switched from `rails test` on 2026-11-20).
 2. `backend_security` — `bin/brakeman --no-pager` and `bin/bundler-audit`.
 3. `backend_lint` — `bin/rubocop -f github`.
 4. `frontend_ci` — `npm install` then `npm run build` (Node 20).
 
-There is no frontend lint job and no automated test job. See `testing.md` for why `backend_test` has no suite to run (the job log shows `0 runs, 0 assertions`). The frontend job uses `node-version: 20` and `npm install` even though `frontend/package-lock.json` is tracked; `npm run lint` is never run in CI. As of 2026-10-26 all four jobs pass; `backend/bin/brakeman` no longer passes `--ensure-latest`, and `bin/bundler-audit` is clean (placeholder ignore removed). The README was updated to reflect Minitest (`rails test`) and required env vars.
+There is no frontend lint job or frontend test job. See `testing.md` for the backend RSpec suite. The frontend job uses `node-version: 20` and `npm install` even though `frontend/package-lock.json` is tracked; `npm run lint` is never run in CI. As of 2026-10-26 all four jobs pass; `backend/bin/brakeman` no longer passes `--ensure-latest`, and `bin/bundler-audit` is clean (placeholder ignore removed). The README was updated to reflect Minitest (`rails test`) and required env vars.
 
 `backend/config/brakeman.ignore` now contains three reviewed false positives from the backup feature: two `Open3.capture3` command-injection warnings (backup and restore) and one `send_file` warning after strict filename validation/containment. Brakeman still reports "Ignored Warnings: 3" and exits 0; do not remove the entries without re-verifying the validation paths.
 

@@ -62,25 +62,24 @@ Changing dev ports, adding another origin (e.g. a LAN address), or debugging "bl
 
 2026-10-26
 
-## CI test job has no suite to run
+## iCloud-evicted files break Docker bind mounts
 
 **Knowledge**
 
-`.github/workflows/ci.yml` runs `bundle exec rails test`, but `backend/spec/` is empty, there is no `backend/test/`, and the test-unit railtie is not required. Do not interpret a green CI run as evidence of test coverage; conversely, do not assume the job actually behaves as intended.
+The repo lives under `~/Desktop`, which iCloud "Desktop & Documents" syncs. macOS evicts rarely-read files to the cloud (`ls -lO` shows `compressed,dataless`). The Docker bind mount (`./backend:/app`) cannot materialize them, so containers fail with `Errno::EIO` / `Input/output error` on files like `/app/.env`, `log/test.log`, or initializers (seen: Rails boot crash, RuboCop exit 2, "log writing failed. Resource deadlock avoided"). Reading the files on the host downloads them: `find . -path ./frontend/node_modules -prune -o -type f -print0 | xargs -0 cat > /dev/null`. Permanent fix is to move the repo outside iCloud-synced folders or mark it "Keep Downloaded".
 
 **Use When**
 
-Reporting verification status or modifying CI.
+Any container command fails with an I/O error on a file that exists on the host.
 
 **Source**
 
-- `.github/workflows/ci.yml`
-- `backend/config/application.rb`
-- `backend/spec/`
+- `docker-compose.dev.yml` (bind mounts)
+- `ls -lO backend/config/initializers`
 
 **Last Verified**
 
-2026-10-26
+2026-11-20
 
 ## Topic slugs are not unique
 

@@ -5,7 +5,7 @@ EXEC_FRONTEND = $(DC) exec frontend
 
 .PHONY: help start stop restart logs logs-backend logs-frontend rails migrate seed \
        questions-and-answers bash frontend build rebuild clean reset-db ps \
-       npm-install npm-add lint-frontend lint-backend lint
+       npm-install npm-add lint-frontend lint-backend lint test-backend
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -76,3 +76,6 @@ lint-backend: ## Run backend rubocop
 	$(EXEC_BACKEND) bundle exec rubocop
 
 lint: lint-frontend lint-backend ## Run both linters
+
+test-backend: ## Run backend RSpec suite against the isolated test database
+	$(DC) exec -e RAILS_ENV=test -e MONGODB_TEST_URI=mongodb://mongodb:27017/prep_core_test backend bundle exec rspec
