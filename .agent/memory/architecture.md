@@ -58,7 +58,7 @@ Authorization is split across three controller levels:
 - `Api::V1::BaseController` adds `before_action :authenticate_user!` for authenticated-user endpoints (`bookmarks`, `upvotes`).
 - `Api::V1::Admin::AdminController` adds both `authenticate_user!` and `authorize_admin!`.
 
-Public read endpoints are implemented by the **admin-namespaced** controllers (`admin/courses#index`, `admin/topics#index`, `admin/questions#index`) which `skip_before_action` both filters. Public routes in `config/routes.rb` point at those same controllers. Changing the filters on those controllers affects both public and admin behavior.
+Public read endpoints live in their own controllers (`Api::V1::CoursesController`, `TopicsController`, `QuestionsController`) that inherit `ApplicationController` directly, so they need no `skip_before_action`. Admin controllers have no auth skips; their `index` actions are admin-only and serve the Course Manager. The public and admin index actions are intentionally separate (duplicated today) so public reads can later be paginated/paywalled while admin keeps full content — see `decisions.md`.
 
 **Use When**
 
@@ -72,11 +72,12 @@ Editing controllers, adding endpoints, or debugging 401/403 responses.
 - `backend/app/controllers/api/v1/admin/courses_controller.rb`
 - `backend/app/controllers/api/v1/admin/topics_controller.rb`
 - `backend/app/controllers/api/v1/admin/questions_controller.rb`
+- `backend/app/controllers/api/v1/{courses,topics,questions}_controller.rb`
 - `backend/config/routes.rb`
 
 **Last Verified**
 
-2026-10-26
+2026-11-20
 
 ## Frontend route map
 

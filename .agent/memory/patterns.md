@@ -68,6 +68,7 @@ Adding fields to an API response or changing response shapes. Keep the admin and
 - `backend/app/controllers/api/v1/users/registrations_controller.rb#user_payload`
 - `backend/app/controllers/api/v1/users/sessions_controller.rb#user_payload`
 - `backend/app/controllers/api/v1/bookmarks_controller.rb`
+- `backend/app/controllers/api/v1/questions_controller.rb#index`
 - `backend/app/controllers/api/v1/admin/questions_controller.rb#index`
 
 **Last Verified**

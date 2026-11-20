@@ -28,12 +28,12 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :courses, only: [ :index ], controller: "admin/courses" do
-        resources :topics, only: [ :index ], controller: "admin/topics"
+      resources :courses, only: [ :index ] do
+        resources :topics, only: [ :index ]
       end
 
       resources :topics, only: [] do
-        resources :questions, only: [ :index ], controller: "admin/questions"
+        resources :questions, only: [ :index ]
       end
 
       resources :bookmarks, only: [ :index ]

@@ -1,7 +1,4 @@
 class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
-  skip_before_action :authenticate_user!, only: [ :index ]
-  skip_before_action :authorize_admin!, only: [ :index ]
-
   def create
     topic = Topic.find_by(id: params[:topic_id])
     return render json: { error: "Topic not found" }, status: :not_found unless topic

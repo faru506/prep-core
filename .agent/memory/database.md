@@ -92,7 +92,7 @@ Reviewing slow list endpoints, adding filters/sorts, or discussing index changes
 
 - `backend/app/models/question.rb`
 - `backend/app/models/user.rb`
-- `backend/app/controllers/api/v1/admin/questions_controller.rb#index`
+- `backend/app/controllers/api/v1/questions_controller.rb#index`
 
 **Last Verified**
 

@@ -180,3 +180,23 @@ Reviewing the lockfile, planning further upgrades, or explaining why Puma is on 
 **Last Verified**
 
 2026-10-26
+
+## Public reads and admin reads are separate controllers
+
+**Knowledge**
+
+Public content reads (`/api/v1/courses`, `/courses/:course_id/topics`, `/topics/:topic_id/questions`) moved out of the admin controllers into `Api::V1::{Courses,Topics,Questions}Controller`. The admin `index` actions were kept and now require admin auth, rather than pointing the Course Manager at the public endpoints. Rationale (user choice): once premium/paywalled content exists, public reads will be gated while admins must still see full content and all questions; the two are expected to diverge, so the current duplication of index logic is accepted.
+
+**Use When**
+
+Adding paywall/visibility rules, changing listing payloads, or tempted to "dedupe" public and admin index actions.
+
+**Source**
+
+- `backend/app/controllers/api/v1/questions_controller.rb`
+- `backend/app/controllers/api/v1/admin/questions_controller.rb`
+- `backend/config/routes.rb`
+
+**Last Verified**
+
+2026-11-20

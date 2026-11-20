@@ -36,7 +36,7 @@ Implementing login/logout/signup or debugging 401s on protected calls.
 - `GET /api/v1/courses/:course_id/topics` → `200`, array of `{ id, title, slug, level }`, ordered by `position`. `:course_id` accepts either a BSON ObjectId or the course **slug**; unknown values raise `Mongoid::Errors::DocumentNotFound`.
 - `GET /api/v1/topics/:topic_id/questions` → `200` with `{ questions: [...], meta: { current_page, per_page, total_pages, total_count } }`. Query params: `level` (`low|medium|hard`, ignored when invalid), `sort=upvotes`, `page` (min 1), `per_page` (default 10, clamped to 1..50). Each question includes `id, title, answer, level, topic_id, upvote_count, bookmarked_by_current_user, upvoted_by_current_user`. Missing topic → `404 { error: "Topic not found" }`.
 
-These routes are handled by admin-namespaced controllers with authentication skipped, but per-user booleans still resolve when a valid token is sent.
+These routes are handled by public controllers (`Api::V1::CoursesController`, `TopicsController`, `QuestionsController`, all `< ApplicationController`, no auth filter); per-user booleans still resolve when a valid token is sent. The admin `index` actions (`/admin/courses`, `/admin/topics?course_id=`, `/admin/topics/:topic_id/questions`) return the same shapes but require an admin token (since 2026-11-20); the Course Manager uses them.
 
 **Use When**
 
@@ -44,9 +44,10 @@ Tracing how the public site loads content, or changing pagination/filtering.
 
 **Source**
 
-- `backend/app/controllers/api/v1/admin/courses_controller.rb#index`
-- `backend/app/controllers/api/v1/admin/topics_controller.rb#index`
-- `backend/app/controllers/api/v1/admin/questions_controller.rb#index`
+- `backend/app/controllers/api/v1/courses_controller.rb#index`
+- `backend/app/controllers/api/v1/topics_controller.rb#index`
+- `backend/app/controllers/api/v1/questions_controller.rb#index`
+- `backend/spec/requests/content_spec.rb`, `questions_spec.rb`
 - `frontend/src/apis/content.js`
 
 **Last Verified**

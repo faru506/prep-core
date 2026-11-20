@@ -102,27 +102,6 @@ Working on topic creation/updating, slug generation, or deep-link resolution.
 
 2026-10-26
 
-## Public endpoints are implemented in admin controllers
-
-**Knowledge**
-
-`/api/v1/courses`, `/api/v1/courses/:course_id/topics`, and `/api/v1/topics/:topic_id/questions` are routed to `Api::V1::Admin::*Controller#index`, which `skip_before_action` both authentication and admin authorization. Editing those skip lines, or adding a new public action to those controllers, can accidentally expose admin behavior or break public browsing.
-
-**Use When**
-
-Touching admin controllers or adding read endpoints.
-
-**Source**
-
-- `backend/config/routes.rb`
-- `backend/app/controllers/api/v1/admin/courses_controller.rb`
-- `backend/app/controllers/api/v1/admin/topics_controller.rb`
-- `backend/app/controllers/api/v1/admin/questions_controller.rb`
-
-**Last Verified**
-
-2026-10-26
-
 ## `make migrate` does not apply here
 
 **Knowledge**

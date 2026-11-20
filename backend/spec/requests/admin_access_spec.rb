@@ -23,6 +23,22 @@ RSpec.describe "Admin access", type: :request do
     expect(Course.count).to eq(0)
   end
 
+  it "keeps admin content reads admin-only" do
+    topic = create(:topic)
+
+    [ "/api/v1/admin/courses", "/api/v1/admin/topics?course_id=#{topic.course_id}",
+      "/api/v1/admin/topics/#{topic.id}/questions" ].each do |path|
+      get path, headers: { "Accept" => "application/json" }
+      expect(response).to have_http_status(:unauthorized), path
+
+      get path, headers: auth_headers_for(user)
+      expect(response).to have_http_status(:forbidden), path
+
+      get path, headers: auth_headers_for(admin)
+      expect(response).to have_http_status(:ok), path
+    end
+  end
+
   it "lets admins list users without exposing password fields" do
     get "/api/v1/admin/users", headers: auth_headers_for(admin)
 

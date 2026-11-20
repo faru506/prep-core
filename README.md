@@ -131,6 +131,8 @@ Backend routes are defined in [backend/config/routes.rb](./backend/config/routes
 
 #### Public Read APIs
 
+No token required (an optional token adds per-user bookmark/upvote flags), except `GET /api/v1/bookmarks`, which needs a signed-in user.
+
 - `GET /api/v1/courses`
 - `GET /api/v1/courses/:course_id/topics`
 - `GET /api/v1/topics/:topic_id/questions`
@@ -144,6 +146,8 @@ Backend routes are defined in [backend/config/routes.rb](./backend/config/routes
 - `DELETE /api/v1/questions/:question_id/upvote`
 
 #### Admin APIs
+
+Every admin endpoint, including the `GET` listings used by the Course Manager, requires an admin JWT. The public site reads content only through the Public Read APIs above.
 
 - `GET/POST/PATCH/DELETE /api/v1/admin/users`
 - `GET/POST/PATCH/DELETE /api/v1/admin/courses`
