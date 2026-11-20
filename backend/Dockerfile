@@ -1,4 +1,4 @@
-FROM ruby:3.4.1
+FROM ruby:3.4.13
 
 # Install dependencies
 RUN apt-get update -qq && \

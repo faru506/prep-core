@@ -74,7 +74,7 @@ PrepCore currently provides two main experiences:
 
 ### Backend
 
-- Ruby 3.4.1
+- Ruby 3.4.13
 - Rails 8.1.x API
 - MongoDB 7
 - Mongoid
@@ -219,7 +219,7 @@ Optional if you want to run things outside Docker:
 
 - Node.js 20+
 - npm
-- Ruby 3.4.1
+- Ruby 3.4.13
 - Bundler
 - MongoDB 7
 

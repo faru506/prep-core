@@ -20,7 +20,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.1
+          ruby-version: 3.4.13
           bundler-cache: true
       - name: Install dependencies
         working-directory: backend
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.1
+          ruby-version: 3.4.13
           bundler-cache: true
       - name: Install dependencies
         working-directory: backend
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.1
+          ruby-version: 3.4.13
           bundler-cache: true
       - name: Install dependencies
         working-directory: backend

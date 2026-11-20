@@ -350,3 +350,23 @@ Touching reorder endpoints or debugging duplicate/gapped positions. Validate the
 **Last Verified**
 
 2026-10-26
+
+## Newer GitHub runners only ship the latest Ruby patch
+
+**Knowledge**
+
+`ubuntu-latest` moved to Ubuntu 26.04, where `ruby/setup-ruby` only provides the newest patch of each Ruby series. With `ruby-version: 3.4.1` every Ruby CI job failed at "Setup Ruby" (`Unavailable version 3.4.1 for ruby on ubuntu-26.04`) before running anything. Ruby is pinned in four places that must move together: `backend/Gemfile` (`ruby "x"`), `backend/Gemfile.lock` (`RUBY VERSION`), `backend/.ruby-version`, `backend/Dockerfile` (`FROM ruby:x`), plus `ruby-version:` in `.github/workflows/ci.yml` (3 jobs). Upgraded to 3.4.13 on 2026-11-20; rebuild the backend image (`docker compose -f docker-compose.dev.yml build backend`) after changing it.
+
+**Use When**
+
+CI fails at "Setup Ruby", or when bumping the Ruby version.
+
+**Source**
+
+- `.github/workflows/ci.yml`
+- `backend/Gemfile`, `backend/Gemfile.lock`, `backend/.ruby-version`, `backend/Dockerfile`
+
+**Last Verified**
+
+2026-11-20
+
