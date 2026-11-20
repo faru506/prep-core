@@ -185,7 +185,7 @@ Reviewing the lockfile, planning further upgrades, or explaining why Puma is on 
 
 **Knowledge**
 
-Public content reads (`/api/v1/courses`, `/courses/:course_id/topics`, `/topics/:topic_id/questions`) moved out of the admin controllers into `Api::V1::{Courses,Topics,Questions}Controller`. The admin `index` actions were kept and now require admin auth, rather than pointing the Course Manager at the public endpoints. Rationale (user choice): once premium/paywalled content exists, public reads will be gated while admins must still see full content and all questions; the two are expected to diverge, so the current duplication of index logic is accepted.
+Public content reads (`/api/v1/courses`, `/courses/:course_id/topics`, `/topics/:topic_id/questions`) moved out of the admin controllers into `Api::V1::{Courses,Topics,Questions}Controller`. The admin `index` actions were kept and now require admin auth, rather than pointing the Course Manager at the public endpoints. Rationale (user choice): once premium/paywalled content exists, public reads will be gated while admins must still see full content and all questions; the two are expected to diverge, so the duplication is accepted. They already diverge: the admin questions index returns every question unpaginated.
 
 **Use When**
 

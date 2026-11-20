@@ -39,6 +39,17 @@ RSpec.describe "Admin access", type: :request do
     end
   end
 
+  it "gives admins every question in a topic, in position order, without pagination" do
+    topic = create(:topic)
+    create_list(:question, 12, topic: topic)
+
+    get "/api/v1/admin/topics/#{topic.id}/questions", headers: auth_headers_for(admin)
+
+    positions = json["questions"].map { |q| Question.find(q["id"]).position }
+    expect(json["questions"].size).to eq(12)
+    expect(positions).to eq(positions.sort)
+  end
+
   it "lets admins list users without exposing password fields" do
     get "/api/v1/admin/users", headers: auth_headers_for(admin)
 
