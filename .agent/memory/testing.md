@@ -40,7 +40,7 @@ Available checks and their last known results (2026-10-26):
 - `npm run build` (frontend): production Vite build succeeds.
 - `bin/brakeman --no-pager` → 0 warnings, exit 0.
 - `bin/bundler-audit` → `No vulnerabilities found` (2026-11-20, after a conservative update: Rails 8.1.4.1, rack 3.2.8, puma 7.2.3, nokogiri 1.19.7, loofah 2.25.3, mongoid 9.0.13, msgpack 1.8.7, rails-html-sanitizer 1.7.2). Advisories reappear as the lockfile ages; see `pitfalls.md`.
-- `make test-backend` → 24 examples, 0 failures (2026-11-20).
+- `make test-backend` → 38 examples, 0 failures (2026-11-20).
 - End-to-end API verification (signup/login/courses/topics/questions/upvote/bookmark/admin/unauth/reorder) is recorded in `DEEP_REVIEW_REPORT.md`; it is a manual curl-based run, not an automated suite.
 
 **Use When**

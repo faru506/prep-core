@@ -54,6 +54,6 @@ RSpec.describe "Admin access", type: :request do
     get "/api/v1/admin/users", headers: auth_headers_for(admin)
 
     expect(response).to have_http_status(:ok)
-    expect(json.first.keys).to contain_exactly("id", "first_name", "last_name", "email", "role")
+    expect(json.first.keys).to contain_exactly("id", "first_name", "last_name", "email", "role", "premium_until")
   end
 end

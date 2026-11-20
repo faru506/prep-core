@@ -55,7 +55,8 @@ Changing interaction endpoints, counters, bookmark grouping, or cascade behavior
 
 - Public (no token): list courses, topics, questions.
 - Authenticated user: read own bookmarks, create/delete own bookmark and upvote.
-- Admin: all `/api/v1/admin/*` management plus reordering.
+- Admin: all `/api/v1/admin/*` management plus reordering; admins also count as premium.
+- Premium answers: see "Premium content" below.
 
 **Use When**
 
@@ -70,3 +71,27 @@ Adding an endpoint or deciding which guard it needs. Never rely on the frontend 
 **Last Verified**
 
 2026-10-26
+
+## Premium content
+
+**Knowledge**
+
+`Question#premium` (Boolean, default false) marks premium questions. `User#premium_until` (Time) grants premium access; `User#premium?` is true for admins or when `premium_until` is in the future (expiry is automatic, no job). `Question#locked_for?(user)` / `Question#answer_for(user)` are the single gating point: locked questions keep title/level/upvotes but return `answer: nil` plus `premium`/`locked` flags. Both `Api::V1::QuestionsController#index` and `BookmarksController` (serialized questions) use them, so new payloads that expose answers must call `answer_for(current_user)`. Admin endpoints always return full answers. Admins set `premium` via admin question create/update (update leaves it unchanged when the param is omitted) and `premium_until` via `PATCH /admin/users/:id` (null clears it). Sign-up ignores `premium_until` (Devise sanitizer only permits names). Payments are not implemented; they should set `premium_until`.
+
+**Use When**
+
+Adding a paywall, payments, new endpoints that return answers, or changing who can see premium content.
+
+**Source**
+
+- `backend/app/models/question.rb#locked_for?`, `#answer_for`
+- `backend/app/models/user.rb#premium?`
+- `backend/app/controllers/api/v1/questions_controller.rb`, `bookmarks_controller.rb`
+- `backend/app/controllers/api/v1/admin/questions_controller.rb`, `admin/users_controller.rb`
+- `frontend/src/components/QuestionCards.jsx` (locked card), `components/Modal/UserModal.jsx`
+- `backend/spec/requests/premium_spec.rb`
+
+**Last Verified**
+
+2026-11-20
+

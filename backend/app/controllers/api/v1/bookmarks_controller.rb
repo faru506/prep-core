@@ -101,8 +101,10 @@ class Api::V1::BookmarksController < Api::V1::BaseController
         {
           id: question.id.to_s,
           title: question.title,
-          answer: question.answer&.content,
+          answer: question.answer_for(current_user),
           level: question.level,
+          premium: question.premium?,
+          locked: question.locked_for?(current_user),
           topic_id: question.topic_id.to_s,
           upvote_count: question.upvote_count.to_i,
           bookmarked_by_current_user: true,

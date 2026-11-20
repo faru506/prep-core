@@ -64,6 +64,12 @@ const SortableQuestion = ({
               {question.title}
             </span>
 
+            {question.premium && (
+              <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                Premium
+              </span>
+            )}
+
           </div>
 
           <div className="flex items-center gap-1 shrink-0">

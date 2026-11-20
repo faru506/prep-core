@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUp, Bookmark } from "lucide-react";
+import { ArrowUp, Bookmark, Lock } from "lucide-react";
 
 import MarkdownPreview from "./Editor/MarkdownPreview";
 import { getQuestionNumberBgClasses } from "../utilities/levels";
@@ -32,6 +32,12 @@ const QuestionCard = React.memo(({
             <h2 className="text-lg md:text-xl font-bold text-slate-100 leading-tight transition-colors duration-300 group-hover:text-white">
               {question.title}
             </h2>
+            {question.premium && (
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                <Lock className="h-3 w-3" />
+                Premium
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -90,7 +96,14 @@ const QuestionCard = React.memo(({
               </div>
 
                 <div className="flex-1 relative pl-1">
-                  <MarkdownPreview content={question.answer || ""} className="leading-relaxed" />
+                  {question.locked ? (
+                    <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
+                      <Lock className="h-4 w-4 shrink-0" />
+                      This answer is available to premium members.
+                    </div>
+                  ) : (
+                    <MarkdownPreview content={question.answer || ""} className="leading-relaxed" />
+                  )}
                 </div>
             </div>
           </div>

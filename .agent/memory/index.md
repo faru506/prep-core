@@ -15,7 +15,7 @@ Use this file before non-trivial work to route to only the memory files relevant
 
 Current topics:
 - Monorepo topology, JWT auth flow, and frontend route map are documented in `architecture.md`.
-- Content hierarchy, engagement rules, and roles are documented in `domain.md`.
+- Content hierarchy, engagement rules, roles, and premium content gating are documented in `domain.md`.
 - API client, ordering, and controller conventions are documented in `patterns.md`.
 - Collections, indexes, and denormalized counters are documented in `database.md`.
 - Endpoint contracts and status codes are documented in `apis.md`.

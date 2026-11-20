@@ -41,8 +41,10 @@ class Api::V1::QuestionsController < ApplicationController
         {
           id: q.id.to_s,
           title: q.title,
-          answer: q.answer&.content,
+          answer: q.answer_for(current_user),
           level: q.level,
+          premium: q.premium?,
+          locked: q.locked_for?(current_user),
           topic_id: q.topic_id.to_s,
           upvote_count: q.upvote_count.to_i,
           bookmarked_by_current_user: bookmarked_ids.include?(q.id.to_s),

@@ -40,7 +40,8 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
       :first_name,
       :last_name,
       :email,
-      :password
+      :password,
+      :premium_until
     )
   end
 
@@ -50,7 +51,8 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
         :first_name,
         :last_name,
         :email,
-        :password
+        :password,
+        :premium_until
       )
 
     permitted.delete(:password) if permitted[:password].blank?
@@ -63,7 +65,8 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::AdminController
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      premium_until: user.premium_until&.iso8601
     }
   end
 end

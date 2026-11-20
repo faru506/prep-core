@@ -9,6 +9,7 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     question = topic.questions.create!(
       title: params[:title],
       level: params[:level],
+      premium: ActiveModel::Type::Boolean.new.cast(params[:premium]) || false,
       position: next_position
     )
 
@@ -22,7 +23,8 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
       id: question.id.to_s,
       title: question.title,
       answer: question.answer&.content,
-      level: question.level
+      level: question.level,
+      premium: question.premium?
     }
   end
 
@@ -30,10 +32,9 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
     question = Question.find_by(id: params[:id])
     return render json: { error: "Question not found" }, status: :not_found unless question
 
-    question.update!(
-      title: params[:title],
-      level: params[:level]
-    )
+    question.assign_attributes(title: params[:title], level: params[:level])
+    question.premium = ActiveModel::Type::Boolean.new.cast(params[:premium]) if params.key?(:premium)
+    question.save!
 
     if question.answer.present?
       question.answer.update!(content: params[:answer])
@@ -46,7 +47,8 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
       id: question.id.to_s,
       title: question.title,
       answer: question.answer&.content,
-      level: question.level
+      level: question.level,
+      premium: question.premium?
     }
   end
 
@@ -79,6 +81,7 @@ class Api::V1::Admin::QuestionsController < Api::V1::Admin::AdminController
           title: q.title,
           answer: q.answer&.content,
           level: q.level,
+          premium: q.premium?,
           topic_id: q.topic_id.to_s
         }
       }

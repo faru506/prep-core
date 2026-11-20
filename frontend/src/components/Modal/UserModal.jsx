@@ -23,6 +23,7 @@ const UserModal = ({
     last_name: user?.last_name || "",
     email: user?.email || "",
     role: user?.role || "user",
+    premium_until: user?.premium_until?.slice(0, 10) || "",
     password: ""
   });
   const [error, setError] = useState("");
@@ -50,7 +51,8 @@ const UserModal = ({
         first_name: form.first_name,
         last_name: form.last_name,
         email: form.email,
-        role: form.role
+        role: form.role,
+        premium_until: form.premium_until || null
       };
 
       if (!isEdit || form.password.trim()) {
@@ -163,6 +165,17 @@ const UserModal = ({
           </div>
 
         </div>
+
+        <label className="flex flex-col gap-2 text-sm text-slate-300">
+          Premium until (leave empty for a free account)
+          <input
+            name="premium_until"
+            type="date"
+            value={form.premium_until}
+            onChange={handleChange}
+            className="rounded-xl border border-slate-700 bg-slate-800/90 p-3 text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+          />
+        </label>
 
         {error && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">

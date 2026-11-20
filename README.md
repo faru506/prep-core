@@ -37,6 +37,7 @@ PrepCore currently provides two main experiences:
   - `Hard`
   - `Upvote`
 - Bookmark toggle on questions
+- Premium questions: titles are public, answers are locked for non-premium users
 - Upvote toggle on questions
 - Bookmarked Items page for authenticated users
 - Syntax-highlighted answer rendering
@@ -132,6 +133,8 @@ Backend routes are defined in [backend/config/routes.rb](./backend/config/routes
 #### Public Read APIs
 
 No token required (an optional token adds per-user bookmark/upvote flags), except `GET /api/v1/bookmarks`, which needs a signed-in user.
+
+Questions carry `premium` and `locked` flags. When `locked` is true (a premium question and the caller is not a premium user or admin), `answer` is `null`; this applies to both question listings and bookmarks. Admins set a question's `premium` flag in the Course Manager and a user's `premium_until` date on the Users page.
 
 - `GET /api/v1/courses`
 - `GET /api/v1/courses/:course_id/topics`

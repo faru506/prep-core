@@ -16,6 +16,7 @@ const CreateQuestionModal = ({
   const [title, setTitle] = useState("");
   const [answer, setAnswer] = useState("");
   const [level, setLevel] = useState("medium");
+  const [premium, setPremium] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -33,7 +34,8 @@ const CreateQuestionModal = ({
         topic_id: topic.id,
         title,
         answer,
-        level
+        level,
+        premium
       });
 
       if (!response.ok) {
@@ -118,6 +120,18 @@ const CreateQuestionModal = ({
             </option>
           ))}
         </select>
+
+        <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800/90 p-3 text-sm text-slate-200">
+          <input
+            type="checkbox"
+            checked={premium}
+            onChange={(e) =>
+              setPremium(e.target.checked)
+            }
+            className="h-4 w-4 accent-amber-400"
+          />
+          Premium (answer visible only to premium users)
+        </label>
 
         <MarkdownEditor
           value={answer}

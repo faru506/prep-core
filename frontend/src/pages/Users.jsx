@@ -7,6 +7,9 @@ import ActionIconButton from "../components/Sortable/ActionIconButton";
 import ConfirmDialog from "../components/Modal/ConfirmDialog";
 import UserModal from "../components/Modal/UserModal";
 
+const isPremiumUser = (user) =>
+  Boolean(user.premium_until) && new Date(user.premium_until) > new Date();
+
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -258,6 +261,11 @@ const Users = () => {
                         <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${user.role === "admin" ? "bg-indigo-400" : "bg-green-400"}`}></span>
                         {user.role}
                       </span>
+                      {isPremiumUser(user) && (
+                        <span className="ml-2 inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full border bg-amber-500/10 text-amber-300 border-amber-500/20">
+                          premium
+                        </span>
+                      )}
                     </td>
 
                     <td className="px-4 md:px-6 py-4">

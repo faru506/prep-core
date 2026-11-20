@@ -20,6 +20,7 @@ class User
   field :last_name,          type: String, default: ""
   field :email,              type: String, default: ""
   field :role,               type: String, default: "user"
+  field :premium_until,      type: Time
   field :encrypted_password, type: String, default: ""
 
   field :jti, type: String, default: -> { SecureRandom.uuid }
@@ -57,6 +58,10 @@ class User
 
   def user?
     role == "user"
+  end
+
+  def premium?
+    admin? || premium_until&.future? || false
   end
 
   def jwt_payload
